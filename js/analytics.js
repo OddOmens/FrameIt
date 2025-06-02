@@ -12,15 +12,15 @@ window.Analytics = {
 
     // State
     state: {
-        isInitialized: false,
         user: null,
+        initialized: false,
         userProfile: null,
         profileLoaded: false
     },
 
     // Initialize analytics
     async init() {
-        if (this.state.isInitialized) return;
+        if (this.state.initialized) return;
 
         try {
             // Get current user if authenticated
@@ -57,7 +57,7 @@ window.Analytics = {
                 }
             }
             
-            this.state.isInitialized = true;
+            this.state.initialized = true;
             
             if (this.config.debugMode) {
                 console.log('📊 Analytics initialized', this.state);
@@ -94,57 +94,48 @@ window.Analytics = {
         console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
         console.log('📊 Analytics user:', this.state.user);
         
-        if (!this.state.user) {
+        // Try to get user from Auth module directly if not in analytics state
+        let currentUser = this.state.user;
+        if (!currentUser) {
             console.log('📊 No user in analytics state - trying to get from Auth module...');
             
-            // Try to get user from Auth module directly
             const authUser = window.Auth?.getCurrentUser();
             if (authUser) {
                 console.log('📊 Found user in Auth module, updating analytics state:', authUser.id);
                 this.state.user = authUser;
+                currentUser = authUser;
             } else {
                 console.log('📊 No user found in Auth module either - skipping upload tracking');
-                return;
+                return { success: false, reason: 'No user logged in' };
             }
         }
 
-        console.log('📊 User found:', this.state.user.id);
+        console.log('📊 User found:', currentUser.id);
 
         try {
             const supabase = this.getSupabase();
             if (!supabase) {
                 console.error('📊 Supabase not available for upload tracking');
-                return;
+                return { success: false, reason: 'Supabase not available' };
             }
 
-            console.log('📊 Calling increment_upload_count with user_id:', this.state.user.id);
+            console.log('📊 Calling increment_upload_count with user_id:', currentUser.id);
             
             const { data, error } = await supabase.rpc('increment_upload_count', {
-                user_id: this.state.user.id
+                user_id: currentUser.id
             });
 
             if (error) {
                 console.error('📊 Upload tracking error:', error);
-                console.error('📊 Error details:', {
-                    message: error.message,
-                    code: error.code,
-                    details: error.details,
-                    hint: error.hint
-                });
-                return;
+                throw error;
             }
 
-            console.log('📊 Upload tracking response:', data);
-            
-            if (this.config.debugMode) {
-                console.log('📊 Image upload tracked successfully');
-            }
+            console.log('📊 Upload tracked successfully:', data);
+            return { success: true, data: data };
+
         } catch (error) {
-            console.error('📊 Failed to track image upload:', error);
-            console.error('📊 Upload tracking exception:', {
-                message: error.message,
-                stack: error.stack
-            });
+            console.error('📊 Failed to track upload:', error);
+            return { success: false, error: error.message };
         }
     },
 

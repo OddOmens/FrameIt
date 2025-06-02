@@ -369,23 +369,37 @@ window.App = {
                 // Use a proper async loop instead of forEach
                 for (let index = 0; index < files.length; index++) {
                     try {
+                        // Check if Analytics is available and properly initialized
                         if (window.Analytics && window.Analytics.trackImageUpload) {
                             console.log(`📊 Tracking upload ${index + 1} of ${files.length}`);
                             console.log(`📊 About to call trackImageUpload for file ${index + 1}`);
                             
+                            // Ensure Analytics is initialized
+                            if (!window.Analytics.state || !window.Analytics.state.initialized) {
+                                console.log('📊 Analytics not initialized, initializing now...');
+                                await window.Analytics.init();
+                            }
+                            
                             const result = await window.Analytics.trackImageUpload();
-                            console.log(`📊 Upload ${index + 1} tracked successfully:`, result);
+                            
+                            if (result && result.success) {
+                                console.log(`📊 Upload ${index + 1} tracked successfully:`, result);
+                            } else {
+                                console.log(`📊 Upload ${index + 1} tracking failed:`, result);
+                            }
                         } else {
                             console.log(`📊 Analytics or trackImageUpload not available:`, {
                                 analyticsExists: !!window.Analytics,
-                                trackImageUploadExists: !!(window.Analytics && window.Analytics.trackImageUpload)
+                                trackImageUploadExists: !!(window.Analytics && window.Analytics.trackImageUpload),
+                                analyticsInitialized: window.Analytics?.state?.initialized
                             });
                         }
                     } catch (analyticsError) {
                         console.error(`📊 Failed to track upload ${index + 1}:`, analyticsError);
                         console.error(`📊 Upload tracking error details:`, {
                             message: analyticsError.message,
-                            stack: analyticsError.stack
+                            stack: analyticsError.stack,
+                            analyticsState: window.Analytics?.state
                         });
                     }
                 }
@@ -1172,41 +1186,67 @@ window.App = {
     
     // Create a new canvas
     createNewCanvas() {
-        // Save current canvas first
-        this.addCurrentCanvasToGallery();
+        console.log('🎨 Creating new canvas...');
+        
+        // Save current canvas first (if it exists and has content)
+        if (this.state.selectedImage || this.state.textLayers.length > 0) {
+            this.addCurrentCanvasToGallery();
+        }
+        
+        // Generate new canvas ID
+        const newCanvasId = `canvas_${Date.now()}`;
+        console.log('🎨 New canvas ID:', newCanvasId);
         
         // Reset to default state
         this.state.selectedImage = null;
         this.state.textLayers = [];
         this.state.selectedTextLayerId = null;
-        this.state.currentCanvasId = `canvas_${Date.now()}`;
-        this.state.selectedCanvasId = this.state.currentCanvasId;
+        this.state.currentCanvasId = newCanvasId;
+        this.state.selectedCanvasId = newCanvasId;
         
         // Reset all settings to defaults
         this.resetUIToDefaults();
         
+        // Create and add the new empty canvas to the gallery immediately
+        const newCanvas = {
+            id: newCanvasId,
+            date: new Date().toISOString(),
+            image: null,
+            settings: this.getCurrentSettings(),
+            textLayers: [],
+            isCurrentCanvas: true
+        };
+        
+        // Add to canvases array at the beginning
+        this.state.canvases.unshift(newCanvas);
+        
         // Show upload prompt
-        document.getElementById('image-drop-zone').classList.remove('hidden');
+        const dropZone = document.getElementById('image-drop-zone');
+        if (dropZone) {
+            dropZone.classList.remove('hidden');
+        }
         
         // Render empty canvas
         this.renderPreview();
         
-        // Update gallery
-        UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
+        // Update gallery immediately to show the new canvas
+        if (window.UI && window.UI.renderGallery) {
+            window.UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
+        }
         
-        // Track canvas creation analytics
+        // Track canvas creation analytics with a small delay to ensure everything is set up
         setTimeout(async () => {
             try {
                 if (window.Analytics && window.Analytics.trackCanvasCreated) {
-                    await window.Analytics.trackCanvasCreated();
-                    console.log('📊 Manual canvas creation tracked successfully');
+                    const result = await window.Analytics.trackCanvasCreated();
+                    console.log('📊 Manual canvas creation tracked successfully:', result);
                 }
             } catch (analyticsError) {
                 console.error('📊 Failed to track manual canvas creation:', analyticsError);
             }
         }, 100);
         
-        console.log('New canvas created');
+        console.log('✅ New canvas created successfully');
     },
     
     // Reset UI to default values
