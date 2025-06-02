@@ -741,33 +741,42 @@ window.UI = {
     
     // Setup shadow position control
     setupShadowPositionControl() {
-        if (!this.elements.shadowPositionGrid || !this.elements.shadowPositionHandle) return;
+        console.log('Setting up shadow position control...');
+        console.log('shadowPositionGrid:', this.elements.shadowPositionGrid);
+        console.log('shadowPositionHandle:', this.elements.shadowPositionHandle);
         
+        if (!this.elements.shadowPositionGrid || !this.elements.shadowPositionHandle) {
+            console.warn('Shadow position elements not found!');
+            return;
+        }
+
         // Handle click on grid
         this.elements.shadowPositionGrid.addEventListener('mousedown', (e) => {
+            console.log('Shadow grid mousedown');
             // Get position relative to grid
             const rect = this.elements.shadowPositionGrid.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
+
             // Convert to percentage and then to offset values (-50 to 50)
             const xPercent = x / rect.width;
             const yPercent = y / rect.height;
             const offsetX = Math.round((xPercent - 0.5) * 100);
             const offsetY = Math.round((yPercent - 0.5) * 100);
-            
+
             // Update handle position
             this.updateShadowHandlePosition(xPercent, yPercent);
-            
+
             // Update the application state
             window.App.setShadowOffset(offsetX, offsetY);
-            
+
             // Start dragging
             this.startShadowHandleDrag();
         });
-        
+
         // Initialize handle position
         this.updateShadowHandleFromState();
+        console.log('Shadow position control setup complete');
     },
     
     // Update shadow handle position based on current app state

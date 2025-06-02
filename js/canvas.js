@@ -759,9 +759,21 @@ window.CanvasRenderer = {
             overlay.zIndex = overlay.isInFront ? 10 : 0;
         }
         
-        // Calculate position from normalized coordinates
-        const x = width * overlay.position.x;
-        const y = height * overlay.position.y;
+        // Handle both old format (x, y) and new format (position.x, position.y)
+        let x, y;
+        if (overlay.position && typeof overlay.position.x !== 'undefined') {
+            // New format: normalized coordinates (0-1)
+            x = width * overlay.position.x;
+            y = height * overlay.position.y;
+        } else if (typeof overlay.x !== 'undefined' && typeof overlay.y !== 'undefined') {
+            // Old format: absolute coordinates - convert to normalized
+            x = overlay.x;
+            y = overlay.y;
+        } else {
+            // Fallback to center if no position data
+            x = width * 0.5;
+            y = height * 0.5;
+        }
         
         // Setup text style
         this.ctx.save();

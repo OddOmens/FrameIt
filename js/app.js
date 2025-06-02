@@ -790,14 +790,17 @@ window.App = {
         const textLayer = {
             id: id,
             text: text,
-            x: options.x || 50,
-            y: options.y || 50,
+            position: {
+                x: options.x || 0.5,  // Default to center
+                y: options.y || 0.5   // Default to center
+            },
             fontSize: options.fontSize || 24,
             fontFamily: options.fontFamily || 'Arial',
             color: options.color || '#FFFFFF',
             fontWeight: options.fontWeight || 'normal',
             fontStyle: options.fontStyle || 'normal',
-            textAlign: options.textAlign || 'left',
+            textAlign: options.textAlign || 'center',
+            align: options.align || 'center',  // For canvas rendering
             visible: true,
             shadow: false,
             shadowColor: '#000000',
@@ -813,12 +816,13 @@ window.App = {
             letterSpacing: 0,
             lineHeight: 1.2,
             textDecoration: 'none',
-            textTransform: 'none'
+            textTransform: 'none',
+            zIndex: 10  // Default to front
         };
-        
+
         this.state.textLayers.push(textLayer);
         this.state.selectedTextLayerId = id;
-        
+
         // Track text layer addition analytics
         if (window.Analytics && window.Analytics.trackTextAdded) {
             window.Analytics.trackTextAdded({
@@ -827,13 +831,13 @@ window.App = {
                 text: textLayer.text
             });
         }
-        
+
         // Render with new text layer
         this.renderPreview();
-        
+
         // Update text layers UI
         UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
-        
+
         return id;
     },
     
@@ -920,9 +924,9 @@ window.App = {
     duplicateTextLayer(id) {
         const textLayer = this.getTextLayerById(id);
         if (!textLayer) return;
-        
+
         this.saveStateForUndo();
-        
+
         // Create a duplicate with a new ID and slightly offset position
         const newLayer = {
             ...textLayer,
@@ -932,13 +936,13 @@ window.App = {
                 y: Math.min(1, textLayer.position.y + 0.05)
             }
         };
-        
+
         // Add to state
         this.state.textLayers.push(newLayer);
-        
+
         // Select the new layer
         this.selectTextLayer(newLayer.id);
-        
+
         // Render the preview
         this.renderPreview();
     },
