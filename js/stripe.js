@@ -47,39 +47,50 @@ window.StripeManager = {
         }
     },
     
-    // Initialize Stripe
+    // Initialize Stripe manager
     async init() {
-        console.log('💳 Initializing Stripe...');
-        
         try {
-            // Get Supabase instance from Auth module
-            if (window.Auth && window.Auth.supabase) {
-                this.supabase = window.Auth.supabase;
-            } else {
+            if (!window.supabase) {
                 console.error('❌ Supabase not available');
-                return false;
+                return;
             }
             
-            // Initialize Stripe (you'll need to include Stripe.js in your HTML)
-            if (typeof Stripe !== 'undefined') {
-                this.stripe = Stripe(this.config.publishableKey);
-                this.isInitialized = true;
-                console.log('✅ Stripe initialized successfully');
-                
-                // Load current subscription status
-                await this.loadSubscriptionStatus();
-                
-                // Setup event listeners
-                this.setupEventListeners();
-                
-                return true;
+            this.supabase = window.supabase;
+            
+            // Try to initialize Stripe (may be blocked by ad blockers)
+            if (window.Stripe && this.config.publishableKey) {
+                try {
+                    this.stripe = window.Stripe(this.config.publishableKey);
+                    console.log('✅ Stripe initialized successfully');
+                } catch (stripeError) {
+                    console.warn('⚠️ Stripe initialization failed (possibly blocked by ad blocker):', stripeError);
+                    this.stripe = null;
+                }
             } else {
-                console.error('❌ Stripe.js not loaded. Please include <script src="https://js.stripe.com/v3/"></script>');
-                return false;
+                console.warn('⚠️ Stripe not available (possibly blocked by ad blocker)');
+                this.stripe = null;
             }
+            
+            // Continue with other initialization even if Stripe fails
+            this.setupEventListeners();
+            
+            // Try to load subscription status
+            try {
+                await this.loadSubscriptionStatus();
+            } catch (subscriptionError) {
+                console.warn('⚠️ Could not load subscription status:', subscriptionError);
+                // Continue with free plan defaults
+                this.updateSubscriptionUI();
+            }
+            
+            this.isInitialized = true;
+            console.log('✅ StripeManager initialized (Stripe available:', !!this.stripe, ')');
+            
         } catch (error) {
-            console.error('❌ Failed to initialize Stripe:', error);
-            return false;
+            console.error('❌ Failed to initialize StripeManager:', error);
+            // Set up with minimal functionality
+            this.isInitialized = true;
+            this.updateSubscriptionUI(); // Use free plan defaults
         }
     },
     
@@ -303,32 +314,54 @@ window.StripeManager = {
         }
         
         const subscription = this.currentSubscription;
-        const plan = this.config.products[subscription.plan_name];
+        const planName = subscription.subscription_tier || subscription.plan_name || 'free';
+        
+        // Get plan config safely with fallback
+        const plan = this.config?.products?.[planName];
         
         return {
-            name: subscription.plan_name,
-            displayName: plan?.name || subscription.plan_name,
-            active: subscription.status === 'active',
+            name: planName,
+            displayName: plan?.name || planName.charAt(0).toUpperCase() + planName.slice(1),
+            active: subscription.status === 'active' || subscription.subscription_tier !== 'cancelled',
             periodEnd: subscription.current_period_end,
             features: plan?.features || []
         };
     },
     
-    // Update UI based on subscription status
+    // Update subscription UI elements
     updateSubscriptionUI() {
-        const currentPlan = this.getCurrentPlan();
-        
-        // Update user level in profiles table if needed
-        this.syncUserLevel(currentPlan.name);
-        
-        // Update pricing modal
-        this.updatePricingModal(currentPlan);
-        
-        // Update account settings
-        this.updateAccountSettings(currentPlan);
-        
-        // Update feature access
-        this.updateFeatureAccess(currentPlan);
+        try {
+            const currentPlan = this.getCurrentPlan();
+            console.log('🎨 Updating subscription UI for plan:', currentPlan.name);
+            
+            // Update pricing modal if it exists
+            if (document.querySelector('.pricing-modal')) {
+                this.updatePricingModal(currentPlan);
+            }
+            
+            // Update account settings if modal exists
+            if (document.querySelector('#user-settings-modal')) {
+                this.updateAccountSettings(currentPlan);
+            }
+            
+            // Update feature access
+            this.updateFeatureAccess(currentPlan);
+            
+            // Sync user level if we have valid subscription data
+            const planName = currentPlan?.name || 'free';
+            this.syncUserLevel(planName);
+            
+        } catch (error) {
+            console.error('❌ Error updating subscription UI:', error);
+            // Continue with free plan defaults if there's an error
+            const freePlan = {
+                name: 'free',
+                displayName: 'Free',
+                active: true,
+                features: ['5 exports per month', 'Basic templates', 'Standard resolution']
+            };
+            this.updateFeatureAccess(freePlan);
+        }
     },
     
     // Sync subscription status with user level in profiles table
@@ -455,7 +488,14 @@ window.StripeManager = {
         `;
         
         if (currentPlan.name !== 'free') {
-            const periodEnd = new Date(this.currentSubscription.current_period_end).toLocaleDateString();
+            const periodEnd = this.currentSubscription?.current_period_end ? 
+                new Date(this.currentSubscription.current_period_end).toLocaleDateString() : 
+                'Unknown';
+                
+            // Get price safely with fallback
+            const productConfig = this.config?.products?.[currentPlan.name];
+            const price = productConfig?.price || 'N/A';
+            
             subscriptionHTML += `
                 <div class="info-item">
                     <label><i class="fas fa-calendar"></i> Billing Period</label>
@@ -464,7 +504,7 @@ window.StripeManager = {
                 
                 <div class="info-item">
                     <label><i class="fas fa-dollar-sign"></i> Amount</label>
-                    <span>$${this.config.products[currentPlan.name].price}/month</span>
+                    <span>$${price}/month</span>
                 </div>
                 
                 <div class="subscription-actions">
