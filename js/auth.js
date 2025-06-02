@@ -996,8 +996,8 @@ window.Auth = {
                             if (window.Analytics && window.Analytics.showAnalyticsDashboard) {
                                 window.Analytics.showAnalyticsDashboard();
                             } else {
-                                console.log('❌ Analytics dashboard not available');
-                                alert('Analytics dashboard is not available in this environment.');
+                                console.log('🎯 Analytics module not loaded or dashboard not available');
+                                alert('Analytics dashboard is loading... Please try again in a moment.');
                             }
                         });
                     } else {
@@ -1575,5 +1575,5 @@ window.Auth = {
         } else {
             this.sendPasswordReset(email);
         }
-    }
+    },
 }; 

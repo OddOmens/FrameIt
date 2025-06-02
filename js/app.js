@@ -710,28 +710,19 @@ window.App = {
         // Resize canvas
         this.updateCanvasSize();
         
-        // Trigger resize handler to update canvas display size
-        setTimeout(() => UI.handleWindowResize(), 50);
-        
-        // Render preview with new dimensions
+        // Re-render
         this.renderPreview();
         
-        // Save resolution for current image if one is selected
-        if (this.state.selectedImageId) {
-            const index = this.state.uploadedImages.findIndex(entry => entry.id === this.state.selectedImageId);
-            if (index !== -1) {
-                // Make sure settings object exists
-                if (!this.state.uploadedImages[index].settings) {
-                    this.state.uploadedImages[index].settings = this.getCurrentSettings();
-                } else {
-                    // Update just the resolution
-                    this.state.uploadedImages[index].settings.resolution = this.state.resolution;
-                }
-            }
+        // Track analytics event
+        if (window.Analytics) {
+            window.Analytics.trackEvent('canvas', 'resolution_changed', {
+                width: width,
+                height: height,
+                resolution_name: resolution?.name || 'custom'
+            });
         }
-        
-        // Save settings
-        this.saveSettings();
+
+        console.log('Resolution set to:', width, 'x', height);
     },
     
     // Load gallery images - modified to not persist images
@@ -805,46 +796,54 @@ window.App = {
             textAlign: options.textAlign || 'center',
             align: options.align || 'center',  // For canvas rendering
             visible: true,
-            shadow: false,
-            shadowColor: '#000000',
-            shadowBlur: 4,
-            shadowOffsetX: 2,
-            shadowOffsetY: 2,
-            background: false,
-            backgroundColor: '#333333',
-            backgroundPadding: 8,
-            backgroundRadius: 4,
+            shadow: {
+                enabled: false,
+                offsetX: 2,
+                offsetY: 2,
+                blur: 4,
+                color: '#000000'
+            },
+            border: {
+                enabled: false,
+                width: 2,
+                color: '#FFFFFF',
+                style: 'solid'
+            },
+            background: {
+                enabled: false,
+                color: '#000000',
+                opacity: 0.5,
+                borderRadius: 0
+            },
             rotation: 0,
             opacity: 1,
-            letterSpacing: 0,
-            lineHeight: 1.2,
-            textDecoration: 'none',
-            textTransform: 'none',
-            zIndex: 10  // Default to front
+            zIndex: 10
         };
 
-        this.state.textLayers.push(textLayer);
-        this.state.selectedTextLayerId = id;
+        this.saveStateForUndo();
 
-        // Track text layer addition analytics
-        if (window.Analytics && window.Analytics.trackTextAdded) {
-            window.Analytics.trackTextAdded({
-                fontFamily: textLayer.fontFamily,
-                fontSize: textLayer.fontSize,
-                text: textLayer.text
+        // Add to state
+        this.state.textLayers.push(textLayer);
+
+        // Select the new layer
+        this.selectTextLayer(id);
+
+        // Show text editor automatically
+        UI.showTextEditor(textLayer);
+
+        // Render the preview
+        this.renderPreview();
+        
+        // Track analytics event
+        if (window.Analytics) {
+            window.Analytics.trackEvent('text', 'text_layer_added', {
+                text_length: text.length,
+                font_size: textLayer.fontSize,
+                font_family: textLayer.fontFamily
             });
         }
 
-        // Render with new text layer
-        this.renderPreview();
-
-        // Update text layers UI
-        UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
-        
-        // Show text editor for the new layer
-        UI.showTextEditor(textLayer);
-
-        return id;
+        console.log('Text layer added:', textLayer);
     },
     
     // Select a text layer for editing

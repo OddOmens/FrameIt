@@ -4559,3 +4559,219 @@ textarea, select {
         font-size: 14px;
     }
 }
+
+/* Analytics Dashboard Styles */
+.analytics-modal .modal-content {
+    max-width: 1200px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.analytics-dashboard-content .modal-header {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.analytics-dashboard-content .modal-header h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.analytics-dashboard-content .modal-header .modal-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.analytics-dashboard-content .modal-header .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.analytics-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.analytics-loading i {
+    font-size: 32px;
+    margin-bottom: 16px;
+    color: #3b82f6;
+}
+
+.analytics-loading p {
+    font-size: 18px;
+    margin: 0;
+}
+
+.analytics-content {
+    padding: 24px;
+}
+
+.analytics-section {
+    margin-bottom: 32px;
+}
+
+.analytics-section h4 {
+    color: #1f2937;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.analytics-section h4 i {
+    color: #3b82f6;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.analytics-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.analytics-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.analytics-card-icon {
+    font-size: 24px;
+    color: #3b82f6;
+    margin-bottom: 8px;
+}
+
+.analytics-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.analytics-card-label {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.analytics-events-list {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.analytics-event {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.analytics-event:last-child {
+    border-bottom: none;
+}
+
+.analytics-event .event-icon {
+    color: #10b981;
+    font-size: 8px;
+}
+
+.analytics-event .event-content {
+    flex: 1;
+}
+
+.analytics-event .event-title {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+.analytics-event .event-time {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.analytics-card-updated {
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.analytics-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #dc2626;
+}
+
+.analytics-error i {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.analytics-error h4 {
+    color: #dc2626;
+    margin: 0 0 8px 0;
+}
+
+.analytics-error p {
+    color: #6b7280;
+    margin: 0 0 20px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    
+    .analytics-card {
+        padding: 16px;
+    }
+    
+    .analytics-card-value {
+        font-size: 24px;
+    }
+    
+    .analytics-dashboard-content .modal-header {
+        padding: 16px;
+    }
+    
+    .analytics-dashboard-content .modal-header h3 {
+        font-size: 20px;
+    }
+}
