@@ -363,17 +363,30 @@ window.App = {
             .then(async images => {
                 // Track image upload analytics for each file
                 console.log(`📊 Processing ${files.length} uploaded files for analytics`);
+                console.log('📊 Current user check:', window.Auth?.getCurrentUser());
+                console.log('📊 Analytics module check:', window.Analytics);
                 
                 // Use a proper async loop instead of forEach
                 for (let index = 0; index < files.length; index++) {
                     try {
                         if (window.Analytics && window.Analytics.trackImageUpload) {
                             console.log(`📊 Tracking upload ${index + 1} of ${files.length}`);
-                            await window.Analytics.trackImageUpload();
-                            console.log(`📊 Upload ${index + 1} tracked successfully`);
+                            console.log(`📊 About to call trackImageUpload for file ${index + 1}`);
+                            
+                            const result = await window.Analytics.trackImageUpload();
+                            console.log(`📊 Upload ${index + 1} tracked successfully:`, result);
+                        } else {
+                            console.log(`📊 Analytics or trackImageUpload not available:`, {
+                                analyticsExists: !!window.Analytics,
+                                trackImageUploadExists: !!(window.Analytics && window.Analytics.trackImageUpload)
+                            });
                         }
                     } catch (analyticsError) {
                         console.error(`📊 Failed to track upload ${index + 1}:`, analyticsError);
+                        console.error(`📊 Upload tracking error details:`, {
+                            message: analyticsError.message,
+                            stack: analyticsError.stack
+                        });
                     }
                 }
                 

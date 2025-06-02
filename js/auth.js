@@ -1029,16 +1029,27 @@ window.Auth = {
             console.log('📊 Fetching analytics data from Supabase...');
 
             // Fetch global stats and user breakdown in parallel
-            const [globalData, profilesData] = await Promise.all([
+            const [globalData, profilesData, usersData] = await Promise.all([
                 supabase.from('global').select('*').single(),
-                supabase.from('profiles').select('user_level, export_count, canvas_count, upload_count, created_at').not('user_level', 'is', null).limit(10)
+                supabase.from('profiles').select('user_level, export_count, canvas_count, upload_count, created_at, id').not('user_level', 'is', null).limit(10),
+                supabase.auth.admin.listUsers()
             ]);
 
             if (globalData.error) throw globalData.error;
             if (profilesData.error) throw profilesData.error;
 
             const globalStats = globalData.data;
-            const recentUsers = profilesData.data
+            const profiles = profilesData.data;
+            
+            // Map profiles with user emails
+            const recentUsers = profiles
+                .map(profile => {
+                    const user = usersData.data?.users?.find(u => u.id === profile.id);
+                    return {
+                        ...profile,
+                        email: user?.email || 'Unknown'
+                    };
+                })
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 .slice(0, 5);
 
@@ -1097,30 +1108,13 @@ window.Auth = {
                             <div class="analytics-event">
                                 <div class="event-icon"><i class="fas fa-user-plus"></i></div>
                                 <div class="event-content">
-                                    <div class="event-title">${this.formatUserLevel(user.user_level)} User</div>
+                                    <div class="event-title">${this.formatUserLevel(user.user_level)} User • ${user.email}</div>
                                     <div class="event-time">Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity</div>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-                    
-                    <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                        <button id="view-full-analytics-btn" class="btn primary-btn" style="padding: 8px 16px; font-size: 13px;">
-                            <i class="fas fa-external-link-alt"></i>
-                            View Full Dashboard
-                        </button>
-                    </div>
                 `;
-
-                // Add event listener for full dashboard button
-                const fullDashboardBtn = document.getElementById('view-full-analytics-btn');
-                if (fullDashboardBtn) {
-                    fullDashboardBtn.addEventListener('click', () => {
-                        if (window.Analytics && window.Analytics.showAnalyticsDashboard) {
-                            window.Analytics.showAnalyticsDashboard();
-                        }
-                    });
-                }
             }
 
             console.log('✅ Global analytics loaded successfully');
