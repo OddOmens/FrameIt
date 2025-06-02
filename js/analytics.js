@@ -22,7 +22,8 @@ window.Analytics = {
         featureTimers: {},
         isInitialized: false,
         user: null,
-        deviceInfo: null
+        deviceInfo: null,
+        userProfile: null
     },
 
     // Initialize analytics
@@ -61,6 +62,29 @@ window.Analytics = {
         // Get current user if authenticated
         if (window.Auth && window.Auth.getCurrentUser) {
             this.state.user = window.Auth.getCurrentUser();
+            
+            // Load user profile for user_level checking
+            if (this.state.user && window.supabase) {
+                try {
+                    const { data: profile, error } = await window.supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', this.state.user.id)
+                        .single();
+                    
+                    if (!error && profile) {
+                        this.state.userProfile = profile;
+                        
+                        if (this.config.debugMode) {
+                            console.log('📊 User profile loaded:', profile);
+                        }
+                    }
+                } catch (error) {
+                    if (this.config.debugMode) {
+                        console.log('📊 No user profile found (this is normal for new users)');
+                    }
+                }
+            }
         }
 
         // Track session start
@@ -407,10 +431,12 @@ window.Analytics = {
     hasFeatureAccess(feature) {
         if (!this.state.user) return false;
         
-        // For now, simple email-based check
-        // You can expand this to check subscription tiers, user roles, etc.
-        const devEmails = ['hello@medusast.one', 'admin@frameit.app'];
-        return devEmails.includes(this.state.user.email);
+        // Check user level from profile (database-driven only)
+        if (this.state.userProfile && this.state.userProfile.user_level === 'dev') {
+            return true;
+        }
+        
+        return false;
     },
 
     // Show analytics dashboard (for dev users)
