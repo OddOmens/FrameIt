@@ -89,61 +89,94 @@ window.Analytics = {
 
     // Track image upload
     async trackImageUpload() {
-        if (!this.state.user) return;
+        if (!this.state.user) {
+            console.log('📊 No user logged in - skipping upload tracking');
+            return;
+        }
 
         try {
             const supabase = this.getSupabase();
-            if (!supabase) return;
+            if (!supabase) {
+                console.error('📊 Supabase not available for upload tracking');
+                return;
+            }
 
-            await supabase.rpc('increment_upload_count', {
+            const { data, error } = await supabase.rpc('increment_upload_count', {
                 user_id: this.state.user.id
             });
 
+            if (error) {
+                console.error('📊 Upload tracking error:', error);
+                return;
+            }
+
             if (this.config.debugMode) {
-                console.log('📊 Image upload tracked');
+                console.log('📊 Image upload tracked successfully');
             }
         } catch (error) {
-            console.error('Failed to track image upload:', error);
+            console.error('📊 Failed to track image upload:', error);
         }
     },
 
     // Track canvas creation
     async trackCanvasCreated() {
-        if (!this.state.user) return;
+        if (!this.state.user) {
+            console.log('📊 No user logged in - skipping canvas tracking');
+            return;
+        }
 
         try {
             const supabase = this.getSupabase();
-            if (!supabase) return;
+            if (!supabase) {
+                console.error('📊 Supabase not available for canvas tracking');
+                return;
+            }
 
-            await supabase.rpc('increment_canvas_count', {
+            const { data, error } = await supabase.rpc('increment_canvas_count', {
                 user_id: this.state.user.id
             });
 
+            if (error) {
+                console.error('📊 Canvas tracking error:', error);
+                return;
+            }
+
             if (this.config.debugMode) {
-                console.log('📊 Canvas creation tracked');
+                console.log('📊 Canvas creation tracked successfully');
             }
         } catch (error) {
-            console.error('Failed to track canvas creation:', error);
+            console.error('📊 Failed to track canvas creation:', error);
         }
     },
 
     // Track export
     async trackExport() {
-        if (!this.state.user) return;
+        if (!this.state.user) {
+            console.log('📊 No user logged in - skipping export tracking');
+            return;
+        }
 
         try {
             const supabase = this.getSupabase();
-            if (!supabase) return;
+            if (!supabase) {
+                console.error('📊 Supabase not available for export tracking');
+                return;
+            }
 
-            await supabase.rpc('increment_export_count', {
+            const { data, error } = await supabase.rpc('increment_export_count', {
                 user_id: this.state.user.id
             });
 
+            if (error) {
+                console.error('📊 Export tracking error:', error);
+                return;
+            }
+
             if (this.config.debugMode) {
-                console.log('📊 Export tracked');
+                console.log('📊 Export tracked successfully');
             }
         } catch (error) {
-            console.error('Failed to track export:', error);
+            console.error('📊 Failed to track export:', error);
         }
     },
 
