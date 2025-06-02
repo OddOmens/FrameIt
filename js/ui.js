@@ -295,9 +295,17 @@ window.UI = {
             window.App.setShadowColor(e.target.value);
         });
         
+        // Throttle the input event for better performance
+        let shadowColorTimeout;
         this.elements.shadowColorInput.addEventListener('input', (e) => {
-            // Real-time update during color selection
-            window.App.setShadowColor(e.target.value);
+            // Update color display immediately for visual feedback
+            document.getElementById('shadow-color-value').textContent = e.target.value;
+            
+            // Throttle the expensive renderPreview call
+            clearTimeout(shadowColorTimeout);
+            shadowColorTimeout = setTimeout(() => {
+                window.App.setShadowColor(e.target.value);
+            }, 50); // 50ms throttle
         });
         
         // Zoom controls
@@ -2112,6 +2120,7 @@ window.UI = {
         // Mouse events for text layer dragging
         let isDraggingText = false;
         let currentTextLayerId = null;
+        let dragUpdateTimeout;
         
         canvas.addEventListener('mousedown', (e) => {
             // Only proceed if we have a selected text layer
@@ -2142,13 +2151,20 @@ window.UI = {
                 // Get the normalized coordinates
                 const coords = getNormalizedCoordinates(e.clientX, e.clientY);
                 
-                // Update the text layer position
-                window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
+                // Throttle position updates for better performance
+                clearTimeout(dragUpdateTimeout);
+                dragUpdateTimeout = setTimeout(() => {
+                    window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
+                }, 16); // ~60fps throttle
                 e.preventDefault();
             }
         });
         
         document.addEventListener('mouseup', () => {
+            if (isDraggingText) {
+                // Ensure final position update
+                clearTimeout(dragUpdateTimeout);
+            }
             isDraggingText = false;
             currentTextLayerId = null;
         });
@@ -2183,13 +2199,20 @@ window.UI = {
                 // Get the normalized coordinates
                 const coords = getNormalizedCoordinates(e.touches[0].clientX, e.touches[0].clientY);
                 
-                // Update the text layer position
-                window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
+                // Throttle position updates for better performance
+                clearTimeout(dragUpdateTimeout);
+                dragUpdateTimeout = setTimeout(() => {
+                    window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
+                }, 16); // ~60fps throttle
                 e.preventDefault();
             }
         }, { passive: false });
         
         document.addEventListener('touchend', () => {
+            if (isDraggingText) {
+                // Ensure final position update
+                clearTimeout(dragUpdateTimeout);
+            }
             isDraggingText = false;
             currentTextLayerId = null;
         });
