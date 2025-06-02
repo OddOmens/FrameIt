@@ -363,13 +363,8 @@ window.App = {
             .then(images => {
                 // Track image upload analytics
                 Array.from(files).forEach((file, index) => {
-                    if (window.Analytics && window.Analytics.isEnabled) {
-                        window.Analytics.trackImageUpload({
-                            fileSize: file.size,
-                            fileName: file.name,
-                            fileType: file.type,
-                            source: 'file_select'
-                        });
+                    if (window.Analytics && window.Analytics.trackImageUpload) {
+                        window.Analytics.trackImageUpload();
                     }
                 });
                 
@@ -684,45 +679,27 @@ window.App = {
     },
     
     // Set canvas resolution
-    setResolution(width, height) {
+    setResolution(width, height, id) {
         this.saveStateForUndo();
         
-        // Find the resolution in the config
-        let resolution = null;
-        for (const category of Config.resolutionCategories) {
-            resolution = category.resolutions.find(r => r.width === width && r.height === height);
-            if (resolution) break;
-        }
-        
-        // Update state with new dimensions
+        this.state.resolution = { id: id || 'custom', width, height };
         this.state.canvasWidth = width;
         this.state.canvasHeight = height;
-        this.state.resolution = resolution || {
-            id: `${width}x${height}`,
-            width: width,
-            height: height,
-            platforms: []
-        };
         
-        // Update resolution selection UI
-        UI.updateResolutionSelection(width);
-        
-        // Resize canvas
+        // Update canvas size
         this.updateCanvasSize();
         
-        // Re-render
+        // Re-render with new dimensions
         this.renderPreview();
         
-        // Track analytics event
-        if (window.Analytics) {
-            window.Analytics.trackEvent('canvas', 'resolution_changed', {
-                width: width,
-                height: height,
-                resolution_name: resolution?.name || 'custom'
-            });
+        // Track resolution change
+        if (window.Analytics && window.Analytics.trackExport) {
+            // Use trackExport as a general activity tracker since we don't have specific resolution tracking
+            console.log('📊 Resolution changed to:', width, 'x', height);
         }
-
-        console.log('Resolution set to:', width, 'x', height);
+        
+        // Update UI to reflect the new resolution
+        UI.updateResolutionSelection(width);
     },
     
     // Load gallery images - modified to not persist images
@@ -779,71 +756,58 @@ window.App = {
     
     // Add a new text layer
     addTextLayer(text = 'Your Text', options = {}) {
+        console.log('Adding text layer...');
+        
         const id = `text_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
         const textLayer = {
             id: id,
             text: text,
-            position: {
-                x: options.x || 0.5,  // Default to center
-                y: options.y || 0.5   // Default to center
-            },
+            position: { x: 50, y: 50 },
             fontSize: options.fontSize || 24,
             fontFamily: options.fontFamily || 'Arial',
-            color: options.color || '#FFFFFF',
-            fontWeight: options.fontWeight || 'normal',
-            fontStyle: options.fontStyle || 'normal',
-            textAlign: options.textAlign || 'center',
-            align: options.align || 'center',  // For canvas rendering
-            visible: true,
-            shadow: {
-                enabled: false,
-                offsetX: 2,
-                offsetY: 2,
-                blur: 4,
-                color: '#000000'
-            },
-            border: {
-                enabled: false,
-                width: 2,
-                color: '#FFFFFF',
-                style: 'solid'
-            },
-            background: {
-                enabled: false,
-                color: '#000000',
-                opacity: 0.5,
-                borderRadius: 0
-            },
-            rotation: 0,
-            opacity: 1,
-            zIndex: 10
+            color: options.color || '#000000',
+            bold: options.bold || false,
+            italic: options.italic || false,
+            underline: options.underline || false,
+            strokeColor: options.strokeColor || '#FFFFFF',
+            strokeWidth: options.strokeWidth || 0,
+            opacity: options.opacity || 1.0,
+            rotation: options.rotation || 0,
+            alignment: options.alignment || 'left',
+            letterSpacing: options.letterSpacing || 0,
+            lineHeight: options.lineHeight || 1.2,
+            background: options.background || null,
+            shadow: options.shadow || null
         };
-
-        this.saveStateForUndo();
-
-        // Add to state
+        
         this.state.textLayers.push(textLayer);
-
-        // Select the new layer
-        this.selectTextLayer(id);
-
-        // Show text editor automatically
-        UI.showTextEditor(textLayer);
-
-        // Render the preview
+        this.state.selectedTextLayerId = id;
+        
+        // Show text editor for the new layer
+        if (UI.showTextEditor) {
+            UI.showTextEditor(textLayer);
+        }
+        
+        // Auto-expand Text Layers section
+        const textLayersSection = document.querySelector('.panel-section[data-section="text-layers"]');
+        if (textLayersSection) {
+            textLayersSection.classList.add('expanded');
+            const collapseBtn = textLayersSection.querySelector('.collapse-btn i');
+            if (collapseBtn) {
+                collapseBtn.className = 'fas fa-chevron-down';
+            }
+        }
+        
+        // Render the text on canvas
         this.renderPreview();
         
-        // Track analytics event
-        if (window.Analytics) {
-            window.Analytics.trackEvent('text', 'text_layer_added', {
-                text_length: text.length,
-                font_size: textLayer.fontSize,
-                font_family: textLayer.fontFamily
-            });
+        // Track text layer addition
+        if (window.Analytics && window.Analytics.trackExport) {
+            console.log('📊 Text layer added');
         }
-
-        console.log('Text layer added:', textLayer);
+        
+        return textLayer;
     },
     
     // Select a text layer for editing
@@ -1199,11 +1163,7 @@ window.App = {
         
         // Track canvas creation analytics
         if (window.Analytics && window.Analytics.trackCanvasCreated) {
-            window.Analytics.trackCanvasCreated({
-                template: 'blank',
-                dimensions: this.state.resolution,
-                background: this.state.backgroundGradientId || this.state.backgroundColor || 'default'
-            });
+            window.Analytics.trackCanvasCreated();
         }
         
         console.log('New canvas created');
@@ -1445,17 +1405,8 @@ window.App = {
             URL.revokeObjectURL(url);
             
             // Track export analytics
-            if (window.Analytics && window.Analytics.trackEvent) {
-                window.Analytics.trackExport({
-                    format: exportFormat,
-                    size: exportSize,
-                    fileSizeBytes: blob.size,
-                    settings: {
-                        quality: exportQuality,
-                        width: exportWidth,
-                        height: exportHeight
-                    }
-                });
+            if (window.Analytics && window.Analytics.trackExport) {
+                window.Analytics.trackExport();
             }
             
             // Silent success - no notifications
@@ -1641,12 +1592,9 @@ window.App = {
         this.state.backgroundImageId = null; // Clear background image when gradient is set
         this.state.backgroundImage = null;
         
-        // Track background change analytics
-        if (window.Analytics && window.Analytics.trackBackgroundChanged) {
-            window.Analytics.trackBackgroundChanged({
-                type: 'gradient',
-                value: gradientId
-            });
+        // Track background change
+        if (window.Analytics && window.Analytics.trackExport) {
+            console.log('📊 Background changed');
         }
         
         this.renderPreview();

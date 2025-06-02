@@ -892,19 +892,21 @@ window.Auth = {
     
     // Load user level and stats information
     async loadUserLevelInfo() {
-        if (!this.supabase) return null;
+        if (!this.supabase || !this.currentUser) return null;
         
         try {
             const { data: profile, error } = await this.supabase
                 .from('profiles')
                 .select('*')
+                .eq('id', this.currentUser.id)
                 .single();
                 
             if (error) {
-                console.log('Profile not found');
+                console.log('Profile not found for user:', this.currentUser.id);
                 return null;
             }
             
+            console.log('📊 Loaded user profile:', profile);
             return profile;
         } catch (error) {
             console.error('Failed to load user profile:', error);
@@ -956,9 +958,9 @@ window.Auth = {
                 </div>
             `;
             
-            // Add Global Statistics section for dev users
-            const isDev = userStats.level === 'dev' || (window.Analytics && window.Analytics.hasFeatureAccess && window.Analytics.hasFeatureAccess('dev'));
-            console.log('🔧 Checking dev access:', { userLevel: userStats.level, isDev, hasAnalytics: !!window.Analytics });
+            // Check if user is dev level - use direct profile check
+            const isDev = userStats.level === 'dev';
+            console.log('🔧 Checking dev access:', { userLevel: userStats.level, isDev });
             
             if (isDev) {
                 console.log('📊 Adding Global Statistics section for dev user');
@@ -966,11 +968,15 @@ window.Auth = {
                     <div class="global-stats-section">
                         <h5><i class="fas fa-globe"></i> Global Statistics</h5>
                         <p class="section-description">View application-wide analytics and usage data.</p>
-                        <button id="view-global-analytics-btn" class="btn primary-btn">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>View Global Analytics</span>
-                            <span class="dev-feature-indicator">Dev</span>
-                        </button>
+                        <div id="global-analytics-container">
+                            <div class="analytics-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Loading global analytics...</p>
+                            </div>
+                            <div class="analytics-content" style="display: none;">
+                                <!-- Analytics content will be inserted here -->
+                            </div>
+                        </div>
                     </div>
                 `;
             } else {
@@ -983,27 +989,10 @@ window.Auth = {
                 updateSection.parentNode.insertBefore(userStatsSection, updateSection);
             }
             
-            // Set up analytics button event listener for dev users
+            // Load analytics data for dev users automatically
             if (isDev) {
-                console.log('🎯 Setting up analytics button event listener');
-                // Use setTimeout to ensure the button is added to DOM
-                setTimeout(() => {
-                    const globalAnalyticsBtn = document.getElementById('view-global-analytics-btn');
-                    if (globalAnalyticsBtn) {
-                        console.log('✅ Analytics button found, adding event listener');
-                        globalAnalyticsBtn.addEventListener('click', () => {
-                            console.log('📊 Analytics button clicked');
-                            if (window.Analytics && window.Analytics.showAnalyticsDashboard) {
-                                window.Analytics.showAnalyticsDashboard();
-                            } else {
-                                console.log('🎯 Analytics module not loaded or dashboard not available');
-                                alert('Analytics dashboard is loading... Please try again in a moment.');
-                            }
-                        });
-                    } else {
-                        console.log('❌ Analytics button not found in DOM');
-                    }
-                }, 100);
+                console.log('🎯 Loading analytics data automatically for dev user');
+                this.loadGlobalAnalytics();
             }
         } else {
             // Update existing stats
@@ -1011,6 +1000,148 @@ window.Auth = {
             if (statValues[0]) statValues[0].textContent = userStats.exports;
             if (statValues[1]) statValues[1].textContent = userStats.canvases;
             if (statValues[2]) statValues[2].textContent = userStats.uploads;
+        }
+    },
+    
+    // Load global analytics data directly into the account settings
+    async loadGlobalAnalytics() {
+        console.log('📊 Loading global analytics data...');
+        
+        const analyticsContainer = document.getElementById('global-analytics-container');
+        if (!analyticsContainer) {
+            console.log('❌ Analytics container not found');
+            return;
+        }
+
+        try {
+            // Wait for Analytics module to be ready
+            if (!window.Analytics || !window.Analytics.getSupabase) {
+                console.log('⏳ Waiting for Analytics module...');
+                setTimeout(() => this.loadGlobalAnalytics(), 1000);
+                return;
+            }
+
+            const supabase = window.Analytics.getSupabase();
+            if (!supabase) {
+                throw new Error('Supabase not available');
+            }
+
+            console.log('📊 Fetching analytics data from Supabase...');
+
+            // Fetch global stats and user breakdown in parallel
+            const [globalData, profilesData] = await Promise.all([
+                supabase.from('global').select('*').single(),
+                supabase.from('profiles').select('user_level, export_count, canvas_count, upload_count, created_at').not('user_level', 'is', null).limit(10)
+            ]);
+
+            if (globalData.error) throw globalData.error;
+            if (profilesData.error) throw profilesData.error;
+
+            const globalStats = globalData.data;
+            const recentUsers = profilesData.data
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 5);
+
+            // Hide loading and show content
+            const loadingDiv = analyticsContainer.querySelector('.analytics-loading');
+            const contentDiv = analyticsContainer.querySelector('.analytics-content');
+            
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            if (contentDiv) {
+                contentDiv.style.display = 'block';
+                contentDiv.innerHTML = `
+                    <div class="analytics-grid" style="margin-bottom: 24px;">
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-users"></i></div>
+                            <div class="analytics-card-value">${globalStats.total_users}</div>
+                            <div class="analytics-card-label">Total Users</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-download"></i></div>
+                            <div class="analytics-card-value">${globalStats.total_exports}</div>
+                            <div class="analytics-card-label">Total Exports</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-palette"></i></div>
+                            <div class="analytics-card-value">${globalStats.total_canvases}</div>
+                            <div class="analytics-card-label">Total Canvases</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="analytics-card-value">${globalStats.total_uploads}</div>
+                            <div class="analytics-card-label">Total Uploads</div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-grid" style="margin-bottom: 24px;">
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-code"></i></div>
+                            <div class="analytics-card-value">${globalStats.dev_users}</div>
+                            <div class="analytics-card-label">Dev Users</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-flask"></i></div>
+                            <div class="analytics-card-value">${globalStats.beta_users}</div>
+                            <div class="analytics-card-label">Beta Users</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-icon"><i class="fas fa-user"></i></div>
+                            <div class="analytics-card-value">${globalStats.standard_users}</div>
+                            <div class="analytics-card-label">Standard Users</div>
+                        </div>
+                    </div>
+                    
+                    <h6 style="color: #a1a1aa; font-size: 14px; margin: 16px 0 8px 0; font-weight: 600;">Recent Users</h6>
+                    <div class="analytics-events-list" style="max-height: 200px; overflow-y: auto;">
+                        ${recentUsers.map(user => `
+                            <div class="analytics-event">
+                                <div class="event-icon"><i class="fas fa-user-plus"></i></div>
+                                <div class="event-content">
+                                    <div class="event-title">${this.formatUserLevel(user.user_level)} User</div>
+                                    <div class="event-time">Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <button id="view-full-analytics-btn" class="btn primary-btn" style="padding: 8px 16px; font-size: 13px;">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Full Dashboard
+                        </button>
+                    </div>
+                `;
+
+                // Add event listener for full dashboard button
+                const fullDashboardBtn = document.getElementById('view-full-analytics-btn');
+                if (fullDashboardBtn) {
+                    fullDashboardBtn.addEventListener('click', () => {
+                        if (window.Analytics && window.Analytics.showAnalyticsDashboard) {
+                            window.Analytics.showAnalyticsDashboard();
+                        }
+                    });
+                }
+            }
+
+            console.log('✅ Global analytics loaded successfully');
+
+        } catch (error) {
+            console.error('❌ Failed to load global analytics:', error);
+            
+            const loadingDiv = analyticsContainer.querySelector('.analytics-loading');
+            if (loadingDiv) {
+                loadingDiv.innerHTML = `
+                    <div class="analytics-error" style="text-align: center; padding: 20px; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 12px;"></i>
+                        <h4 style="margin: 0 0 8px 0;">Failed to Load Analytics</h4>
+                        <p style="margin: 0 0 16px 0; color: #a1a1aa;">${error.message}</p>
+                        <button onclick="window.Auth.loadGlobalAnalytics()" class="btn primary-btn" style="padding: 8px 16px; font-size: 13px;">
+                            <i class="fas fa-refresh"></i>
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
         }
     },
     
