@@ -1061,7 +1061,7 @@ window.Auth = {
             if (contentDiv) {
                 contentDiv.style.display = 'block';
                 contentDiv.innerHTML = `
-                    <div class="user-stats-grid" style="margin-bottom: 24px;">
+                    <div class="user-stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">${globalStats.total_users}</div>
                             <div class="stat-label">Total Users</div>
@@ -1076,7 +1076,7 @@ window.Auth = {
                         </div>
                     </div>
                     
-                    <div class="user-stats-grid" style="margin-bottom: 24px;">
+                    <div class="user-stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">${globalStats.total_exports}</div>
                             <div class="stat-label">Total Exports</div>
@@ -1091,14 +1091,16 @@ window.Auth = {
                         </div>
                     </div>
                     
-                    <h6 style="color: #a1a1aa; font-size: 14px; margin: 16px 0 8px 0; font-weight: 600;">Recent Users</h6>
-                    <div class="analytics-events-list" style="max-height: 200px; overflow-y: auto;">
+                    <h6 style="color: #a1a1aa; font-size: 14px; margin: 24px 0 12px 0; font-weight: 600;">Recent Users</h6>
+                    <div style="max-height: 200px; overflow-y: auto;">
                         ${recentUsers.map(user => `
-                            <div class="analytics-event" style="background: #2a2a2a; border: 1px solid #404040; padding: 12px; margin-bottom: 8px; border-radius: 6px;">
-                                <div class="event-icon" style="background: #404040; color: #a1a1aa;"><i class="fas fa-user-plus"></i></div>
-                                <div class="event-content">
-                                    <div class="event-title" style="color: #e1e1e1; font-weight: 500;">${this.formatUserLevel(user.user_level)} User • ${user.email}</div>
-                                    <div class="event-time" style="color: #a1a1aa; font-size: 12px;">Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity</div>
+                            <div style="background: #333333; border: 1px solid #444444; padding: 16px; margin-bottom: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                                <div style="background: #444444; color: #888888; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="color: #ffffff; font-weight: 500; font-size: 14px; margin-bottom: 4px;">${this.formatUserLevel(user.user_level)} User • ${user.email}</div>
+                                    <div style="color: #888888; font-size: 12px;">Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity</div>
                                 </div>
                             </div>
                         `).join('')}

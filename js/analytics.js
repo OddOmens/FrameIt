@@ -89,10 +89,9 @@ window.Analytics = {
 
     // Track image upload
     async trackImageUpload() {
-        console.log('📊 trackImageUpload called');
-        console.log('📊 Analytics state:', this.state);
-        console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
-        console.log('📊 Analytics user:', this.state.user);
+        console.log('📊 === trackImageUpload START ===');
+        console.log('📊 Current analytics state:', this.state);
+        console.log('📊 Auth user check:', window.Auth?.getCurrentUser());
         
         // Try to get user from Auth module directly if not in analytics state
         let currentUser = this.state.user;
@@ -110,7 +109,7 @@ window.Analytics = {
             }
         }
 
-        console.log('📊 User found:', currentUser.id);
+        console.log('📊 User confirmed:', currentUser.id, currentUser.email);
 
         try {
             const supabase = this.getSupabase();
@@ -119,22 +118,42 @@ window.Analytics = {
                 return { success: false, reason: 'Supabase not available' };
             }
 
-            console.log('📊 Calling increment_upload_count with user_id:', currentUser.id);
+            console.log('📊 Supabase client confirmed, calling increment_upload_count...');
+            console.log('📊 Function parameters:', { user_id: currentUser.id });
             
+            const startTime = Date.now();
             const { data, error } = await supabase.rpc('increment_upload_count', {
                 user_id: currentUser.id
             });
+            const endTime = Date.now();
+
+            console.log(`📊 Function call completed in ${endTime - startTime}ms`);
+            console.log('📊 Raw response data:', data);
+            console.log('📊 Raw response error:', error);
 
             if (error) {
-                console.error('📊 Upload tracking error:', error);
+                console.error('📊 Upload tracking error details:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
                 throw error;
             }
 
-            console.log('📊 Upload tracked successfully:', data);
+            console.log('📊 Upload tracked successfully, response:', data);
+            console.log('📊 === trackImageUpload END SUCCESS ===');
             return { success: true, data: data };
 
         } catch (error) {
+            console.error('📊 === trackImageUpload END ERROR ===');
             console.error('📊 Failed to track upload:', error);
+            console.error('📊 Error details:', {
+                message: error.message,
+                stack: error.stack,
+                user: currentUser,
+                timestamp: new Date().toISOString()
+            });
             return { success: false, error: error.message };
         }
     },
