@@ -360,18 +360,22 @@ window.App = {
         const promises = Array.from(files).map(file => Utils.loadImageFromFile(file));
         
         Promise.all(promises)
-            .then(images => {
+            .then(async images => {
                 // Track image upload analytics for each file
-                Array.from(files).forEach(async (file, index) => {
+                console.log(`📊 Processing ${files.length} uploaded files for analytics`);
+                
+                // Use a proper async loop instead of forEach
+                for (let index = 0; index < files.length; index++) {
                     try {
                         if (window.Analytics && window.Analytics.trackImageUpload) {
+                            console.log(`📊 Tracking upload ${index + 1} of ${files.length}`);
                             await window.Analytics.trackImageUpload();
                             console.log(`📊 Upload ${index + 1} tracked successfully`);
                         }
                     } catch (analyticsError) {
                         console.error(`📊 Failed to track upload ${index + 1}:`, analyticsError);
                     }
-                });
+                }
                 
                 // Set the first image as the selected image for current canvas
                 this.state.selectedImage = images[0];
@@ -394,17 +398,16 @@ window.App = {
                         };
                         this.state.canvases.unshift(newCanvas);
                         
-                        // Track canvas creation for each new canvas
-                        setTimeout(async () => {
-                            try {
-                                if (window.Analytics && window.Analytics.trackCanvasCreated) {
-                                    await window.Analytics.trackCanvasCreated();
-                                    console.log(`📊 New canvas ${i + 1} creation tracked successfully`);
-                                }
-                            } catch (analyticsError) {
-                                console.error(`📊 Failed to track canvas ${i + 1} creation:`, analyticsError);
+                        // Track canvas creation for each new canvas - use proper async/await
+                        try {
+                            if (window.Analytics && window.Analytics.trackCanvasCreated) {
+                                console.log(`📊 Tracking canvas ${i + 1} creation`);
+                                await window.Analytics.trackCanvasCreated();
+                                console.log(`📊 New canvas ${i + 1} creation tracked successfully`);
                             }
-                        }, i * 100); // Stagger the requests slightly
+                        } catch (analyticsError) {
+                            console.error(`📊 Failed to track canvas ${i + 1} creation:`, analyticsError);
+                        }
                     }
                 }
                 
