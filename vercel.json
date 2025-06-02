@@ -1,9 +1,20 @@
 {
+  "version": 2,
   "functions": {
-    "api/*.js": {
+    "api/**/*.js": {
       "runtime": "nodejs18.x"
     }
   },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -13,20 +24,14 @@
           "value": "*"
         },
         {
-          "key": "Access-Control-Allow-Methods", 
-          "value": "GET, POST, OPTIONS"
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
         },
         {
           "key": "Access-Control-Allow-Headers",
           "value": "Content-Type, Authorization"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
     }
   ]
 } 
