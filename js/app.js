@@ -73,6 +73,11 @@ window.App = {
         // Initialize Canvas Renderer
         CanvasRenderer.init(document.getElementById('preview-canvas'));
         
+        // Initialize Analytics
+        if (window.Analytics) {
+            window.Analytics.init();
+        }
+        
         // Load background images
         this.loadBackgroundImages();
         
@@ -780,56 +785,56 @@ window.App = {
     
     // Add a new text layer
     addTextLayer(text = 'Your Text', options = {}) {
-        this.saveStateForUndo();
+        const id = `text_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
-        // Create the text layer with default properties
-        const textLayer = new TextModels.TextOverlay({
-            text,
-            fontSize: options.fontSize || 36,
-            fontFamily: options.fontFamily || 'Arial, sans-serif',
+        const textLayer = {
+            id: id,
+            text: text,
+            x: options.x || 50,
+            y: options.y || 50,
+            fontSize: options.fontSize || 24,
+            fontFamily: options.fontFamily || 'Arial',
             color: options.color || '#FFFFFF',
-            align: options.align || 'center',
-            bold: options.bold || false,
-            italic: options.italic || false,
-            underline: options.underline || false,
-            opacity: options.opacity !== undefined ? options.opacity : 1,
-            position: options.position || { x: 0.5, y: 0.5 }, // Centered by default (0-1 values)
-            zIndex: options.zIndex || 10,
+            fontWeight: options.fontWeight || 'normal',
+            fontStyle: options.fontStyle || 'normal',
+            textAlign: options.textAlign || 'left',
             visible: true,
-            shadow: options.shadow || false,
-            shadowColor: options.shadowColor || '#000000',
-            shadowBlur: options.shadowBlur || 3,
-            shadowOffsetX: options.shadowOffsetX || 2,
-            shadowOffsetY: options.shadowOffsetY || 2,
-            backgroundColor: options.backgroundColor || null,
-            padding: options.padding || 0
-        });
+            shadow: false,
+            shadowColor: '#000000',
+            shadowBlur: 4,
+            shadowOffsetX: 2,
+            shadowOffsetY: 2,
+            background: false,
+            backgroundColor: '#333333',
+            backgroundPadding: 8,
+            backgroundRadius: 4,
+            rotation: 0,
+            opacity: 1,
+            letterSpacing: 0,
+            lineHeight: 1.2,
+            textDecoration: 'none',
+            textTransform: 'none'
+        };
+        
+        this.state.textLayers.push(textLayer);
+        this.state.selectedTextLayerId = id;
         
         // Track text layer addition analytics
-        if (window.Analytics && window.Analytics.isEnabled) {
+        if (window.Analytics && window.Analytics.trackTextAdded) {
             window.Analytics.trackTextAdded({
                 fontFamily: textLayer.fontFamily,
                 fontSize: textLayer.fontSize,
-                text: text
+                text: textLayer.text
             });
         }
         
-        // Add to state
-        this.state.textLayers.push(textLayer);
-        
-        // Select the new text layer
-        this.selectTextLayer(textLayer.id);
-        
-        // Render the preview
+        // Render with new text layer
         this.renderPreview();
         
-        // Update UI
+        // Update text layers UI
         UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
         
-        // Update current canvas in gallery
-        this.addCurrentCanvasToGallery();
-        
-        return textLayer;
+        return id;
     },
     
     // Select a text layer for editing
@@ -992,8 +997,8 @@ window.App = {
         const textLayer = this.getTextLayerById(id);
         if (!textLayer) return;
         
-        const newBackground = textLayer.backgroundColor ? null : color;
-        this.updateTextLayer(id, { backgroundColor: newBackground });
+        const newBackground = textLayer.background ? false : true;
+        this.updateTextLayer(id, { background: newBackground, backgroundColor: color });
     },
     
     // Set noise overlay
@@ -1159,72 +1164,40 @@ window.App = {
         UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
     },
     
-    // Create new canvas
+    // Create a new canvas
     createNewCanvas() {
-        // Save current canvas
+        // Save current canvas first
         this.addCurrentCanvasToGallery();
         
-        // Track canvas creation analytics
-        if (window.Analytics && window.Analytics.isEnabled) {
-            window.Analytics.trackCanvasCreated({
-                template: 'blank',
-                dimensions: `${this.state.canvasWidth}x${this.state.canvasHeight}`,
-                background: this.state.backgroundGradientId || this.state.backgroundColor || 'white'
-            });
-        }
-        
-        // Create new canvas ID
-        this.state.currentCanvasId = `canvas_${Date.now()}`;
-        
-        // Reset to defaults
+        // Reset to default state
         this.state.selectedImage = null;
         this.state.textLayers = [];
         this.state.selectedTextLayerId = null;
-        this.state.backgroundColor = '#FFFFFF';
-        this.state.backgroundGradientId = null;
-        this.state.backgroundImageId = null;
-        this.state.backgroundImage = null;
-        this.state.backgroundBlurRadius = 0;
-        this.state.backgroundTwirlAmount = 0;
-        this.state.backgroundSaturation = 100;
-        this.state.backgroundHueRotation = 0;
-        this.state.backgroundContrast = 100;
-        this.state.backgroundBrightness = 100;
-        this.state.backgroundWaveAmount = 0;
-        this.state.backgroundRippleAmount = 0;
-        this.state.backgroundZoomAmount = 100;
-        this.state.backgroundShakeAmount = 0;
-        this.state.backgroundLensAmount = 0;
-        this.state.noiseOverlayId = null;
-        this.state.noiseOverlayIntensity = 1.0;
-        this.state.noiseOpacity = Config.defaultNoiseOpacity;
-        this.state.noiseBlendMode = Config.defaultNoiseBlendMode;
-        this.state.noiseScale = Config.defaultNoiseScale;
-        this.state.noiseInvert = Config.defaultNoiseInvert;
-        this.state.cornerRadius = Config.defaultCornerRadius;
-        this.state.padding = Config.defaultPadding;
-        this.state.shadowOpacity = Config.defaultShadowOpacity;
-        this.state.shadowRadius = Config.defaultShadowRadius;
-        this.state.shadowOffsetX = Config.defaultShadowOffsetX;
-        this.state.shadowOffsetY = Config.defaultShadowOffsetY;
-        this.state.shadowColor = Config.defaultShadowColor;
-        this.state.rotation = Config.defaultRotation;
-        this.state.isFlippedHorizontally = false;
-        this.state.isFlippedVertically = false;
+        this.state.currentCanvasId = `canvas_${Date.now()}`;
+        this.state.selectedCanvasId = this.state.currentCanvasId;
         
-        // Reset UI
+        // Reset all settings to defaults
         this.resetUIToDefaults();
         
-        // No need for clear button since there's no image
+        // Show upload prompt
+        document.getElementById('image-drop-zone').classList.remove('hidden');
         
-        // Hide upload zone - don't show upload prompt for new canvas
-        document.getElementById('image-drop-zone').classList.add('hidden');
-        
-        // Render new canvas
+        // Render empty canvas
         this.renderPreview();
         
-        // Add new canvas to gallery
-        this.addCurrentCanvasToGallery();
+        // Update gallery
+        UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
+        
+        // Track canvas creation analytics
+        if (window.Analytics && window.Analytics.trackCanvasCreated) {
+            window.Analytics.trackCanvasCreated({
+                template: 'blank',
+                dimensions: this.state.resolution,
+                background: this.state.backgroundGradientId || this.state.backgroundColor || 'default'
+            });
+        }
+        
+        console.log('New canvas created');
     },
     
     // Reset UI to default values
@@ -1385,8 +1358,10 @@ window.App = {
             if (!isRunningLocally) {
                 // Check if user is authenticated
                 const currentUser = window.Auth?.getCurrentUser();
-                if (!currentUser) {
-                    window.Auth?.showLoginModal();
+                const currentSession = window.Auth?.getCurrentSession();
+                
+                if (!currentUser || !currentSession) {
+                    window.Auth?.showAuthModal('login');
                     return;
                 }
                 
@@ -1400,11 +1375,27 @@ window.App = {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentUser.access_token || currentUser.session?.access_token}`
+                        'Authorization': `Bearer ${currentSession.access_token}`
                     }
                 });
                 
-                const verificationResult = await verificationResponse.json();
+                // Check if response is JSON
+                const contentType = verificationResponse.headers.get('content-type');
+                let verificationResult;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    verificationResult = await verificationResponse.json();
+                } else {
+                    // Server returned HTML or plain text (likely an error page)
+                    const textResponse = await verificationResponse.text();
+                    console.error('Server returned non-JSON response:', textResponse);
+                    
+                    if (!verificationResponse.ok) {
+                        throw new Error(`Server error (${verificationResponse.status}): Please check your environment variables are configured correctly.`);
+                    } else {
+                        throw new Error('Server returned unexpected response format');
+                    }
+                }
                 
                 if (!verificationResponse.ok) {
                     if (verificationResult.subscription_required) {
@@ -1471,6 +1462,20 @@ window.App = {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
+            // Track export analytics
+            if (window.Analytics && window.Analytics.trackEvent) {
+                window.Analytics.trackExport({
+                    format: exportFormat,
+                    size: exportSize,
+                    fileSizeBytes: blob.size,
+                    settings: {
+                        quality: exportQuality,
+                        width: exportWidth,
+                        height: exportHeight
+                    }
+                });
+            }
             
             // Silent success - no notifications
             
@@ -1650,24 +1655,24 @@ window.App = {
     // Set background gradient
     setBackgroundGradient(gradientId) {
         this.saveStateForUndo();
-        
-        // Find the gradient using getAllGradients method
-        const allGradients = Config.getAllGradients();
-        const gradient = allGradients.find(g => g.id === gradientId);
-        if (!gradient) {
-            console.warn(`Gradient not found: ${gradientId}`);
-            return;
-        }
-        
         this.state.backgroundGradientId = gradientId;
-        this.state.backgroundColor = null;
-        this.state.backgroundImageId = null;
+        this.state.backgroundColor = null; // Clear solid color when gradient is set
+        this.state.backgroundImageId = null; // Clear background image when gradient is set
         this.state.backgroundImage = null;
         
-        this.renderPreview();
-        this.updateUIState();
+        // Track background change analytics
+        if (window.Analytics && window.Analytics.trackBackgroundChanged) {
+            window.Analytics.trackBackgroundChanged({
+                type: 'gradient',
+                value: gradientId
+            });
+        }
         
-        console.log(`🎨 Background gradient set to: ${gradient.name}`);
+        this.renderPreview();
+        this.saveSettings();
+        
+        // Update UI selection
+        UI.updateBackgroundSelection(null, gradientId, null);
     },
 
     // Set background blur
