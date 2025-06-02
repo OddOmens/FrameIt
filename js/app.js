@@ -1293,12 +1293,44 @@ window.App = {
     
     // Add Dev Analytics button for dev users (will be shown/hidden based on user level)
     createDevAnalyticsButton() {
-        // Check if user is dev level (will be updated when Analytics loads)
-        setTimeout(() => {
-            if (window.Analytics && window.Analytics.hasFeatureAccess('dev')) {
-                this.showDevAnalyticsButton();
+        // Function to check user level and show button if needed
+        const checkUserLevel = () => {
+            if (window.Analytics && window.Analytics.state.userProfile) {
+                const userLevel = window.Analytics.state.userProfile.user_level;
+                console.log('👤 Checking user level for analytics button:', userLevel);
+                
+                if (userLevel === 'dev') {
+                    console.log('🔧 Dev user detected, showing analytics button');
+                    this.showDevAnalyticsButton();
+                } else {
+                    console.log('👤 User is not dev level, hiding dev features');
+                    this.hideDevFeatures();
+                }
+                return true; // Stop checking
+            } else {
+                console.log('⏳ User profile not loaded yet, will retry...');
+                return false; // Keep checking
             }
-        }, 2000); // Wait for Analytics to initialize
+        };
+        
+        // Try immediately
+        if (checkUserLevel()) return;
+        
+        // If not ready, keep checking every 500ms for up to 10 seconds
+        let attempts = 0;
+        const maxAttempts = 10; // Reduced to 5 seconds
+        
+        const intervalId = setInterval(() => {
+            attempts++;
+            
+            if (checkUserLevel() || attempts >= maxAttempts) {
+                clearInterval(intervalId);
+                if (attempts >= maxAttempts) {
+                    console.log('⚠️ Timed out waiting for user profile to load, defaulting to non-dev user');
+                    this.hideDevFeatures(); // Default to hiding dev features
+                }
+            }
+        }, 500);
     },
     
     // Show the Dev Analytics button in the toolbar
