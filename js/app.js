@@ -108,7 +108,7 @@ window.App = {
             helpBtn.addEventListener('click', () => UI.showHelpModal());
         }
         
-        // Add Dev Analytics button for dev users (will be shown/hidden based on user level)
+        // Add Dev Analytics button for dev users (called by Analytics module when profile loads)
         this.createDevAnalyticsButton();
         
         console.log('✅ FrameIt initialized successfully');
@@ -1291,46 +1291,18 @@ window.App = {
         this.saveSettings();
     },
     
-    // Add Dev Analytics button for dev users (will be shown/hidden based on user level)
+    // Add Dev Analytics button for dev users (called by Analytics module when profile loads)
     createDevAnalyticsButton() {
-        // Function to check user level and show button if needed
-        const checkUserLevel = () => {
-            if (window.Analytics && window.Analytics.state.userProfile) {
-                const userLevel = window.Analytics.state.userProfile.user_level;
-                console.log('👤 Checking user level for analytics button:', userLevel);
-                
-                if (userLevel === 'dev') {
-                    console.log('🔧 Dev user detected, showing analytics button');
-                    this.showDevAnalyticsButton();
-                } else {
-                    console.log('👤 User is not dev level, hiding dev features');
-                    this.hideDevFeatures();
-                }
-                return true; // Stop checking
-            } else {
-                console.log('⏳ User profile not loaded yet, will retry...');
-                return false; // Keep checking
-            }
-        };
+        // This function is now called directly by Analytics.onProfileLoaded()
+        // when a dev user is detected, so no need for polling/retries
         
-        // Try immediately
-        if (checkUserLevel()) return;
-        
-        // If not ready, keep checking every 500ms for up to 10 seconds
-        let attempts = 0;
-        const maxAttempts = 10; // Reduced to 5 seconds
-        
-        const intervalId = setInterval(() => {
-            attempts++;
-            
-            if (checkUserLevel() || attempts >= maxAttempts) {
-                clearInterval(intervalId);
-                if (attempts >= maxAttempts) {
-                    console.log('⚠️ Timed out waiting for user profile to load, defaulting to non-dev user');
-                    this.hideDevFeatures(); // Default to hiding dev features
-                }
-            }
-        }, 500);
+        if (window.Analytics && window.Analytics.hasFeatureAccess && window.Analytics.hasFeatureAccess('dev')) {
+            console.log('🔧 Dev user confirmed, showing analytics button');
+            this.showDevAnalyticsButton();
+        } else {
+            console.log('👤 Non-dev user, hiding dev features');
+            this.hideDevFeatures();
+        }
     },
     
     // Show the Dev Analytics button in the toolbar
