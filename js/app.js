@@ -2050,4 +2050,6 @@ window.App = {
 // Initialize the application when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.App.init();
-}); 
+});
+
+console.log('✅ FrameIt app.js loaded successfully'); 
