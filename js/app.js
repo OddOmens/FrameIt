@@ -704,6 +704,9 @@ window.App = {
             platforms: []
         };
         
+        // Update resolution selection UI
+        UI.updateResolutionSelection(width);
+        
         // Resize canvas
         this.updateCanvasSize();
         
@@ -837,6 +840,9 @@ window.App = {
 
         // Update text layers UI
         UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
+        
+        // Show text editor for the new layer
+        UI.showTextEditor(textLayer);
 
         return id;
     },
@@ -1297,56 +1303,24 @@ window.App = {
     
     // Add Dev Analytics button for dev users (called by Analytics module when profile loads)
     createDevAnalyticsButton() {
-        // This function is now called directly by Analytics.onProfileLoaded()
-        // when a dev user is detected, so no need for polling/retries
-        
+        // Analytics is now integrated into the account section instead of a separate button
+        // This function remains for compatibility but doesn't create a separate button
         if (window.Analytics && window.Analytics.hasFeatureAccess && window.Analytics.hasFeatureAccess('dev')) {
-            console.log('🔧 Dev user confirmed, showing analytics button');
-            this.showDevAnalyticsButton();
+            console.log('🔧 Dev user confirmed, analytics available in account section');
         } else {
-            console.log('👤 Non-dev user, hiding dev features');
-            this.hideDevFeatures();
+            console.log('👤 Non-dev user');
         }
     },
     
-    // Show the Dev Analytics button in the toolbar
+    // This function is no longer needed as analytics is integrated into account section
     showDevAnalyticsButton() {
-        // Check if button already exists
-        if (document.getElementById('dev-analytics-btn')) return;
-        
-        // Find the toolbar left section
-        const toolbarLeft = document.querySelector('.toolbar-left');
-        if (!toolbarLeft) return;
-        
-        // Create the Dev Analytics button
-        const devAnalyticsBtn = document.createElement('button');
-        devAnalyticsBtn.id = 'dev-analytics-btn';
-        devAnalyticsBtn.className = 'btn';
-        devAnalyticsBtn.innerHTML = `
-            <i class="fas fa-chart-bar"></i>
-            <span>Analytics</span>
-            <span class="dev-feature-indicator">Dev</span>
-        `;
-        
-        // Add click handler
-        devAnalyticsBtn.addEventListener('click', () => {
-            if (window.Analytics) {
-                window.Analytics.showAnalyticsDashboard();
-            }
-        });
-        
-        // Append to the end of toolbar-left (after help button)
-        toolbarLeft.appendChild(devAnalyticsBtn);
-        
-        console.log('✅ Dev Analytics button added to toolbar-left');
+        // Analytics is now integrated into account section
+        console.log('📊 Analytics is now available in the Account section under "Your Statistics"');
     },
     
     // Hide dev features for non-dev users
     hideDevFeatures() {
-        const devAnalyticsBtn = document.getElementById('dev-analytics-btn');
-        if (devAnalyticsBtn) {
-            devAnalyticsBtn.remove();
-        }
+        // No separate button to remove since analytics is integrated into account section
     },
     
     // Export image with Stripe usage tracking

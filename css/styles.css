@@ -4492,3 +4492,70 @@ textarea, select {
         font-size: 24px;
     }
 }
+
+/* Global Statistics Section within User Settings */
+.global-stats-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.global-stats-section h5 {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.global-stats-section h5 i {
+    color: #3b82f6;
+    font-size: 16px;
+}
+
+.global-stats-section .section-description {
+    color: #a1a1aa;
+    font-size: 14px;
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+}
+
+.global-stats-section .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.global-stats-section .btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.global-stats-section .dev-feature-indicator {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border: 1px solid #fbbf24;
+}
+
+@media (max-width: 768px) {
+    .global-stats-section {
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+    
+    .global-stats-section .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}

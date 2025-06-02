@@ -920,10 +920,37 @@ window.Auth = {
                 </div>
             `;
             
+            // Add Global Statistics section for dev users
+            if (window.Analytics && window.Analytics.hasFeatureAccess && window.Analytics.hasFeatureAccess('dev')) {
+                userStatsSection.innerHTML += `
+                    <div class="global-stats-section">
+                        <h5><i class="fas fa-globe"></i> Global Statistics</h5>
+                        <p class="section-description">View application-wide analytics and usage data.</p>
+                        <button id="view-global-analytics-btn" class="btn primary-btn">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>View Global Analytics</span>
+                            <span class="dev-feature-indicator">Dev</span>
+                        </button>
+                    </div>
+                `;
+            }
+            
             // Insert before the update profile section
             const updateSection = document.querySelector('.user-settings-section:nth-child(2)');
             if (updateSection) {
                 updateSection.parentNode.insertBefore(userStatsSection, updateSection);
+            }
+            
+            // Set up analytics button event listener for dev users
+            if (window.Analytics && window.Analytics.hasFeatureAccess && window.Analytics.hasFeatureAccess('dev')) {
+                const globalAnalyticsBtn = document.getElementById('view-global-analytics-btn');
+                if (globalAnalyticsBtn) {
+                    globalAnalyticsBtn.addEventListener('click', () => {
+                        if (window.Analytics && window.Analytics.showAnalyticsDashboard) {
+                            window.Analytics.showAnalyticsDashboard();
+                        }
+                    });
+                }
             }
         } else {
             // Update existing stats

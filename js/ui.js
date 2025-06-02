@@ -741,10 +741,6 @@ window.UI = {
     
     // Setup shadow position control
     setupShadowPositionControl() {
-        console.log('Setting up shadow position control...');
-        console.log('shadowPositionGrid:', this.elements.shadowPositionGrid);
-        console.log('shadowPositionHandle:', this.elements.shadowPositionHandle);
-        
         if (!this.elements.shadowPositionGrid || !this.elements.shadowPositionHandle) {
             console.warn('Shadow position elements not found!');
             return;
@@ -752,7 +748,6 @@ window.UI = {
 
         // Handle click on grid
         this.elements.shadowPositionGrid.addEventListener('mousedown', (e) => {
-            console.log('Shadow grid mousedown');
             // Get position relative to grid
             const rect = this.elements.shadowPositionGrid.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -776,7 +771,6 @@ window.UI = {
 
         // Initialize handle position
         this.updateShadowHandleFromState();
-        console.log('Shadow position control setup complete');
     },
     
     // Update shadow handle position based on current app state
@@ -2298,6 +2292,12 @@ window.UI = {
     // Show text editor for a layer
     showTextEditor(textLayer) {
         if (!this.elements.textEditor || !textLayer) return;
+        
+        // Ensure the Text Layers section is expanded
+        const textLayersSection = document.querySelector('.settings-section:has(.text-layers-list)');
+        if (textLayersSection && textLayersSection.classList.contains('collapsed')) {
+            this.toggleSettingsSection(textLayersSection);
+        }
         
         // Show the editor
         this.elements.textEditor.classList.remove('hidden');
