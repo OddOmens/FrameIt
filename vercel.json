@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/verify-export-permission.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "headers": [
     {
       "source": "/api/(.*)",
