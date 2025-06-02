@@ -335,25 +335,52 @@ window.StripeManager = {
     async syncUserLevel(planName) {
         if (!this.supabase || !window.Auth.getCurrentUser()) return;
         
-        // Map subscription plans to user levels
-        const levelMapping = {
-            free: 'standard',
-            pro: 'beta', 
-            team: 'dev'
-        };
-        
-        const userLevel = levelMapping[planName] || 'standard';
-        
         try {
+            // First, check if the user level has been manually set
+            const { data: currentProfile, error: fetchError } = await this.supabase
+                .from('profiles')
+                .select('user_level, level_manually_set')
+                .eq('id', window.Auth.getCurrentUser().id)
+                .single();
+            
+            if (fetchError && fetchError.code !== 'PGRST116') {
+                console.error('❌ Error fetching current profile:', fetchError);
+                return;
+            }
+            
+            // If user level has been manually set, don't override it
+            if (currentProfile?.level_manually_set === true) {
+                console.log('🔒 User level manually set, skipping automatic sync');
+                return;
+            }
+            
+            // Map subscription plans to user levels (only if not manually set)
+            const levelMapping = {
+                free: 'standard',
+                pro: 'beta', 
+                team: 'dev'
+            };
+            
+            const userLevel = levelMapping[planName] || 'standard';
+            
+            // Only update if the level would actually change
+            if (currentProfile?.user_level === userLevel) {
+                console.log('✅ User level already matches subscription tier');
+                return;
+            }
+            
             const { error } = await this.supabase
                 .from('profiles')
-                .update({ user_level: userLevel })
+                .update({ 
+                    user_level: userLevel,
+                    level_manually_set: false // Reset manual flag since this is automatic
+                })
                 .eq('id', window.Auth.getCurrentUser().id);
                 
             if (error) {
                 console.error('❌ Error syncing user level:', error);
             } else {
-                console.log(`✅ User level synced to: ${userLevel}`);
+                console.log(`✅ User level synced to: ${userLevel} (based on ${planName} subscription)`);
             }
         } catch (error) {
             console.error('❌ Failed to sync user level:', error);
@@ -542,6 +569,34 @@ window.StripeManager = {
             window.showNotification(message, type);
         } else {
             alert(message);
+        }
+    },
+    
+    // Reset user level to automatic (based on subscription)
+    async resetUserLevelToAutomatic() {
+        if (!this.supabase || !window.Auth.getCurrentUser()) return false;
+        
+        try {
+            // Clear the manual flag and let syncUserLevel handle the rest
+            const { error } = await this.supabase
+                .from('profiles')
+                .update({ level_manually_set: false })
+                .eq('id', window.Auth.getCurrentUser().id);
+                
+            if (error) {
+                console.error('❌ Error resetting user level to automatic:', error);
+                return false;
+            }
+            
+            // Now sync based on current subscription
+            const currentPlan = this.getCurrentPlan();
+            await this.syncUserLevel(currentPlan.name);
+            
+            console.log('✅ User level reset to automatic based on subscription');
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to reset user level to automatic:', error);
+            return false;
         }
     }
 };
