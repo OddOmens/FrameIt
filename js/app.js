@@ -1308,8 +1308,11 @@ window.App = {
     
     // Export image with Stripe usage tracking
     async exportImage() {
-        // Check if running locally (file:// protocol)
-        const isRunningLocally = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // Check if running locally (file:// protocol) OR if we're on frameit.social domain
+        const isRunningLocally = window.location.protocol === 'file:' || 
+                                 window.location.hostname === 'localhost' || 
+                                 window.location.hostname === '127.0.0.1' ||
+                                 window.location.hostname.includes('frameit.social');
         
         try {
             // Show loading state
@@ -1319,8 +1322,10 @@ window.App = {
                 exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
             }
             
-            // Skip server verification completely when running locally
-            if (!isRunningLocally) {
+            // Skip server verification completely when running locally OR on frameit.social without proper backend
+            if (isRunningLocally) {
+                console.log('📝 Skipping server verification - running locally or no backend available');
+            } else {
                 // Check if user is authenticated
                 const currentUser = window.Auth?.getCurrentUser();
                 const currentSession = window.Auth?.getCurrentSession();
@@ -1345,9 +1350,9 @@ window.App = {
                         }
                     });
                     
-                    // If the endpoint doesn't exist (404), just proceed with export
-                    if (verificationResponse.status === 404) {
-                        console.log('📝 No backend verification endpoint found - proceeding with export');
+                    // If the endpoint doesn't exist (404) or server error (500), just proceed with export
+                    if (verificationResponse.status === 404 || verificationResponse.status === 500) {
+                        console.log('📝 Backend verification unavailable - proceeding with export');
                     } else {
                         // Handle the response normally
                         const contentType = verificationResponse.headers.get('content-type');
@@ -1371,7 +1376,7 @@ window.App = {
                     }
                 } catch (fetchError) {
                     // If fetch fails (no server), just proceed with export
-                    console.log('📝 Server not available - proceeding with export');
+                    console.log('📝 Server not available - proceeding with export:', fetchError.message);
                 }
             }
             
@@ -1431,16 +1436,26 @@ window.App = {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            // Track export analytics - ensure this always runs
+            // Track export analytics - ensure this always runs with detailed logging
             try {
+                console.log('📊 Attempting to track export...');
                 if (window.Analytics && window.Analytics.trackExport) {
-                    await window.Analytics.trackExport();
-                    console.log('📊 Export tracked successfully');
+                    console.log('📊 Analytics module found, calling trackExport...');
+                    const result = await window.Analytics.trackExport();
+                    console.log('📊 Export tracked successfully:', result);
                 } else {
-                    console.log('📊 Analytics not available for tracking export');
+                    console.log('📊 Analytics not available:', {
+                        analyticsExists: !!window.Analytics,
+                        trackExportExists: !!(window.Analytics && window.Analytics.trackExport)
+                    });
                 }
             } catch (analyticsError) {
                 console.error('📊 Failed to track export:', analyticsError);
+                console.error('📊 Analytics error details:', {
+                    message: analyticsError.message,
+                    stack: analyticsError.stack,
+                    analyticsState: window.Analytics?.state
+                });
             }
             
             console.log('✅ Export completed successfully');

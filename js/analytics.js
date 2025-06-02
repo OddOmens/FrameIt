@@ -89,10 +89,14 @@ window.Analytics = {
 
     // Track image upload
     async trackImageUpload() {
+        console.log('📊 trackImageUpload called');
+        
         if (!this.state.user) {
             console.log('📊 No user logged in - skipping upload tracking');
             return;
         }
+
+        console.log('📊 User found:', this.state.user.id);
 
         try {
             const supabase = this.getSupabase();
@@ -101,29 +105,47 @@ window.Analytics = {
                 return;
             }
 
+            console.log('📊 Calling increment_upload_count with user_id:', this.state.user.id);
+            
             const { data, error } = await supabase.rpc('increment_upload_count', {
                 user_id: this.state.user.id
             });
 
             if (error) {
                 console.error('📊 Upload tracking error:', error);
+                console.error('📊 Error details:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
                 return;
             }
 
+            console.log('📊 Upload tracking response:', data);
+            
             if (this.config.debugMode) {
                 console.log('📊 Image upload tracked successfully');
             }
         } catch (error) {
             console.error('📊 Failed to track image upload:', error);
+            console.error('📊 Upload tracking exception:', {
+                message: error.message,
+                stack: error.stack
+            });
         }
     },
 
     // Track canvas creation
     async trackCanvasCreated() {
+        console.log('📊 trackCanvasCreated called');
+        
         if (!this.state.user) {
             console.log('📊 No user logged in - skipping canvas tracking');
             return;
         }
+
+        console.log('📊 User found:', this.state.user.id);
 
         try {
             const supabase = this.getSupabase();
@@ -132,29 +154,47 @@ window.Analytics = {
                 return;
             }
 
+            console.log('📊 Calling increment_canvas_count with user_id:', this.state.user.id);
+
             const { data, error } = await supabase.rpc('increment_canvas_count', {
                 user_id: this.state.user.id
             });
 
             if (error) {
                 console.error('📊 Canvas tracking error:', error);
+                console.error('📊 Error details:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
                 return;
             }
+
+            console.log('📊 Canvas tracking response:', data);
 
             if (this.config.debugMode) {
                 console.log('📊 Canvas creation tracked successfully');
             }
         } catch (error) {
             console.error('📊 Failed to track canvas creation:', error);
+            console.error('📊 Canvas tracking exception:', {
+                message: error.message,
+                stack: error.stack
+            });
         }
     },
 
     // Track export
     async trackExport() {
+        console.log('📊 trackExport called');
+        
         if (!this.state.user) {
             console.log('📊 No user logged in - skipping export tracking');
             return;
         }
+
+        console.log('📊 User found:', this.state.user.id);
 
         try {
             const supabase = this.getSupabase();
@@ -163,20 +203,37 @@ window.Analytics = {
                 return;
             }
 
+            console.log('📊 Calling increment_export_count with user_id:', this.state.user.id);
+
             const { data, error } = await supabase.rpc('increment_export_count', {
                 user_id: this.state.user.id
             });
 
             if (error) {
                 console.error('📊 Export tracking error:', error);
+                console.error('📊 Error details:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
                 return;
             }
+
+            console.log('📊 Export tracking response:', data);
 
             if (this.config.debugMode) {
                 console.log('📊 Export tracked successfully');
             }
+            
+            return data;
         } catch (error) {
             console.error('📊 Failed to track export:', error);
+            console.error('📊 Export tracking exception:', {
+                message: error.message,
+                stack: error.stack
+            });
+            throw error; // Re-throw so the calling function can handle it
         }
     },
 
