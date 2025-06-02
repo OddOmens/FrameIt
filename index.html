@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrameIt - Professional Screenshot Mockup Tool</title>
+    <meta name="description" content="Create beautiful screenshot mockups with customizable frames, shadows, and backgrounds. Perfect for app presentations and portfolios.">
+    <meta name="keywords" content="screenshot mockup, app presentation, device frames, mockup generator, design tool">
+    <meta name="author" content="Odd Omens">
+    <meta property="og:title" content="FrameIt - Professional Screenshot Mockup Tool">
+    <meta property="og:description" content="Create beautiful screenshot mockups with customizable frames, shadows, and backgrounds.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frameit.oddomens.com">
+    <link rel="canonical" href="https://frameit.oddomens.com">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Lora:wght@400;700&family=PT+Serif:wght@400;700&family=Crimson+Text:wght@400;600;700&family=Fira+Sans:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script defer data-domain="frameit.oddomens.com" src="https://plausible.io/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        .platform-icons {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            padding-left: 16px;
+        }
+
+        .platform-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .platform-icon:hover {
+            opacity: 1;
+        }
+
+        .platform-icon i {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* Updated resolution styles */
+        .resolution-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 14px;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 4px;
+        }
+
+        .resolution-option:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .resolution-option.selected {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .resolution-option .check-icon {
+            color: var(--accent-color);
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .resolution-option .check-icon i {
+            font-size: 16px;
+        }
+
+        .resolution-option .resolution-name {
+            flex: 1;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .resolution-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 4px;
+        }
+
+        .category-header {
+            display: none;
+        }
+
+        .category-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Updated section header styles */
+        .settings-section .section-header {
+            padding: var(--space-s) 0;
+            margin-bottom: var(--space-m);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent;
+            position: relative;
+        }
+
+        .settings-section .section-header h5 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+        }
+
+        .settings-section .section-header::after {
+            content: '\f078';  /* chevron-down */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: #888;
+            transition: transform 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .settings-section.collapsed .section-header::after {
+            transform: rotate(-90deg);  /* Point right when collapsed */
+        }
+
+        .settings-section .section-content {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 2000px;
+            opacity: 1;
+            overflow: hidden;
+        }
+
+        .settings-section.collapsed .section-content {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Noise controls */
+        .noise-controls {
+            padding: 8px 0;
+        }
+        
+        .noise-controls .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .noise-controls .select-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background-color: #1a1a1a;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .noise-controls .select-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .noise-options {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #333;
+        }
+        
+        .noise-options .adjustment-row {
+            margin-bottom: 8px;
+        }
+        
+        .noise-options .slider-container {
+            margin-bottom: 16px;
+        }
+        
+        /* Close upload zone button */
+        .close-upload-zone {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        
+        .close-upload-zone:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+        
+        /* Subsection styles */
+        .settings-subsection {
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .subsection-header {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s ease;
+        }
+        
+        .subsection-header:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        .subsection-header h6 {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+        }
+        
+        .subsection-header::after {
+            content: '\f078';  /* chevron-down */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 11px;
+            color: #888;
+            transition: transform 0.2s ease;
+        }
+        
+        .settings-subsection.collapsed .subsection-header::after {
+            transform: rotate(-90deg);  /* Point right when collapsed */
+        }
+        
+        .subsection-content {
+            padding: 16px;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 2000px;
+            opacity: 1;
+            overflow: hidden;
+        }
+        
+        .settings-subsection.collapsed .subsection-content {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 16px;
+        }
+        
+        /* Header buttons container */
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .header-buttons .btn {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Toolbar and Content Wrapper -->
+        <div class="toolbar-and-content-wrapper">
+            <!-- Top Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="app-logo">
+                        <span class="logo-text">FrameIt</span>
+                    </div>
+                    
+                    <!-- Authentication UI (moved here to be next to logo) -->
+                    <div id="auth-section" class="auth-section">
+                        <button id="account-btn" class="btn">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Account</span>
+                        </button>
+                        
+                        <!-- Hidden elements for auth state management -->
+                        <div id="auth-buttons" class="auth-buttons hidden">
+                            <button id="login-btn" class="btn">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Login</span>
+                            </button>
+                            <button id="signup-btn" class="btn primary-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Sign Up</span>
+                            </button>
+                        </div>
+                        
+                        <div id="user-menu" class="user-menu hidden">
+                            <div class="user-info">
+                                <span id="user-email" class="user-email"></span>
+                                <button id="user-settings-btn" class="btn icon-btn">
+                                    <i class="fas fa-user-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="help-btn" class="btn">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help</span>
+                    </button>
+                    
+                    <!-- Analytics button will be inserted here by JavaScript for dev users -->
+                </div>
+                
+                <div class="toolbar-right">
+                    <button id="add-image-btn" class="btn">
+                        <i class="fas fa-image"></i>
+                        <span>Add Image</span>
+                    </button>
+                    <button id="upload-btn" class="btn">
+                        <i class="fas fa-plus"></i>
+                        <span>New Canvas</span>
+                    </button>
+                    <button id="export-all-btn" class="btn">
+                        <i class="fas fa-file-export"></i>
+                        <span>Export All</span>
+                    </button>
+                    <button id="export-btn" class="btn primary-btn" disabled>
+                        <i class="fas fa-download"></i>
+                        <span>Export Mockup</span>
+                    </button>
+                    <button class="btn" id="upgrade-btn" style="display: none;">
+                        <i class="fas fa-crown"></i>
+                        Upgrade
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Gallery Panel (vertical left side) -->
+                <div class="gallery-bar" id="gallery-container">
+                    <h5 class="panel-title">Gallery
+                        <button id="gallery-upload-btn" class="btn success-btn">
+                            <i class="fas fa-plus"></i>
+                            <span>New Canvas</span>
+                        </button>
+                    </h5>
+                    <div class="gallery-content-wrapper">
+                        <div class="gallery-content" id="gallery-content">
+                            <!-- Gallery items will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Left Column with Canvas -->
+                <div class="left-column">
+                    <!-- Canvas Preview Area -->
+                    <div class="canvas-container">
+                        <div class="canvas-wrapper">
+                            <div id="canvas-preview" class="canvas-preview">
+                                <div id="image-drop-zone" class="image-drop-zone">
+                                    <button class="close-upload-zone" id="close-upload-zone">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div class="upload-prompt">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Add an image to this canvas</p>
+                                        <p><small>Or use "New Canvas" to create additional designs</small></p>
+                                        <button class="btn upload-btn">Add Image</button>
+                                    </div>
+                                </div>
+                                <canvas id="preview-canvas"></canvas>
+                            </div>
+                        </div>
+                        <div class="canvas-zoom-controls">
+                            <button id="zoom-out-btn" class="zoom-btn" title="Zoom Out">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button id="zoom-reset-btn" class="zoom-btn" title="Reset Zoom">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button id="zoom-in-btn" class="zoom-btn" title="Zoom In">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control Panels -->
+                <div class="control-panels">
+                    <!-- Combined Settings Panel -->
+                    <div class="control-panel">
+                        <h5 class="panel-title">Customize
+                            <button id="apply-to-all-btn" class="btn success-btn">
+                                <i class="fas fa-sync"></i>
+                                <span>Apply to All</span>
+                            </button>
+                        </h5>
+                        <div class="panel-content">
+                            <!-- Resolution Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Resolution</h5>
+                                </div>
+                                <div class="section-content">
+                                    <div class="resolution-categories">
+                                        <!-- Resolution categories will be populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <!-- Image Manipulation Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Image Manipulation</h5>
+                                </div>
+                                <div class="section-content">
+                                    <div class="adjustment-row">
+                                        <label>Corner Radius</label>
+                                        <span class="value-display" id="corner-radius-value">25px</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="corner-radius-slider" min="0" max="100" value="25" step="1">
+                                        <button id="reset-corner-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Padding</label>
+                                        <span class="value-display" id="padding-value">75px</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="padding-slider" min="0" max="150" value="75" step="1">
+                                        <button id="reset-padding-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Rotation</label>
+                                        <span class="value-display" id="rotation-value">0°</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="rotation-slider" min="0" max="360" value="0" step="1">
+                                        <button id="reset-rotation-btn" class="reset-btn" disabled>
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="button-row">
+                                        <button id="flip-h-btn" class="btn">
+                                            <i class="fas fa-arrows-alt-h"></i>
+                                            <span>Flip H</span>
+                                        </button>
+                                        <button id="flip-v-btn" class="btn">
+                                            <i class="fas fa-arrows-alt-v"></i>
+                                            <span>Flip V</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <!-- Shadow Settings Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Shadow Settings</h5>
+                                </div>
+                                <div class="section-content">
+                                    <div class="adjustment-row">
+                                        <label>Shadow Opacity</label>
+                                        <span class="value-display" id="shadow-opacity-value">15%</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="shadow-opacity-slider" min="0" max="1" value="0.15" step="0.01">
+                                        <button id="reset-shadow-opacity-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Shadow Color</label>
+                                        <span class="value-display" id="shadow-color-value">#000000</span>
+                                    </div>
+                                    <div class="color-input-wrapper">
+                                        <input type="color" id="shadow-color-input" value="#000000">
+                                        <button id="reset-shadow-color-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Shadow Radius</label>
+                                        <span class="value-display" id="shadow-radius-value">8px</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="shadow-radius-slider" min="0" max="200" value="8" step="1">
+                                        <button id="reset-shadow-radius-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Shadow Offset X</label>
+                                        <span class="value-display" id="shadow-offset-x-value">0px</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="shadow-offset-x-slider" min="-50" max="50" value="0" step="1">
+                                        <button id="reset-shadow-offset-x-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Shadow Offset Y</label>
+                                        <span class="value-display" id="shadow-offset-y-value">4px</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="shadow-offset-y-slider" min="-50" max="50" value="4" step="1">
+                                        <button id="reset-shadow-offset-y-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Shadow Position</label>
+                                    </div>
+                                    <div class="shadow-position-control">
+                                        <div class="shadow-position-grid">
+                                            <div class="shadow-position-handle" id="shadow-position-handle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <!-- Templates Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Templates</h5>
+                                </div>
+                                <div class="section-content">
+                                    <div class="templates-grid" id="templates-grid">
+                                        <!-- Template swatches will be added here via JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <!-- Background Options Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Background</h5>
+                                    <div class="header-buttons">
+                                        <button id="reset-bg-effects-btn" class="btn small-btn danger-btn">
+                                            <i class="fas fa-undo-alt"></i>
+                                            <span>Reset Effects</span>
+                                        </button>
+                                        <button id="random-bg-btn" class="btn small-btn">
+                                            <i class="fas fa-dice"></i>
+                                            <span>Random</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="section-content">
+                                    <!-- Blur & Filters Subsection -->
+                                    <div class="settings-subsection">
+                                        <div class="subsection-header">
+                                            <h6>Blur & Filters</h6>
+                                        </div>
+                                        <div class="subsection-content">
+                                            <div class="adjustment-row">
+                                                <label>Background Blur</label>
+                                                <span class="value-display" id="blur-value">0%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-blur-slider" min="0" max="20" value="0" step="1">
+                                                <button id="reset-blur-btn" class="reset-btn" disabled>
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Saturation</label>
+                                                <span class="value-display" id="saturation-value">100%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-saturation-slider" min="0" max="200" value="100" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Hue Rotation</label>
+                                                <span class="value-display" id="hue-value">0°</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-hue-slider" min="0" max="360" value="0" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Contrast</label>
+                                                <span class="value-display" id="contrast-value">100%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-contrast-slider" min="0" max="200" value="100" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Brightness</label>
+                                                <span class="value-display" id="brightness-value">100%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-brightness-slider" min="0" max="200" value="100" step="5">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Distortion Effects Subsection -->
+                                    <div class="settings-subsection">
+                                        <div class="subsection-header">
+                                            <h6>Distortion Effects</h6>
+                                        </div>
+                                        <div class="subsection-content">
+                                            <div class="adjustment-row">
+                                                <label>Twirl Effect</label>
+                                                <span class="value-display" id="twirl-value">0%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-twirl-slider" min="0" max="100" value="0" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Wave Distortion</label>
+                                                <span class="value-display" id="wave-value">0%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-wave-slider" min="0" max="100" value="0" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Ripple Effect</label>
+                                                <span class="value-display" id="ripple-value">0%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-ripple-slider" min="0" max="100" value="0" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Zoom Scale</label>
+                                                <span class="value-display" id="zoom-value">100%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-zoom-slider" min="50" max="200" value="100" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Shake Effect</label>
+                                                <span class="value-display" id="shake-value">0%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-shake-slider" min="0" max="100" value="0" step="5">
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Lens Distortion</label>
+                                                <span class="value-display" id="lens-value">0%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="bg-lens-slider" min="0" max="100" value="0" step="5">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Color Options Subsection -->
+                                    <div class="settings-subsection">
+                                        <div class="subsection-header">
+                                            <h6>Color Options</h6>
+                                        </div>
+                                        <div class="subsection-content">
+                                            <!-- Color swatches -->
+                                            <h5 class="subsection-title">Colors</h5>
+                                            <div class="color-grid" id="color-swatches">
+                                                <!-- Color swatches will be added here via JavaScript -->
+                                            </div>
+                                            
+                                            <!-- Gradients -->
+                                            <h5 class="subsection-title">Gradients</h5>
+                                            <div class="gradient-grid" id="gradient-swatches">
+                                                <!-- Gradient swatches will be added here via JavaScript -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <!-- Noise Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Noise & Texture</h5>
+                                    <button id="random-noise-btn" class="btn small-btn">
+                                        <i class="fas fa-dice"></i>
+                                        <span>Random</span>
+                                    </button>
+                                </div>
+                                <div class="section-content">
+                                    <div class="noise-controls">
+                                        <div class="form-group">
+                                            <label for="noise-overlay-select">Noise Type:</label>
+                                            <select id="noise-overlay-select" class="select-control">
+                                                <!-- Options will be populated by JavaScript -->
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="noise-options" id="noise-options" style="display: none;">
+                                            <div class="adjustment-row">
+                                                <label>Noise Intensity</label>
+                                                <span class="value-display" id="noise-intensity-value">100%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="noise-intensity-slider" min="0" max="2" value="1" step="0.1">
+                                                <button id="reset-noise-intensity-btn" class="reset-btn">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Noise Opacity</label>
+                                                <span class="value-display" id="noise-opacity-value">70%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="noise-opacity-slider" min="0" max="1" value="0.7" step="0.05">
+                                                <button id="reset-noise-opacity-btn" class="reset-btn">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="noise-blend-mode">Blend Mode:</label>
+                                                <select id="noise-blend-mode" class="select-control">
+                                                    <option value="multiply">Multiply</option>
+                                                    <option value="overlay">Overlay</option>
+                                                    <option value="soft-light">Soft Light</option>
+                                                    <option value="hard-light">Hard Light</option>
+                                                    <option value="screen">Screen</option>
+                                                    <option value="darken">Darken</option>
+                                                    <option value="lighten">Lighten</option>
+                                                    <option value="normal">Normal</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="adjustment-row">
+                                                <label>Scale</label>
+                                                <span class="value-display" id="noise-scale-value">100%</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="noise-scale-slider" min="0.1" max="3" value="1" step="0.1">
+                                                <button id="reset-noise-scale-btn" class="reset-btn">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <div class="checkbox-container">
+                                                    <input type="checkbox" id="noise-invert-toggle">
+                                                    <label for="noise-invert-toggle">Invert Colors</label>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="button-row">
+                                                <button id="clear-noise-btn" class="btn danger-btn">
+                                                    <i class="fas fa-times"></i>
+                                                    <span>Clear Noise</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <!-- Text Layers Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Text Layers</h5>
+                                    <button id="add-text-btn" class="btn primary-btn small-btn">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Add Text</span>
+                                    </button>
+                                </div>
+                                <div class="section-content">
+                                    <div id="text-layers-list" class="text-layers-list">
+                                        <!-- Text layers will be added here via JavaScript -->
+                                        <div class="empty-text-layers">
+                                            <p>No text layers yet. Click "Add Text" to create one.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="text-editor" class="text-editor hidden">
+                                        <div class="divider"></div>
+                                        <h5 class="subsection-title">Edit Text Layer</h5>
+                                        
+                                        <div class="form-group">
+                                            <label>Text Content</label>
+                                            <textarea id="text-content" rows="4" placeholder="Enter your text. Press Enter for new lines."></textarea>
+                                            <small class="form-help">Text will automatically wrap at 90% of the canvas width. Press Enter for manual line breaks.</small>
+                                        </div>
+                                        
+                                        <div class="adjustment-row">
+                                            <label>Font Size</label>
+                                            <span class="value-display" id="font-size-value">36px</span>
+                                        </div>
+                                        <div class="slider-container">
+                                            <input type="range" id="font-size-slider" min="10" max="500" value="36" step="1">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Font Family</label>
+                                            <select id="font-family-select">
+                                                <option value="Arial, sans-serif">Arial</option>
+                                                <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
+                                                <option value="'Times New Roman', serif">Times New Roman</option>
+                                                <option value="Georgia, serif">Georgia</option>
+                                                <option value="Verdana, sans-serif">Verdana</option>
+                                                <option value="'Roboto', sans-serif">Roboto</option>
+                                                <option value="'Open Sans', sans-serif">Open Sans</option>
+                                                <option value="'Montserrat', sans-serif">Montserrat</option>
+                                                <option value="'Playfair Display', serif">Playfair Display</option>
+                                                <option value="'Lato', sans-serif">Lato</option>
+                                                <option value="'Source Sans Pro', sans-serif">Source Sans Pro</option>
+                                                <option value="'Nunito', sans-serif">Nunito</option>
+                                                <option value="'Poppins', sans-serif">Poppins</option>
+                                                <option value="'Inter', sans-serif">Inter</option>
+                                                <option value="'Raleway', sans-serif">Raleway</option>
+                                                <option value="'Oswald', sans-serif">Oswald</option>
+                                                <option value="'Merriweather', serif">Merriweather</option>
+                                                <option value="'Lora', serif">Lora</option>
+                                                <option value="'PT Serif', serif">PT Serif</option>
+                                                <option value="'Crimson Text', serif">Crimson Text</option>
+                                                <option value="'Fira Sans', sans-serif">Fira Sans</option>
+                                                <option value="'Ubuntu', sans-serif">Ubuntu</option>
+                                                <option value="'Work Sans', sans-serif">Work Sans</option>
+                                                <option value="'Quicksand', sans-serif">Quicksand</option>
+                                                <option value="'Barlow', sans-serif">Barlow</option>
+                                                <option value="'DM Sans', sans-serif">DM Sans</option>
+                                                <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                                                <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                                                <option value="'Fira Code', monospace">Fira Code</option>
+                                                <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                                                <option value="monospace">Monospace</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Position</label>
+                                            <div class="text-position-controls">
+                                                <button id="bring-to-front-btn" class="btn small-btn">
+                                                    <i class="fas fa-level-up-alt"></i>
+                                                    <span>Bring to Front</span>
+                                                </button>
+                                                <button id="send-to-back-btn" class="btn small-btn">
+                                                    <i class="fas fa-level-down-alt"></i>
+                                                    <span>Send to Back</span>
+                                                </button>
+                                            </div>
+                                            <div class="quick-position-grid">
+                                                <button id="pos-top-left" class="quick-pos-btn" title="Top Left">⬉</button>
+                                                <button id="pos-top" class="quick-pos-btn" title="Top Center">⬆</button>
+                                                <button id="pos-top-right" class="quick-pos-btn" title="Top Right">⬈</button>
+                                                <button id="pos-left" class="quick-pos-btn" title="Middle Left">⬅</button>
+                                                <button id="pos-center" class="quick-pos-btn" title="Center">⦿</button>
+                                                <button id="pos-right" class="quick-pos-btn" title="Middle Right">➡</button>
+                                                <button id="pos-bottom-left" class="quick-pos-btn" title="Bottom Left">⬋</button>
+                                                <button id="pos-bottom" class="quick-pos-btn" title="Bottom Center">⬇</button>
+                                                <button id="pos-bottom-right" class="quick-pos-btn" title="Bottom Right">⬊</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Font Color</label>
+                                            <div class="color-input-wrapper">
+                                                <input type="color" id="text-color-input" value="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Text Align</label>
+                                            <div class="text-align-buttons">
+                                                <button id="align-left-btn" class="btn small-btn">
+                                                    <i class="fas fa-align-left"></i>
+                                                </button>
+                                                <button id="align-center-btn" class="btn small-btn active">
+                                                    <i class="fas fa-align-center"></i>
+                                                </button>
+                                                <button id="align-right-btn" class="btn small-btn">
+                                                    <i class="fas fa-align-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Text Style</label>
+                                            <div class="text-style-buttons">
+                                                <button id="bold-btn" class="btn small-btn">
+                                                    <i class="fas fa-bold"></i>
+                                                </button>
+                                                <button id="italic-btn" class="btn small-btn">
+                                                    <i class="fas fa-italic"></i>
+                                                </button>
+                                                <button id="underline-btn" class="btn small-btn">
+                                                    <i class="fas fa-underline"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="adjustment-row">
+                                            <label>Text Opacity</label>
+                                            <span class="value-display" id="text-opacity-value">100%</span>
+                                        </div>
+                                        <div class="slider-container">
+                                            <input type="range" id="text-opacity-slider" min="0" max="1" value="1" step="0.01">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Text Shadow</label>
+                                            <div class="checkbox-container">
+                                                <input type="checkbox" id="text-shadow-toggle">
+                                                <label for="text-shadow-toggle">Enable Shadow</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="text-shadow-options" class="shadow-options">
+                                            <div class="form-group">
+                                                <label>Shadow Color</label>
+                                                <div class="color-input-wrapper">
+                                                    <input type="color" id="text-shadow-color" value="#000000">
+                                                </div>
+                                            </div>
+                                            <div class="adjustment-row">
+                                                <label>Shadow Blur</label>
+                                                <span class="value-display" id="text-shadow-blur-value">3px</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="text-shadow-blur-slider" min="0" max="20" value="3" step="1">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Background</label>
+                                            <div class="checkbox-container">
+                                                <input type="checkbox" id="text-bg-toggle">
+                                                <label for="text-bg-toggle">Add Background</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="text-bg-options" class="background-options">
+                                            <div class="form-group">
+                                                <label>Background Color</label>
+                                                <div class="color-input-wrapper">
+                                                    <input type="color" id="text-bg-color" value="#333333">
+                                                </div>
+                                            </div>
+                                            <div class="adjustment-row">
+                                                <label>Padding</label>
+                                                <span class="value-display" id="text-padding-value">10px</span>
+                                            </div>
+                                            <div class="slider-container">
+                                                <input type="range" id="text-padding-slider" min="0" max="50" value="10" step="1">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="button-row">
+                                            <button id="delete-text-btn" class="btn danger-btn">
+                                                <i class="fas fa-trash"></i>
+                                                <span>Delete</span>
+                                            </button>
+                                            <button id="duplicate-text-btn" class="btn">
+                                                <i class="fas fa-copy"></i>
+                                                <span>Duplicate</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="history-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Screenshot History</h3>
+                <div class="modal-actions">
+                    <button id="clear-history-btn" class="btn danger-btn small-btn">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear All</span>
+                    </button>
+                    <button class="modal-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="history-items" class="history-items">
+                    <!-- History items will be added here dynamically -->
+                </div>
+                <div id="empty-history" class="empty-history">
+                    <i class="fas fa-photo-video"></i>
+                    <h4>No History</h4>
+                    <p>Your exported mockups will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export Settings Modal -->
+    <div class="modal" id="export-settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Export Settings</h3>
+                <div class="modal-actions">
+                    <button class="modal-close-btn" id="export-settings-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Export Dimensions</h4>
+                    <div class="setting-row">
+                        <label for="export-dimension-select">Size:</label>
+                        <select id="export-dimension-select" class="select-control">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div id="custom-size-controls" class="setting-row hidden">
+                        <div class="dimension-input-container">
+                            <label for="custom-width">Width:</label>
+                            <input type="number" id="custom-width" class="number-input" min="50" max="8000">
+                        </div>
+                        <div class="dimension-input-container">
+                            <label for="custom-height">Height:</label>
+                            <input type="number" id="custom-height" class="number-input" min="50" max="8000">
+                        </div>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="maintain-aspect-ratio" checked>
+                            <label for="maintain-aspect-ratio">Maintain aspect ratio</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Export Format</h4>
+                    <div class="setting-row">
+                        <label for="export-format-select">Format:</label>
+                        <select id="export-format-select" class="select-control">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="setting-row" id="quality-container">
+                        <label for="export-quality-select">Quality:</label>
+                        <select id="export-quality-select" class="select-control">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-row">
+                    <button id="cancel-export-btn" class="btn">Cancel</button>
+                    <button id="confirm-export-btn" class="btn primary-btn">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Help Modal -->
+    <div class="modal" id="help-modal">
+        <div class="modal-content help-modal-content">
+            <div class="modal-header help-modal-header">
+                <h3>Welcome to FrameIt</h3>
+                <button class="modal-close-btn" id="help-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body help-modal-body">
+                <div class="help-section">
+                    <h4><i class="fas fa-cloud-upload-alt"></i> Getting Started</h4>
+                    <p>Create beautiful designs with or without images! Add images by clicking "Add Image" or drag & drop files directly onto the canvas. You can also create stunning text and background-only designs.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-palette"></i> Background Options</h4>
+                    <p>Choose from solid colors, gradients, or upload custom background images. Use the "Random" button to quickly try different backgrounds.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-texture"></i> Noise & Texture</h4>
+                    <p>Add realistic textures to enhance your backgrounds:</p>
+                    <ul>
+                        <li><strong>Types:</strong> Paper, canvas, grain, Perlin noise, static, fabric, and dot patterns</li>
+                        <li><strong>Intensity:</strong> Control how strong the texture appears</li>
+                        <li><strong>Opacity:</strong> Adjust transparency of the texture overlay</li>
+                        <li><strong>Blend Modes:</strong> Choose how texture interacts with background</li>
+                        <li><strong>Scale:</strong> Make texture patterns larger or smaller</li>
+                        <li><strong>Invert:</strong> Reverse texture colors for different effects</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-sliders-h"></i> Image Controls</h4>
+                    <p>Fine-tune your mockups with corner radius, padding, rotation, flipping, and advanced shadow settings including color, opacity, blur, and positioning.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-font"></i> Text Layers</h4>
+                    <p>Add custom text overlays with full typography control, positioning, shadows, backgrounds, and layering options.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-expand-arrows-alt"></i> Resolutions</h4>
+                    <p>Choose from preset resolutions optimized for social media platforms or create custom dimensions.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-keyboard"></i> Shortcuts</h4>
+                    <ul>
+                        <li><strong>Ctrl/Cmd + Z:</strong> Undo</li>
+                        <li><strong>Ctrl/Cmd + Y:</strong> Redo</li>
+                        <li><strong>Ctrl/Cmd + Scroll:</strong> Zoom</li>
+                        <li><strong>Drag:</strong> Pan canvas when zoomed</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-download"></i> Export</h4>
+                    <p>Export individual mockups or batch export all images with custom formats (PNG, JPEG, WebP) and quality settings.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Authentication Modal -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content auth-modal-content">
+            <div class="modal-header auth-modal-header">
+                <h3 id="auth-modal-title">Welcome to FrameIt</h3>
+                <button class="modal-close-btn" id="auth-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body auth-modal-body">
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form">
+                    <h4>Login to Your Account</h4>
+                    <p class="auth-subtitle">Continue creating beautiful mockups</p>
+                    
+                    <form id="login-form-element">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required placeholder="Enter your password">
+                        </div>
+                        <div id="login-error" class="auth-error hidden"></div>
+                        <button type="submit" class="btn primary-btn auth-submit-btn" id="login-submit">
+                            <span class="btn-text">Login</span>
+                            <span class="btn-spinner hidden">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+                    </form>
+                    
+                    <div class="auth-forgot-password">
+                        <button id="forgot-password-btn" class="forgot-password-link">
+                            Forgot your password?
+                        </button>
+                    </div>
+                    
+                    <div class="auth-divider">
+                        <span>Don't have an account?</span>
+                    </div>
+                    
+                    <button id="show-signup" class="btn auth-switch-btn">
+                        <span>Sign up for free</span>
+                    </button>
+                </div>
+                
+                <!-- Signup Form -->
+                <div id="signup-form" class="auth-form hidden">
+                    <h4>Create Your Account</h4>
+                    <p class="auth-subtitle">Join FrameIt and start creating amazing mockups</p>
+                    
+                    <form id="signup-form-element">
+                        <div class="form-group">
+                            <label for="signup-email">Email</label>
+                            <input type="email" id="signup-email" required placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <input type="password" id="signup-password" required placeholder="Create a password (min 6 characters)" minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-confirm-password">Confirm Password</label>
+                            <input type="password" id="signup-confirm-password" required placeholder="Confirm your password">
+                        </div>
+                        <div id="signup-error" class="auth-error hidden"></div>
+                        <div id="signup-success" class="auth-success hidden">
+                            Account created successfully! Please check your email to verify your account.
+                        </div>
+                        <button type="submit" class="btn primary-btn auth-submit-btn" id="signup-submit">
+                            <span class="btn-text">Create Account</span>
+                            <span class="btn-spinner hidden">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>Already have an account?</span>
+                    </div>
+                    
+                    <button id="show-login" class="btn auth-switch-btn">
+                        <span>Login instead</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Gate (shown when not logged in) -->
+    <div id="auth-gate" class="auth-gate">
+        <div class="landing-container">
+            <!-- Left Side - Product Information -->
+            <div class="landing-left">
+                <div class="landing-content">
+                    <div class="landing-logo">
+                        <span class="logo-text">FrameIt</span>
+                    </div>
+                    
+                    <h1 class="landing-title">Professional Screenshot Mockup Tool</h1>
+                    <p class="landing-subtitle">Create stunning mockups in seconds with our powerful design tools</p>
+                    
+                    <div class="landing-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Beautiful Backgrounds</h3>
+                                <p>Choose from solid colors, gradients, or upload custom images with advanced filters</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Advanced Effects</h3>
+                                <p>Add realistic textures, shadows, and distortion effects to enhance your designs</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-font"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Custom Text Overlays</h3>
+                                <p>Add professional typography with shadows, backgrounds, and positioning controls</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>High Quality Exports</h3>
+                                <p>Export in multiple formats with custom resolutions optimized for any platform</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="landing-testimonial">
+                        <div class="testimonial-content">
+                            <p>"FrameIt has revolutionized how we create mockups for our app presentations. The quality and ease of use is unmatched."</p>
+                            <div class="testimonial-author">
+                                <strong>— Design Team Lead</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Authentication Forms -->
+            <div class="landing-right">
+                <div class="auth-container">
+                    <!-- Login Form -->
+                    <div id="landing-login-form" class="landing-auth-form active">
+                        <h2>Welcome Back</h2>
+                        <p class="form-subtitle">Sign in to continue creating amazing mockups</p>
+                        
+                        <form id="landing-login-form-element">
+                            <div class="form-group">
+                                <label for="landing-login-email">Email Address</label>
+                                <input type="email" id="landing-login-email" required placeholder="Enter your email" autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="landing-login-password">Password</label>
+                                <input type="password" id="landing-login-password" required placeholder="Enter your password" autocomplete="current-password">
+                            </div>
+                            <div id="landing-login-error" class="auth-error hidden"></div>
+                            <button type="submit" class="auth-btn primary" id="landing-login-submit">
+                                <span class="btn-text">Sign In</span>
+                                <span class="btn-spinner hidden">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                            </button>
+                        </form>
+                        
+                        <div class="auth-forgot">
+                            <button id="landing-forgot-password-btn" class="forgot-link">
+                                Forgot your password?
+                            </button>
+                        </div>
+                        
+                        <div class="auth-switch">
+                            <p>Don't have an account? <button id="show-landing-signup" class="switch-link">Sign up for free</button></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Signup Form -->
+                    <div id="landing-signup-form" class="landing-auth-form">
+                        <h2>Get Started Free</h2>
+                        <p class="form-subtitle">Create your account and start designing in minutes</p>
+                        
+                        <form id="landing-signup-form-element">
+                            <div class="form-group">
+                                <label for="landing-signup-email">Email Address</label>
+                                <input type="email" id="landing-signup-email" required placeholder="Enter your email" autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="landing-signup-password">Password</label>
+                                <input type="password" id="landing-signup-password" required placeholder="Create a password (min 6 characters)" minlength="6" autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label for="landing-signup-confirm-password">Confirm Password</label>
+                                <input type="password" id="landing-signup-confirm-password" required placeholder="Confirm your password" autocomplete="new-password">
+                            </div>
+                            <div id="landing-signup-error" class="auth-error hidden"></div>
+                            <div id="landing-signup-success" class="auth-success hidden">
+                                Account created successfully! Please check your email to verify your account.
+                            </div>
+                            <button type="submit" class="auth-btn primary" id="landing-signup-submit">
+                                <span class="btn-text">Create Account</span>
+                                <span class="btn-spinner hidden">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                            </button>
+                        </form>
+                        
+                        <div class="auth-switch">
+                            <p>Already have an account? <button id="show-landing-login" class="switch-link">Sign in instead</button></p>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-features">
+                        <div class="auth-feature">
+                            <i class="fas fa-check"></i>
+                            <span>No credit card required</span>
+                        </div>
+                        <div class="auth-feature">
+                            <i class="fas fa-check"></i>
+                            <span>Start creating immediately</span>
+                        </div>
+                        <div class="auth-feature">
+                            <i class="fas fa-check"></i>
+                            <span>Export unlimited mockups</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Settings Modal -->
+    <div id="user-settings-modal" class="modal">
+        <div class="modal-content user-settings-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-cog"></i> Account Settings</h3>
+                <button class="modal-close-btn" id="user-settings-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-settings-section">
+                    <h4><i class="fas fa-info-circle"></i> Account Information</h4>
+                    <p class="section-description">View your account details and verification status.</p>
+                    <div class="user-info-display">
+                        <div class="info-item">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <span id="user-email">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-shield-alt"></i> Verification Status</label>
+                            <span id="verification-status" class="verification-status unverified">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Unverified
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-calendar-alt"></i> Member Since</label>
+                            <span id="member-since">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="user-settings-section">
+                    <h4><i class="fas fa-user-edit"></i> Update Profile</h4>
+                    <p class="section-description">Change your email address and account preferences.</p>
+                    <div class="form-group">
+                        <label for="new-email">New Email Address</label>
+                        <input type="email" id="new-email" placeholder="Enter new email address">
+                    </div>
+                    <button id="update-email-btn" class="btn primary-btn">
+                        <i class="fas fa-save"></i>
+                        Update Email
+                    </button>
+                    <div class="auth-error hidden" id="update-email-error"></div>
+                    <div class="auth-success hidden" id="update-email-success"></div>
+                </div>
+
+                <div class="user-settings-section">
+                    <h4><i class="fas fa-key"></i> Change Password</h4>
+                    <p class="section-description">Update your password to keep your account secure.</p>
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <input type="password" id="confirm-password" placeholder="Confirm new password">
+                    </div>
+                    <button id="change-password-btn" class="btn primary-btn">
+                        <i class="fas fa-lock"></i>
+                        Change Password
+                    </button>
+                    <div class="auth-error hidden" id="change-password-error"></div>
+                    <div class="auth-success hidden" id="change-password-success"></div>
+                </div>
+
+                <div class="user-settings-section danger-section">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                    <p class="section-description">Permanently delete your account and all associated data.</p>
+                    <div class="danger-warning">
+                        <i class="fas fa-warning"></i>
+                        <span>This action cannot be undone. All your data, including saved bookmarks, will be permanently deleted.</span>
+                    </div>
+                    <div class="danger-actions">
+                        <button id="delete-account-btn" class="btn danger-btn">
+                            <i class="fas fa-trash-alt"></i>
+                            Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="user-settings-actions">
+                <button id="close-settings-btn" class="btn">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div class="modal" id="delete-account-modal">
+        <div class="modal-content delete-account-content">
+            <div class="modal-header">
+                <h3>Delete Account</h3>
+                <button class="modal-close-btn" id="delete-account-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-confirmation">
+                    <div class="warning-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4>Are you absolutely sure?</h4>
+                    <p>This action <strong>cannot be undone</strong>. This will permanently delete your account and remove all your data from our servers.</p>
+                    
+                    <div class="form-group">
+                        <label for="delete-confirmation-email">Please type your email address to confirm:</label>
+                        <input type="email" id="delete-confirmation-email" placeholder="Enter your email address">
+                    </div>
+                    
+                    <div id="delete-account-error" class="auth-error hidden"></div>
+                    
+                    <div class="delete-actions">
+                        <button id="cancel-delete-btn" class="btn">Cancel</button>
+                        <button id="confirm-delete-btn" class="btn danger-btn" disabled>
+                            <span class="btn-text">Delete My Account</span>
+                            <span class="btn-spinner hidden">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Modal -->
+    <div id="pricing-modal" class="modal">
+        <div class="modal-content pricing-content">
+            <div class="modal-header">
+                <h3>Choose Your Plan</h3>
+                <button class="modal-close-btn" id="pricing-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="pricing-plans">
+                    <!-- Free Plan -->
+                    <div class="pricing-card">
+                        <h4>Free</h4>
+                        <div class="price">$0<span>/month</span></div>
+                        <ul class="features">
+                            <li>5 exports per month</li>
+                            <li>Basic templates</li>
+                            <li>Standard resolution</li>
+                            <li>Watermark on exports</li>
+                        </ul>
+                        <button class="btn current-plan" disabled>Current Plan</button>
+                    </div>
+                    
+                    <!-- Pro Plan -->
+                    <div class="pricing-card featured">
+                        <div class="popular-badge">Most Popular</div>
+                        <h4>Pro</h4>
+                        <div class="price">$9<span>/month</span></div>
+                        <ul class="features">
+                            <li>Unlimited exports</li>
+                            <li>Premium templates</li>
+                            <li>4K resolution exports</li>
+                            <li>No watermarks</li>
+                            <li>Advanced effects</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <button class="btn primary-btn" id="subscribe-pro">
+                            <span class="btn-text">Upgrade to Pro</span>
+                            <span class="btn-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Team Plan -->
+                    <div class="pricing-card">
+                        <h4>Team</h4>
+                        <div class="price">$29<span>/month</span></div>
+                        <ul class="features">
+                            <li>Everything in Pro</li>
+                            <li>Team collaboration</li>
+                            <li>Shared template library</li>
+                            <li>Brand kit management</li>
+                            <li>Usage analytics</li>
+                            <li>API access</li>
+                            <li>Custom integrations</li>
+                        </ul>
+                        <button class="btn primary-btn" id="subscribe-team">
+                            <span class="btn-text">Upgrade to Team</span>
+                            <span class="btn-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Usage Meter Demo -->
+                <div class="usage-meter">
+                    <h4>Current Usage</h4>
+                    <div class="usage-progress">
+                        <div class="usage-progress-bar" style="width: 60%;"></div>
+                    </div>
+                    <div class="usage-text">
+                        <span>3 of 5 exports used</span>
+                        <span>Resets in 18 days</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for uploads -->
+    <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+    
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/frameit-config.js"></script>
+    <script src="js/noise.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/models/export.js"></script>
+    <script src="js/models/image.js"></script>
+    <script src="js/models/text.js"></script>
+    <script src="js/models.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/stripe.js"></script>
+    <script src="js/payments.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Initialize authentication when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM loaded, initializing Auth...');
+            await Auth.init();
+        });
+    </script>
+</body>
+</html>

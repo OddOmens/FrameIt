@@ -1,0 +1,28 @@
+{
+  "name": "frameit",
+  "version": "1.0.0",
+  "description": "Professional Screenshot Mockup Tool with Stripe Integration",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "stripe": "^14.21.0",
+    "@supabase/supabase-js": "^2.38.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mockup",
+    "screenshot",
+    "design",
+    "stripe",
+    "payments",
+    "frameit"
+  ],
+  "author": "Odd Omens",
+  "license": "MIT"
+} 
