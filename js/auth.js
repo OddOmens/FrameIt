@@ -8,6 +8,7 @@ console.log('🔍 Auth.js file loaded successfully');
 window.Auth = {
     supabase: null,
     currentUser: null,
+    currentSession: null,
     testMode: false, // Set to true to bypass auth for testing
     
     // Initialize authentication
@@ -65,6 +66,7 @@ window.Auth = {
             if (session) {
                 console.log('User already logged in:', session.user.email);
                 this.currentUser = session.user;
+                this.currentSession = session;
                 this.showMainApp();
             } else {
                 console.log('No active session, showing auth gate');
@@ -107,6 +109,7 @@ window.Auth = {
             if (data.session) {
                 console.log('✅ Email confirmation successful');
                 this.currentUser = data.session.user;
+                this.currentSession = data.session;
                 
                 // Show success message
                 const notification = document.createElement('div');
@@ -394,10 +397,12 @@ window.Auth = {
         
         if (event === 'SIGNED_IN' && session) {
             this.currentUser = session.user;
+            this.currentSession = session; // Store the full session with access token
             this.hideAuthModal(); // Hide modal immediately when signed in
             this.showMainApp();
         } else if (event === 'SIGNED_OUT') {
             this.currentUser = null;
+            this.currentSession = null; // Clear session
             this.showAuthGate();
         }
     },
@@ -407,6 +412,7 @@ window.Auth = {
         const authGate = document.getElementById('auth-gate');
         const appContainer = document.querySelector('.app-container');
         const accountBtn = document.getElementById('account-btn');
+        const logoutBtn = document.getElementById('logout-btn');
         
         if (authGate) {
             authGate.style.display = 'flex';
@@ -422,6 +428,11 @@ window.Auth = {
                 accountSpan.textContent = 'Account';
             }
         }
+        
+        // Hide logout button when logged out
+        if (logoutBtn) {
+            logoutBtn.style.display = 'none';
+        }
     },
     
     // Show the main application
@@ -432,6 +443,7 @@ window.Auth = {
         const userMenu = document.getElementById('user-menu');
         const userEmail = document.getElementById('user-email');
         const accountBtn = document.getElementById('account-btn');
+        const logoutBtn = document.getElementById('logout-btn');
         
         if (authGate) {
             authGate.style.display = 'none';
@@ -455,6 +467,11 @@ window.Auth = {
                 accountSpan.textContent = this.currentUser.email;
             }
             console.log('👤 Account button updated with user email:', this.currentUser.email);
+        }
+        
+        // Show logout button when logged in
+        if (logoutBtn) {
+            logoutBtn.style.display = 'flex';
         }
         
         this.hideAuthModal();
@@ -777,6 +794,11 @@ window.Auth = {
     // Get current user
     getCurrentUser() {
         return this.currentUser;
+    },
+    
+    // Get current session (includes access token)
+    getCurrentSession() {
+        return this.currentSession;
     },
     
     // Check if user is authenticated
@@ -1212,6 +1234,7 @@ window.Auth = {
                 
                 // Clear local data
                 this.currentUser = null;
+                this.currentSession = null;
                 this.showAuthGate();
                 this.hideDeleteAccountModal();
                 
