@@ -90,10 +90,22 @@ window.Analytics = {
     // Track image upload
     async trackImageUpload() {
         console.log('📊 trackImageUpload called');
+        console.log('📊 Analytics state:', this.state);
+        console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
+        console.log('📊 Analytics user:', this.state.user);
         
         if (!this.state.user) {
-            console.log('📊 No user logged in - skipping upload tracking');
-            return;
+            console.log('📊 No user in analytics state - trying to get from Auth module...');
+            
+            // Try to get user from Auth module directly
+            const authUser = window.Auth?.getCurrentUser();
+            if (authUser) {
+                console.log('📊 Found user in Auth module, updating analytics state:', authUser.id);
+                this.state.user = authUser;
+            } else {
+                console.log('📊 No user found in Auth module either - skipping upload tracking');
+                return;
+            }
         }
 
         console.log('📊 User found:', this.state.user.id);
@@ -139,10 +151,22 @@ window.Analytics = {
     // Track canvas creation
     async trackCanvasCreated() {
         console.log('📊 trackCanvasCreated called');
+        console.log('📊 Analytics state:', this.state);
+        console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
+        console.log('📊 Analytics user:', this.state.user);
         
         if (!this.state.user) {
-            console.log('📊 No user logged in - skipping canvas tracking');
-            return;
+            console.log('📊 No user in analytics state - trying to get from Auth module...');
+            
+            // Try to get user from Auth module directly
+            const authUser = window.Auth?.getCurrentUser();
+            if (authUser) {
+                console.log('📊 Found user in Auth module, updating analytics state:', authUser.id);
+                this.state.user = authUser;
+            } else {
+                console.log('📊 No user found in Auth module either - skipping canvas tracking');
+                return;
+            }
         }
 
         console.log('📊 User found:', this.state.user.id);
@@ -188,10 +212,22 @@ window.Analytics = {
     // Track export
     async trackExport() {
         console.log('📊 trackExport called');
+        console.log('📊 Analytics state:', this.state);
+        console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
+        console.log('📊 Analytics user:', this.state.user);
         
         if (!this.state.user) {
-            console.log('📊 No user logged in - skipping export tracking');
-            return;
+            console.log('📊 No user in analytics state - trying to get from Auth module...');
+            
+            // Try to get user from Auth module directly
+            const authUser = window.Auth?.getCurrentUser();
+            if (authUser) {
+                console.log('📊 Found user in Auth module, updating analytics state:', authUser.id);
+                this.state.user = authUser;
+            } else {
+                console.log('📊 No user found in Auth module either - skipping export tracking');
+                return;
+            }
         }
 
         console.log('📊 User found:', this.state.user.id);
