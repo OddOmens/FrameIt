@@ -146,57 +146,48 @@ window.Analytics = {
         console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
         console.log('📊 Analytics user:', this.state.user);
         
-        if (!this.state.user) {
+        // Try to get user from Auth module directly if not in analytics state
+        let currentUser = this.state.user;
+        if (!currentUser) {
             console.log('📊 No user in analytics state - trying to get from Auth module...');
             
-            // Try to get user from Auth module directly
             const authUser = window.Auth?.getCurrentUser();
             if (authUser) {
                 console.log('📊 Found user in Auth module, updating analytics state:', authUser.id);
                 this.state.user = authUser;
+                currentUser = authUser;
             } else {
                 console.log('📊 No user found in Auth module either - skipping canvas tracking');
-                return;
+                return { success: false, reason: 'No user logged in' };
             }
         }
 
-        console.log('📊 User found:', this.state.user.id);
+        console.log('📊 User found:', currentUser.id);
 
         try {
             const supabase = this.getSupabase();
             if (!supabase) {
                 console.error('📊 Supabase not available for canvas tracking');
-                return;
+                return { success: false, reason: 'Supabase not available' };
             }
 
-            console.log('📊 Calling increment_canvas_count with user_id:', this.state.user.id);
+            console.log('📊 Calling increment_canvas_count with user_id:', currentUser.id);
 
             const { data, error } = await supabase.rpc('increment_canvas_count', {
-                user_id: this.state.user.id
+                user_id: currentUser.id
             });
 
             if (error) {
                 console.error('📊 Canvas tracking error:', error);
-                console.error('📊 Error details:', {
-                    message: error.message,
-                    code: error.code,
-                    details: error.details,
-                    hint: error.hint
-                });
-                return;
+                throw error;
             }
 
-            console.log('📊 Canvas tracking response:', data);
+            console.log('📊 Canvas tracked successfully:', data);
+            return { success: true, data: data };
 
-            if (this.config.debugMode) {
-                console.log('📊 Canvas creation tracked successfully');
-            }
         } catch (error) {
             console.error('📊 Failed to track canvas creation:', error);
-            console.error('📊 Canvas tracking exception:', {
-                message: error.message,
-                stack: error.stack
-            });
+            return { success: false, error: error.message };
         }
     },
 
@@ -207,60 +198,48 @@ window.Analytics = {
         console.log('📊 Auth module user:', window.Auth?.getCurrentUser());
         console.log('📊 Analytics user:', this.state.user);
         
-        if (!this.state.user) {
+        // Try to get user from Auth module directly if not in analytics state
+        let currentUser = this.state.user;
+        if (!currentUser) {
             console.log('📊 No user in analytics state - trying to get from Auth module...');
             
-            // Try to get user from Auth module directly
             const authUser = window.Auth?.getCurrentUser();
             if (authUser) {
                 console.log('📊 Found user in Auth module, updating analytics state:', authUser.id);
                 this.state.user = authUser;
+                currentUser = authUser;
             } else {
                 console.log('📊 No user found in Auth module either - skipping export tracking');
-                return;
+                return { success: false, reason: 'No user logged in' };
             }
         }
 
-        console.log('📊 User found:', this.state.user.id);
+        console.log('📊 User found:', currentUser.id);
 
         try {
             const supabase = this.getSupabase();
             if (!supabase) {
                 console.error('📊 Supabase not available for export tracking');
-                return;
+                return { success: false, reason: 'Supabase not available' };
             }
 
-            console.log('📊 Calling increment_export_count with user_id:', this.state.user.id);
+            console.log('📊 Calling increment_export_count with user_id:', currentUser.id);
 
             const { data, error } = await supabase.rpc('increment_export_count', {
-                user_id: this.state.user.id
+                user_id: currentUser.id
             });
 
             if (error) {
                 console.error('📊 Export tracking error:', error);
-                console.error('📊 Error details:', {
-                    message: error.message,
-                    code: error.code,
-                    details: error.details,
-                    hint: error.hint
-                });
-                return;
+                throw error;
             }
 
-            console.log('📊 Export tracking response:', data);
-
-            if (this.config.debugMode) {
-                console.log('📊 Export tracked successfully');
-            }
+            console.log('📊 Export tracked successfully:', data);
+            return { success: true, data: data };
             
-            return data;
         } catch (error) {
             console.error('📊 Failed to track export:', error);
-            console.error('📊 Export tracking exception:', {
-                message: error.message,
-                stack: error.stack
-            });
-            throw error; // Re-throw so the calling function can handle it
+            return { success: false, error: error.message };
         }
     },
 

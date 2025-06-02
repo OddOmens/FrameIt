@@ -1062,43 +1062,32 @@ window.Auth = {
                 contentDiv.style.display = 'block';
                 contentDiv.innerHTML = `
                     <div class="user-stats-grid" style="margin-bottom: 24px;">
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-users"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.total_users}</div>
-                            <div class="analytics-card-label stat-label">Total Users</div>
+                        <div class="stat-item">
+                            <div class="stat-value">${globalStats.total_users}</div>
+                            <div class="stat-label">Total Users</div>
                         </div>
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-download"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.total_exports}</div>
-                            <div class="analytics-card-label stat-label">Total Exports</div>
+                        <div class="stat-item">
+                            <div class="stat-value">${globalStats.total_exports}</div>
+                            <div class="stat-label">Total Exports</div>
                         </div>
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-palette"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.total_canvases}</div>
-                            <div class="analytics-card-label stat-label">Total Canvases</div>
+                        <div class="stat-item">
+                            <div class="stat-value">${globalStats.total_canvases}</div>
+                            <div class="stat-label">Total Canvases</div>
                         </div>
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.total_uploads}</div>
-                            <div class="analytics-card-label stat-label">Total Uploads</div>
+                        <div class="stat-item">
+                            <div class="stat-value">${globalStats.total_uploads}</div>
+                            <div class="stat-label">Total Uploads</div>
                         </div>
                     </div>
                     
                     <div class="user-stats-grid" style="margin-bottom: 24px;">
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-code"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.dev_users}</div>
-                            <div class="analytics-card-label stat-label">Dev Users</div>
+                        <div class="stat-item">
+                            <div class="stat-value">${globalStats.standard_users}</div>
+                            <div class="stat-label">Standard Users</div>
                         </div>
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-flask"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.beta_users}</div>
-                            <div class="analytics-card-label stat-label">Beta Users</div>
-                        </div>
-                        <div class="analytics-card stat-item">
-                            <div class="analytics-card-icon"><i class="fas fa-user"></i></div>
-                            <div class="analytics-card-value stat-value">${globalStats.standard_users}</div>
-                            <div class="analytics-card-label stat-label">Standard Users</div>
+                        <div class="stat-item">
+                            <div class="stat-value">${globalStats.beta_users}</div>
+                            <div class="stat-label">Beta Users</div>
                         </div>
                     </div>
                     

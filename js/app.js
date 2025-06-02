@@ -369,37 +369,49 @@ window.App = {
                 // Use a proper async loop instead of forEach
                 for (let index = 0; index < files.length; index++) {
                     try {
+                        console.log(`📊 === UPLOAD ${index + 1} TRACKING START ===`);
+                        
                         // Check if Analytics is available and properly initialized
                         if (window.Analytics && window.Analytics.trackImageUpload) {
                             console.log(`📊 Tracking upload ${index + 1} of ${files.length}`);
                             console.log(`📊 About to call trackImageUpload for file ${index + 1}`);
+                            console.log(`📊 Analytics state before call:`, window.Analytics.state);
+                            console.log(`📊 Current user before call:`, window.Auth?.getCurrentUser());
                             
                             // Ensure Analytics is initialized
                             if (!window.Analytics.state || !window.Analytics.state.initialized) {
                                 console.log('📊 Analytics not initialized, initializing now...');
                                 await window.Analytics.init();
+                                console.log('📊 Analytics initialized, new state:', window.Analytics.state);
                             }
                             
+                            console.log(`📊 Calling trackImageUpload() now...`);
                             const result = await window.Analytics.trackImageUpload();
+                            console.log(`📊 trackImageUpload() returned:`, result);
                             
                             if (result && result.success) {
-                                console.log(`📊 Upload ${index + 1} tracked successfully:`, result);
+                                console.log(`📊 ✅ Upload ${index + 1} tracked successfully:`, result);
                             } else {
-                                console.log(`📊 Upload ${index + 1} tracking failed:`, result);
+                                console.log(`📊 ⚠️ Upload ${index + 1} tracking failed:`, result);
                             }
                         } else {
-                            console.log(`📊 Analytics or trackImageUpload not available:`, {
+                            console.log(`📊 ❌ Analytics or trackImageUpload not available:`, {
                                 analyticsExists: !!window.Analytics,
                                 trackImageUploadExists: !!(window.Analytics && window.Analytics.trackImageUpload),
-                                analyticsInitialized: window.Analytics?.state?.initialized
+                                analyticsInitialized: window.Analytics?.state?.initialized,
+                                analyticsState: window.Analytics?.state
                             });
                         }
+                        
+                        console.log(`📊 === UPLOAD ${index + 1} TRACKING END ===`);
+                        
                     } catch (analyticsError) {
-                        console.error(`📊 Failed to track upload ${index + 1}:`, analyticsError);
+                        console.error(`📊 ❌ Failed to track upload ${index + 1}:`, analyticsError);
                         console.error(`📊 Upload tracking error details:`, {
                             message: analyticsError.message,
                             stack: analyticsError.stack,
-                            analyticsState: window.Analytics?.state
+                            analyticsState: window.Analytics?.state,
+                            authUser: window.Auth?.getCurrentUser()
                         });
                     }
                 }
