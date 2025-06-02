@@ -370,6 +370,7 @@ window.App = {
                 for (let index = 0; index < files.length; index++) {
                     try {
                         console.log(`📊 === UPLOAD ${index + 1} TRACKING START ===`);
+                        console.log(`📊 File being processed:`, files[index].name, files[index].size, 'bytes');
                         
                         // Check if Analytics is available and properly initialized
                         if (window.Analytics && window.Analytics.trackImageUpload) {
@@ -377,6 +378,8 @@ window.App = {
                             console.log(`📊 About to call trackImageUpload for file ${index + 1}`);
                             console.log(`📊 Analytics state before call:`, window.Analytics.state);
                             console.log(`📊 Current user before call:`, window.Auth?.getCurrentUser());
+                            console.log(`📊 User ID:`, window.Auth?.getCurrentUser()?.id);
+                            console.log(`📊 Supabase available:`, !!window.Analytics.getSupabase());
                             
                             // Ensure Analytics is initialized
                             if (!window.Analytics.state || !window.Analytics.state.initialized) {
@@ -386,13 +389,17 @@ window.App = {
                             }
                             
                             console.log(`📊 Calling trackImageUpload() now...`);
+                            const startTime = Date.now();
                             const result = await window.Analytics.trackImageUpload();
-                            console.log(`📊 trackImageUpload() returned:`, result);
+                            const endTime = Date.now();
+                            console.log(`📊 trackImageUpload() returned after ${endTime - startTime}ms:`, result);
                             
                             if (result && result.success) {
                                 console.log(`📊 ✅ Upload ${index + 1} tracked successfully:`, result);
+                                console.log(`📊 ✅ New upload count:`, result.data?.new_upload_count);
                             } else {
                                 console.log(`📊 ⚠️ Upload ${index + 1} tracking failed:`, result);
+                                console.log(`📊 ⚠️ Failure reason:`, result?.reason || result?.error);
                             }
                         } else {
                             console.log(`📊 ❌ Analytics or trackImageUpload not available:`, {
@@ -411,7 +418,8 @@ window.App = {
                             message: analyticsError.message,
                             stack: analyticsError.stack,
                             analyticsState: window.Analytics?.state,
-                            authUser: window.Auth?.getCurrentUser()
+                            authUser: window.Auth?.getCurrentUser(),
+                            fileName: files[index]?.name
                         });
                     }
                 }
