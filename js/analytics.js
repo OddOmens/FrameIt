@@ -8,9 +8,9 @@ window.Analytics = {
     config: {
         enabled: true,
         sessionTimeout: 30 * 60 * 1000, // 30 minutes
-        batchSize: 10,
-        flushInterval: 30000, // 30 seconds
-        debugMode: false
+        batchSize: 3, // Reduced from 10 to flush more frequently
+        flushInterval: 15000, // Reduced from 30 seconds to 15 seconds
+        debugMode: true // Enable debug mode to help troubleshoot
     },
 
     // State
@@ -23,7 +23,8 @@ window.Analytics = {
         isInitialized: false,
         user: null,
         deviceInfo: null,
-        userProfile: null
+        userProfile: null,
+        profileLoaded: false
     },
 
     // Initialize analytics
@@ -78,6 +79,9 @@ window.Analytics = {
                         if (this.config.debugMode) {
                             console.log('📊 User profile loaded:', profile);
                         }
+                        
+                        // Trigger dev features check after profile is loaded
+                        this.onProfileLoaded();
                     }
                 } catch (error) {
                     if (this.config.debugMode) {
@@ -87,10 +91,10 @@ window.Analytics = {
             }
         }
 
-        // Track session start
-        if (this.state.user) {
+        // Create session record
+        if (this.state.user && window.supabase) {
             try {
-                const { data, error } = await window.supabase
+                await window.supabase
                     .from('user_sessions')
                     .insert({
                         user_id: this.state.user.id,
@@ -99,21 +103,38 @@ window.Analytics = {
                         device_type: this.state.deviceInfo.deviceType,
                         browser: this.state.deviceInfo.browser,
                         os: this.state.deviceInfo.os,
-                        referrer: document.referrer || null,
-                        page_views: 1
-                    })
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                
-                if (this.config.debugMode) {
-                    console.log('📊 Session started:', data);
-                }
+                        ip_address: null, // Server-side detection
+                        referrer: document.referrer || null
+                    });
             } catch (error) {
-                console.error('Failed to start session:', error);
+                if (this.config.debugMode) {
+                    console.log('📊 Failed to create session record:', error);
+                }
             }
         }
+    },
+
+    // Called when user profile is loaded
+    onProfileLoaded() {
+        if (this.config.debugMode) {
+            console.log('📊 Profile loaded, checking user level:', this.state.userProfile?.user_level);
+        }
+        
+        // Check if user is dev level and show analytics button
+        if (this.hasFeatureAccess('dev')) {
+            console.log('🔧 Dev user detected, showing analytics button');
+            if (window.App && window.App.showDevAnalyticsButton) {
+                window.App.showDevAnalyticsButton();
+            }
+        } else {
+            console.log('👤 User level:', this.state.userProfile?.user_level || 'none');
+            if (window.App && window.App.hideDevFeatures) {
+                window.App.hideDevFeatures();
+            }
+        }
+        
+        // Mark profile as loaded for any waiting functions
+        this.state.profileLoaded = true;
     },
 
     // Track an event
@@ -146,41 +167,6 @@ window.Analytics = {
         }
     },
 
-    // Track feature usage with timing
-    startFeatureTimer(featureName) {
-        this.state.featureTimers[featureName] = {
-            startTime: Date.now(),
-            featureName: featureName
-        };
-    },
-
-    async endFeatureTimer(featureName, additionalData = null) {
-        const timer = this.state.featureTimers[featureName];
-        if (!timer) return;
-
-        const timeSpent = Math.round((Date.now() - timer.startTime) / 1000); // seconds
-        delete this.state.featureTimers[featureName];
-
-        // Track the feature usage
-        await this.trackEvent('feature_use', featureName, {
-            time_spent_seconds: timeSpent,
-            ...additionalData
-        });
-
-        // Update feature usage in database
-        if (this.state.user) {
-            try {
-                await window.supabase.rpc('update_feature_usage', {
-                    p_user_id: this.state.user.id,
-                    p_feature_name: featureName,
-                    p_time_spent_seconds: timeSpent
-                });
-            } catch (error) {
-                console.error('Failed to update feature usage:', error);
-            }
-        }
-    },
-
     // Track specific app events
     async trackImageUpload(imageData) {
         await this.trackEvent('image_upload', 'file_selected', {
@@ -189,15 +175,9 @@ window.Analytics = {
             file_name: imageData.fileName,
             source: imageData.source || 'unknown'
         });
-    },
-
-    async trackExport(exportData) {
-        await this.trackEvent('export', 'image_exported', {
-            format: exportData.format,
-            size: exportData.size,
-            file_size_bytes: exportData.fileSizeBytes,
-            settings: exportData.settings
-        });
+        
+        // Immediately flush for important events
+        await this.flushEvents();
     },
 
     async trackCanvasCreated(canvasData) {
@@ -206,66 +186,9 @@ window.Analytics = {
             dimensions: canvasData.dimensions,
             background: canvasData.background
         });
-    },
-
-    async trackTextAdded(textData) {
-        await this.trackEvent('text', 'text_layer_added', {
-            font_family: textData.fontFamily,
-            font_size: textData.fontSize,
-            text_length: textData.text ? textData.text.length : 0
-        });
-    },
-
-    async trackBackgroundChanged(backgroundData) {
-        await this.trackEvent('background', 'background_changed', {
-            type: backgroundData.type, // 'color', 'gradient', 'image'
-            value: backgroundData.value
-        });
-    },
-
-    async trackError(errorData) {
-        await this.trackEvent('error', 'javascript_error', {
-            error_message: errorData.message,
-            error_stack: errorData.stack,
-            error_type: errorData.type || 'unknown'
-        });
-
-        // Also log to error_logs table
-        if (this.state.user) {
-            try {
-                await window.supabase
-                    .from('error_logs')
-                    .insert({
-                        user_id: this.state.user.id,
-                        error_type: 'javascript',
-                        error_message: errorData.message,
-                        error_stack: errorData.stack,
-                        page_url: window.location.href,
-                        user_agent: navigator.userAgent,
-                        browser_info: this.state.deviceInfo
-                    });
-            } catch (error) {
-                console.error('Failed to log error:', error);
-            }
-        }
-    },
-
-    async trackPerformance(metricType, metricValue, additionalData = null) {
-        if (!this.state.user) return;
-
-        try {
-            await window.supabase
-                .from('performance_metrics')
-                .insert({
-                    user_id: this.state.user.id,
-                    metric_type: metricType,
-                    metric_value: metricValue,
-                    page_url: window.location.href,
-                    additional_data: additionalData
-                });
-        } catch (error) {
-            console.error('Failed to track performance:', error);
-        }
+        
+        // Immediately flush for important events
+        await this.flushEvents();
     },
 
     // Flush events to database
@@ -292,35 +215,6 @@ window.Analytics = {
         }
     },
 
-    // End current session
-    async endSession() {
-        if (!this.state.sessionId || !this.state.user) return;
-
-        const sessionEnd = new Date();
-        const duration = Math.round((sessionEnd - this.state.sessionStart) / 1000);
-
-        try {
-            // Flush any remaining events
-            await this.flushEvents();
-
-            // Update session end time
-            await window.supabase
-                .from('user_sessions')
-                .update({
-                    session_end: sessionEnd.toISOString(),
-                    duration_seconds: duration
-                })
-                .eq('user_id', this.state.user.id)
-                .eq('session_start', this.state.sessionStart.toISOString());
-
-            if (this.config.debugMode) {
-                console.log('📊 Session ended, duration:', duration, 'seconds');
-            }
-        } catch (error) {
-            console.error('Failed to end session:', error);
-        }
-    },
-
     // Setup event listeners
     setupEventListeners() {
         // Track page visibility changes
@@ -334,7 +228,6 @@ window.Analytics = {
 
         // Track before page unload
         window.addEventListener('beforeunload', () => {
-            this.endSession();
             this.flushEvents();
         });
 
@@ -343,24 +236,6 @@ window.Analytics = {
             document.addEventListener(eventType, () => {
                 this.state.lastActivity = new Date();
             }, { passive: true });
-        });
-
-        // Track JavaScript errors
-        window.addEventListener('error', (event) => {
-            this.trackError({
-                message: event.message,
-                stack: event.error?.stack,
-                type: 'javascript_error'
-            });
-        });
-
-        // Track unhandled promise rejections
-        window.addEventListener('unhandledrejection', (event) => {
-            this.trackError({
-                message: event.reason?.message || 'Unhandled promise rejection',
-                stack: event.reason?.stack,
-                type: 'promise_rejection'
-            });
         });
     },
 
@@ -372,7 +247,6 @@ window.Analytics = {
             // Check for session timeout
             const now = new Date();
             if (now - this.state.lastActivity > this.config.sessionTimeout) {
-                this.endSession();
                 this.startSession();
             }
         }, this.config.flushInterval);
@@ -439,110 +313,20 @@ window.Analytics = {
         return false;
     },
 
-    // Show analytics dashboard (for dev users)
-    async showAnalyticsDashboard() {
-        if (!this.hasFeatureAccess('dev')) {
-            console.warn('Analytics dashboard access denied');
-            return;
+    // Manual flush for testing (accessible via console)
+    async manualFlush() {
+        console.log('🔧 Manual flush triggered');
+        await this.flushEvents();
+        
+        // Also update daily metrics
+        if (window.supabase) {
+            try {
+                await window.supabase.rpc('update_daily_metrics');
+                console.log('✅ Daily metrics updated');
+            } catch (error) {
+                console.error('❌ Failed to update daily metrics:', error);
+            }
         }
-
-        // Create and show analytics modal
-        const modal = document.createElement('div');
-        modal.className = 'modal visible';
-        modal.id = 'analytics-dashboard';
-        modal.style.zIndex = '10001';
-
-        try {
-            // Fetch analytics data
-            const { data: dailyMetrics } = await window.supabase
-                .from('daily_metrics')
-                .select('*')
-                .order('date', { ascending: false })
-                .limit(30);
-
-            const { data: featureUsage } = await window.supabase
-                .from('feature_popularity')
-                .select('*');
-
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-chart-bar"></i> Analytics Dashboard</h3>
-                        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body" style="padding: 20px;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                <h4>Daily Active Users</h4>
-                                <div style="font-size: 24px; font-weight: bold; color: #007bff;">
-                                    ${dailyMetrics?.[0]?.active_users || 0}
-                                </div>
-                                <small>Today</small>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                <h4>Total Exports</h4>
-                                <div style="font-size: 24px; font-weight: bold; color: #28a745;">
-                                    ${dailyMetrics?.reduce((sum, day) => sum + (day.total_exports || 0), 0) || 0}
-                                </div>
-                                <small>Last 30 days</small>
-                            </div>
-                        </div>
-                        
-                        <h4>Feature Usage</h4>
-                        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
-                            ${featureUsage?.map(feature => `
-                                <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: between;">
-                                    <span>${feature.feature_name}</span>
-                                    <span style="margin-left: auto; font-weight: bold;">${feature.total_usage}</span>
-                                </div>
-                            `).join('') || '<p style="padding: 20px; text-align: center;">No data available</p>'}
-                        </div>
-                        
-                        <div style="margin-top: 20px; text-align: center;">
-                            <small style="color: #666;">
-                                Session ID: ${this.state.sessionId}<br>
-                                Events in queue: ${this.state.eventQueue.length}
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-
-        } catch (error) {
-            console.error('Failed to load analytics dashboard:', error);
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Analytics Dashboard</h3>
-                        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Failed to load analytics data.</p>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-    },
-
-    // Enable/disable analytics
-    setEnabled(enabled) {
-        this.config.enabled = enabled;
-        if (this.config.debugMode) {
-            console.log('📊 Analytics', enabled ? 'enabled' : 'disabled');
-        }
-    },
-
-    // Enable/disable debug mode
-    setDebugMode(debug) {
-        this.config.debugMode = debug;
-        console.log('📊 Analytics debug mode', debug ? 'enabled' : 'disabled');
     }
 };
 
@@ -554,9 +338,4 @@ document.addEventListener('DOMContentLoaded', () => {
             window.Analytics.init();
         }
     }, 1000);
-});
-
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = window.Analytics;
-} 
+}); 
