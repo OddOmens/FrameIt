@@ -159,23 +159,10 @@ const PaymentManager = {
     },
     
     updateUI() {
-        // Show/hide upgrade button based on plan
+        // Always hide upgrade button
         const upgradeBtn = document.getElementById('upgrade-btn');
         if (upgradeBtn) {
-            if (this.currentPlan === 'free') {
-                upgradeBtn.style.display = 'flex';
-                
-                // Update button text based on usage
-                if (this.usageCount >= this.usageLimit - 1) {
-                    upgradeBtn.innerHTML = '<i class="fas fa-crown"></i> Upgrade Now';
-                    upgradeBtn.classList.add('primary-btn');
-                } else {
-                    upgradeBtn.innerHTML = '<i class="fas fa-crown"></i> Upgrade';
-                    upgradeBtn.classList.remove('primary-btn');
-                }
-            } else {
-                upgradeBtn.style.display = 'none';
-            }
+            upgradeBtn.style.display = 'none';
         }
         
         // Add plan badge to user menu

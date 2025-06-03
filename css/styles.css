@@ -2458,6 +2458,848 @@ textarea, select {
     opacity: 1;
 }
 
+/* Help Modal Improvements */
+.help-modal-content {
+    max-width: 680px;
+    width: 90vw;
+    max-height: 85vh;
+}
+
+.help-modal-header {
+    padding: var(--space-xl) var(--space-xl) var(--space-l) var(--space-xl);
+    border-bottom: 1px solid #333;
+}
+
+.help-modal-header h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.help-modal-body {
+    padding: var(--space-xl);
+    max-height: calc(85vh - 100px);
+    overflow-y: auto;
+}
+
+.help-section {
+    margin-bottom: var(--space-xl);
+    padding: var(--space-l);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.help-section h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: var(--space-m);
+}
+
+.help-section h4 i {
+    color: var(--accent-color);
+    font-size: 18px;
+}
+
+.help-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-m);
+}
+
+.help-section p:last-child {
+    margin-bottom: 0;
+}
+
+.help-section ul {
+    margin: var(--space-m) 0;
+    padding-left: var(--space-xl);
+}
+
+.help-section li {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-s);
+}
+
+.help-section li strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* Help modal scrollbar */
+.help-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.help-modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.help-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.help-modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Buttons */
+.help-section button {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.help-section button:hover {
+    background-color: var(--btn-hover);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1280px) {
+    .main-content {
+        padding: var(--space-s);
+        gap: var(--space-s);
+    }
+    
+    .left-column {
+        max-width: calc(100% - 620px);
+    }
+    
+    .gallery-bar {
+        width: 240px;
+    }
+    
+    .control-panels {
+        width: 360px;
+        max-height: calc(100vh - 70px); /* Adjusted for smaller screens */
+    }
+    
+    .background-content {
+        max-height: 350px;
+    }
+    
+    .background-categories {
+        max-height: none;
+    }
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        flex-direction: column;
+        height: auto;
+        max-height: calc(100vh - 52px);
+        overflow-y: auto; /* Make the main content scrollable on mobile */
+    }
+    
+    .left-column {
+        max-width: 100%;
+        margin-bottom: var(--space-m);
+    }
+    
+    .gallery-bar {
+        width: 100%;
+        height: 200px;
+        margin-right: 0;
+        margin-bottom: var(--space-m);
+    }
+    
+    .gallery-content {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .control-panels {
+        width: 100%;
+        height: auto;
+        max-height: 60vh; /* Increased for better mobile view */
+    }
+    
+    .background-content {
+        max-height: 300px;
+    }
+    
+    .background-categories {
+        max-height: none;
+    }
+    
+    /* Fix for mobile safari bottom bar issues */
+    .panel-content {
+        padding-bottom: 80px;
+    }
+}
+
+/* Background Options */
+.subsection-title {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    margin: var(--space-m) 0 var(--space-s) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.subsection-title:first-child {
+    margin-top: 0;
+}
+
+.subsection-title .btn {
+    font-size: 11px;
+    padding: 4px 8px;
+    margin: 0;
+}
+
+.color-grid, .gradient-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-s);
+    padding: 0 var(--space-m);
+    margin-bottom: 15px;
+    max-width: 100%;
+    overflow: hidden; /* Contain hover effects */
+}
+
+.color-swatch, .gradient-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.color-swatch:hover, .gradient-swatch:hover {
+    transform: scale(1.05);
+    z-index: 1; /* Add z-index to keep it above neighboring swatches */
+    position: relative; /* Ensure z-index works */
+}
+
+.color-swatch.selected, .gradient-swatch.selected {
+    border-color: white;
+    border-width: 2px;
+}
+
+/* Gradient Grid */
+.gradient-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-s);
+    padding: 0 var(--space-m);
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Remove old gradient category styles - now using gradient-grid */
+.gradient-section-header {
+    margin-top: var(--space-m);
+    margin-bottom: var(--space-s);
+    padding: 0 var(--space-m);
+}
+
+.gradient-section-header:first-child {
+    margin-top: 0;
+}
+
+.gradient-section-header h4 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.gradient-category {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-s);
+    padding: 0 var(--space-m);
+    margin-bottom: var(--space-m);
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Background categories */
+.background-categories {
+    max-height: none;
+    overflow-y: visible;
+    scrollbar-width: none;
+    padding-right: 0;
+    padding-bottom: 5px;
+    margin-bottom: 0;
+}
+
+.bg-category {
+    margin-bottom: var(--space-l);
+    padding-bottom: 5px;
+}
+
+.bg-category h6 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 0 var(--space-l);
+    margin-bottom: var(--space-s);
+}
+
+.bg-image-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-s);
+    padding: 0 var(--space-m);
+    margin-bottom: 15px;
+}
+
+.bg-image-item {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    position: relative;
+}
+
+.bg-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Add a light background when the image is loading */
+.bg-image-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    z-index: 0;
+}
+
+.bg-image-item.selected {
+    border-color: white;
+    border-width: 2px;
+}
+
+/* Text Layer Styling */
+.text-element {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.1s ease, border-color 0.2s ease;
+    z-index: 10;
+}
+
+.text-element.selected {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.text-element-controls {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.text-element:hover .text-element-controls,
+.text-element.selected .text-element-controls {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.text-element-controls button {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.text-element-controls button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.text-element-controls .delete-text-btn:hover {
+    background-color: rgba(229, 57, 53, 0.2);
+    color: #ff6b6b;
+}
+
+.text-element-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-color);
+    border: 1px solid white;
+    border-radius: 50%;
+    cursor: nw-resize;
+}
+
+.text-element-handle.top-left { top: -4px; left: -4px; }
+.text-element-handle.top-right { top: -4px; right: -4px; }
+.text-element-handle.bottom-left { bottom: -4px; left: -4px; }
+.text-element-handle.bottom-right { bottom: -4px; right: -4px; }
+
+/* Text Layer List */
+.text-layer-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-s) var(--space-m);
+    background-color: var(--panel-bg);
+    border-radius: 4px;
+    margin-bottom: var(--space-xs);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.text-layer-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.text-layer-item.selected {
+    background-color: rgba(59, 130, 246, 0.15);
+    border-left: 3px solid var(--accent-color);
+}
+
+.text-layer-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+}
+
+.text-layer-preview {
+    font-size: 13px;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-layer-actions {
+    display: flex;
+    gap: var(--space-xs);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.text-layer-item:hover .text-layer-actions {
+    opacity: 1;
+}
+
+.text-layer-actions button {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    padding: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.text-layer-actions button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.text-layer-actions .delete-btn:hover {
+    background-color: rgba(229, 57, 53, 0.2);
+    color: #ff6b6b;
+}
+
+/* Text Editor Panel */
+.text-editor {
+    padding: var(--space-m);
+    border-top: 1px solid var(--border-color);
+    background-color: var(--panel-bg);
+}
+
+.text-editor .form-group {
+    margin-bottom: var(--space-m);
+}
+
+.text-editor label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+}
+
+.text-editor input[type="text"],
+.text-editor textarea {
+    width: 100%;
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.text-editor input[type="text"]:focus,
+.text-editor textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+
+.text-style-buttons,
+.text-align-buttons {
+    display: flex;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-s);
+}
+
+.text-style-buttons button,
+.text-align-buttons button {
+    flex: 1;
+    background-color: var(--btn-bg);
+    border: none;
+    color: var(--text-color);
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.text-style-buttons button:hover,
+.text-align-buttons button:hover {
+    background-color: var(--btn-hover);
+}
+
+.text-style-buttons button.active,
+.text-align-buttons button.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Scrollbar styling */
+.panel-content::-webkit-scrollbar,
+.background-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panel-content::-webkit-scrollbar-track,
+.background-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.panel-content::-webkit-scrollbar-thumb,
+.background-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover,
+.background-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Add a background to the scrollable content */
+.background-content {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 10px 5px;
+}
+
+/* Improve scrolling performance */
+.panel-content,
+.background-content {
+    scroll-behavior: smooth;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
+    will-change: scroll-position; /* Optimize scrolling */
+}
+
+/* Fixing the backgrounds section */
+.settings-section[data-section="background"] .section-content,
+.settings-section:nth-child(4) .section-content {
+    padding-bottom: 0; /* Remove extra padding since we have the scrollable container */
+}
+
+/* Last settings section needs more padding */
+.settings-section:last-child {
+    margin-bottom: 20px;
+}
+
+/* Create a scrollable container for all background content */
+.background-content {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    scrollbar-width: thin;
+    padding-right: 8px;
+    padding-left: 8px;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Make sure subsection titles are well spaced in the background content */
+.background-content .subsection-title {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    padding-left: 5px;
+}
+
+/* Responsive adjustments for the background content */
+@media (max-width: 1280px) {
+    .background-content {
+        max-height: 350px;
+    }
+    
+    /* Remove background categories max-height since it's no longer scrollable independently */
+    .background-categories {
+        max-height: none;
+    }
+}
+
+@media (max-width: 992px) {
+    .background-content {
+        max-height: 300px;
+    }
+    
+    /* Remove background categories max-height since it's no longer scrollable independently */
+    .background-categories {
+        max-height: none;
+    }
+}
+
+/* Make scrollbar always visible in background content for better UX */
+.background-content::-webkit-scrollbar {
+    width: 8px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.bg-image-item:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Gallery specific panel-title button styling */
+.gallery-bar .panel-title {
+    padding: var(--space-m) var(--space-l);
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #1a1a1a;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a2a2a;
+    flex-shrink: 0;
+}
+
+/* Button styling for panel headers */
+.panel-title button {
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-left: auto;
+    background-color: #3a3a3a;
+}
+
+.panel-title button:hover:not(:disabled) {
+    background-color: #4a4a4a;
+}
+
+/* Empty Gallery State */
+.empty-gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    text-align: center;
+    height: 100%;
+    min-height: 250px;
+    grid-column: 1 / -1; /* Span all columns in grid */
+    width: 100%;
+}
+
+.empty-gallery .empty-gallery-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto; /* Center in available space */
+}
+
+.empty-gallery i {
+    font-size: 36px;
+    color: #555;
+    margin-bottom: var(--space-m);
+}
+
+.empty-gallery p {
+    color: var(--text-secondary);
+    margin: 4px 0;
+}
+
+.empty-gallery .hint {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Notification fix to ensure it doesn't affect layout */
+.notification {
+    position: fixed !important; 
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+    top: 20px !important;
+    right: 20px !important;
+}
+
+.text-position-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-bottom: var(--space-s);
+}
+
+.text-position-controls button {
+    flex: 1;
+    font-size: 13px;
+}
+
+/* Add quick position grid styles */
+.quick-position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.quick-pos-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-pos-btn:hover {
+    background-color: var(--panel-hover);
+    color: var(--accent-color);
+}
+
+/* Existing styles for shadow options */
+.shadow-options, .background-options {
+    padding: var(--space-s);
+    margin-bottom: var(--space-m);
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-s);
+    padding: 0;
+    margin-bottom: 15px;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.template-item {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.template-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.template-item:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    z-index: 1;
+    position: relative;
+}
+
+.template-item.selected {
+    border-color: var(--accent-color);
+    border-width: 2px;
+}
+
+.template-item-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 8px 6px 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.template-item:hover .template-item-name {
+    opacity: 1;
+}
+
 /* Authentication Styles */
 .auth-section {
     display: flex;
@@ -3562,12 +4404,10 @@ textarea, select {
 }
 
 .info-item span {
-    font-size: 14px;
+    font-size: 13px;
     color: #ffffff;
     font-weight: 500;
     background: transparent;
-    padding: 0;
-    border-radius: 0;
     border: none;
 }
 
@@ -4276,31 +5116,70 @@ textarea, select {
 
 /* User Level Badges */
 .user-level-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.user-level-badge.standard {
-    background: rgba(156, 163, 175, 0.2);
-    color: #9ca3af;
-    border: 1px solid #9ca3af;
+/* Pill badge base styles */
+.pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+    border: 1px solid transparent;
 }
 
-.user-level-badge.beta {
-    background: rgba(251, 191, 36, 0.2);
-    color: #fbbf24;
-    border: 1px solid #fbbf24;
+/* User level badge colors */
+.user-level-badge.standard,
+.pill-badge.standard {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-color: #1d4ed8;
 }
 
-.user-level-badge.dev {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-    border: 1px solid #22c55e;
+.user-level-badge.beta,
+.pill-badge.beta {
+    background-color: #7c3aed;
+    color: #ffffff;
+    border-color: #6d28d9;
+}
+
+.user-level-badge.dev,
+.pill-badge.dev {
+    background-color: #059669;
+    color: #ffffff;
+    border-color: #047857;
+}
+
+/* Verification status badge colors */
+.verification-status.pill-badge.verified {
+    background-color: #10b981;
+    color: #ffffff;
+    border-color: #059669;
+}
+
+.verification-status.pill-badge.unverified {
+    background-color: #f59e0b;
+    color: #ffffff;
+    border-color: #d97706;
+}
+
+/* Icon spacing in badges */
+.pill-badge i {
+    font-size: 10px;
+    margin-right: 2px;
 }
 
 /* Analytics Events List */

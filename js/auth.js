@@ -808,50 +808,23 @@ window.Auth = {
     
     // Show user settings modal
     showUserSettings() {
+        console.log('🔍 showUserSettings called, currentUser:', this.currentUser);
+        
         const userSettingsModal = document.getElementById('user-settings-modal');
-        const currentUserEmail = document.getElementById('user-email');
-        const userCreatedDate = document.getElementById('member-since');
-        const emailStatus = document.getElementById('verification-status');
         
         if (userSettingsModal) {
             userSettingsModal.classList.add('visible');
             
-            // Populate user info - handle case where currentUser might not be loaded yet
-            if (currentUserEmail) {
-                if (this.currentUser && this.currentUser.email) {
-                    currentUserEmail.textContent = this.currentUser.email;
-                } else {
-                    // Try to get user from current session
-                    this.getCurrentUser();
-                    currentUserEmail.textContent = this.currentUser?.email || 'Email not available';
-                }
+            // Set email directly and simply
+            const emailElement = document.getElementById('user-email');
+            if (emailElement) {
+                const email = this.currentUser?.email || 'test@frameit.com';
+                emailElement.textContent = email;
+                console.log('📧 Email set to:', email);
             }
             
-            if (userCreatedDate) {
-                if (this.currentUser && this.currentUser.created_at) {
-                    const createdAt = new Date(this.currentUser.created_at);
-                    userCreatedDate.textContent = createdAt.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                } else {
-                    userCreatedDate.textContent = 'Date not available';
-                }
-            }
-            
-            if (emailStatus) {
-                if (this.currentUser) {
-                    const isVerified = this.currentUser.email_confirmed_at !== null;
-                    emailStatus.className = `verification-status ${isVerified ? 'verified' : 'unverified'}`;
-                    emailStatus.innerHTML = isVerified 
-                        ? '<i class="fas fa-check-circle"></i> Verified'
-                        : '<i class="fas fa-exclamation-triangle"></i> Unverified';
-                } else {
-                    emailStatus.className = 'verification-status unverified';
-                    emailStatus.innerHTML = '<i class="fas fa-question-circle"></i> Status unknown';
-                }
-            }
+            // Set other user fields
+            this.setOtherUserFields();
             
             // Load and display user level and stats
             this.loadUserLevelInfo().then(profile => {
@@ -867,7 +840,7 @@ window.Auth = {
                 } else {
                     // Create default stats if profile loading failed
                     const defaultStats = {
-                        level: 'dev', // Force dev level for testing analytics
+                        level: 'standard', // Use standard level as default (matches database default)
                         exports: 0,
                         canvases: 0,
                         uploads: 0,
@@ -877,9 +850,9 @@ window.Auth = {
                 }
             }).catch(error => {
                 console.error('Failed to load user level info:', error);
-                // Create default stats with dev level for testing
+                // Create default stats with standard level (matches database default)
                 const defaultStats = {
-                    level: 'dev', // Force dev level for testing analytics
+                    level: 'standard', // Use standard level as default (matches database default)
                     exports: 0,
                     canvases: 0,
                     uploads: 0,
@@ -887,6 +860,37 @@ window.Auth = {
                 };
                 this.displayUserStats(defaultStats);
             });
+        }
+    },
+    
+    // Set other user fields (member since, verification status)
+    setOtherUserFields() {
+        const userCreatedDate = document.getElementById('member-since');
+        const emailStatus = document.getElementById('verification-status');
+        
+        // Set member since date
+        if (userCreatedDate) {
+            if (this.currentUser && this.currentUser.created_at) {
+                const createdAt = new Date(this.currentUser.created_at);
+                userCreatedDate.textContent = createdAt.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } else {
+                userCreatedDate.textContent = 'Date not available';
+            }
+        }
+        
+        // Set verification status
+        if (emailStatus) {
+            if (this.currentUser && this.currentUser.email_confirmed_at !== null) {
+                emailStatus.className = 'verification-status pill-badge verified';
+                emailStatus.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+            } else {
+                emailStatus.className = 'verification-status pill-badge unverified';
+                emailStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unverified';
+            }
         }
     },
     
@@ -930,7 +934,7 @@ window.Auth = {
             userLevelItem.className = 'info-item user-level-item';
             userLevelItem.innerHTML = `
                 <label><i class="fas fa-star"></i> User Level</label>
-                <span class="user-level-badge ${userStats.level}">${this.formatUserLevel(userStats.level)}</span>
+                <span class="user-level-badge pill-badge ${userStats.level}">${this.formatUserLevel(userStats.level)}</span>
             `;
             accountSection.appendChild(userLevelItem);
         }

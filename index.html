@@ -21,7 +21,7 @@
     <script defer data-domain="frameit.oddomens.com" src="https://plausible.io/js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
+    <!-- <script src="https://js.stripe.com/v3/"></script> -->
     <style>
         .platform-icons {
             display: flex;
@@ -316,18 +316,13 @@
                         
                         <div id="user-menu" class="user-menu hidden">
                             <div class="user-info">
-                                <span id="user-email" class="user-email"></span>
+                                <span id="user-email"></span>
                                 <button id="user-settings-btn" class="btn icon-btn">
                                     <i class="fas fa-user-circle"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    
-                    <button class="btn" id="upgrade-btn" style="display: none;">
-                        <i class="fas fa-crown"></i>
-                        Upgrade
-                    </button>
                     
                     <button id="help-btn" class="btn">
                         <i class="fas fa-question-circle"></i>
@@ -1431,7 +1426,7 @@
                     <div class="user-info-display">
                         <div class="info-item">
                             <label><i class="fas fa-envelope"></i> Email</label>
-                            <span id="user-email">Loading...</span>
+                            <span id="user-email"></span>
                         </div>
                         <div class="info-item">
                             <label><i class="fas fa-shield-alt"></i> Verification Status</label>
