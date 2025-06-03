@@ -10,6 +10,7 @@ window.Auth = {
     currentUser: null,
     currentSession: null,
     testMode: false, // Set to true to bypass auth for testing
+    hasRunSyncCheck: false, // Flag to prevent repeated sync checks
     
     // Initialize authentication
     async init() {
@@ -398,12 +399,78 @@ window.Auth = {
         if (event === 'SIGNED_IN' && session) {
             this.currentUser = session.user;
             this.currentSession = session; // Store the full session with access token
+            
+            // Ensure current user's profile has email
+            this.ensureCurrentUserProfile();
+            
             this.hideAuthModal(); // Hide modal immediately when signed in
             this.showMainApp();
         } else if (event === 'SIGNED_OUT') {
             this.currentUser = null;
             this.currentSession = null; // Clear session
             this.showAuthGate();
+        }
+    },
+    
+    // Ensure current user's profile exists and has email
+    async ensureCurrentUserProfile() {
+        if (!this.currentUser?.email || !this.supabase) return;
+        
+        try {
+            console.log('🔍 Checking current user profile...');
+            
+            // Check if profile exists and has email
+            const { data: existingProfile, error } = await this.supabase
+                .from('profiles')
+                .select('id, email')
+                .eq('id', this.currentUser.id)
+                .single();
+            
+            if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+                console.warn('⚠️ Error checking user profile:', error.message);
+                return;
+            }
+            
+            if (!existingProfile) {
+                // Create new profile
+                try {
+                    await this.supabase
+                        .from('profiles')
+                        .insert({
+                            id: this.currentUser.id,
+                            email: this.currentUser.email,
+                            user_level: 'standard',
+                            export_count: 0,
+                            canvas_count: 0,
+                            upload_count: 0
+                        });
+                    console.log('✅ Created profile for current user');
+                    
+                    // Update global statistics
+                    await this.updateGlobalStats('new_user', 'standard');
+                    
+                    // Refresh analytics if open
+                    this.refreshAnalyticsIfOpen();
+                    
+                    // Show notification that stats were updated
+                    this.showNotification('Global statistics updated with new user!', 'success');
+                } catch (insertError) {
+                    console.warn('⚠️ Could not create profile for current user:', insertError.message);
+                }
+            } else if (!existingProfile.email) {
+                // Update existing profile with email
+                try {
+                    await this.supabase
+                        .from('profiles')
+                        .update({ email: this.currentUser.email })
+                        .eq('id', this.currentUser.id);
+                    console.log('✅ Updated current user profile with email');
+                } catch (updateError) {
+                    console.warn('⚠️ Could not update current user profile:', updateError.message);
+                }
+            }
+        } catch (profileError) {
+            console.warn('⚠️ Error ensuring current user profile:', profileError.message);
         }
     },
     
@@ -460,14 +527,8 @@ window.Auth = {
             userMenu.classList.add('hidden'); // Hide the separate user menu
         }
         
-        // Update account button to show user email
-        if (accountBtn && this.currentUser) {
-            const accountSpan = accountBtn.querySelector('span');
-            if (accountSpan) {
-                accountSpan.textContent = this.currentUser.email;
-            }
-            console.log('👤 Account button updated with user email:', this.currentUser.email);
-        }
+        // Update all email displays using the helper method
+        this.updateEmailDisplays();
         
         // Show logout button when logged in
         if (logoutBtn) {
@@ -475,12 +536,6 @@ window.Auth = {
         }
         
         this.hideAuthModal();
-        
-        // Also update user settings modal if it's open
-        const currentUserEmailElement = document.getElementById('current-user-email');
-        if (currentUserEmailElement && this.currentUser) {
-            currentUserEmailElement.textContent = this.currentUser.email;
-        }
     },
     
     // Show authentication modal
@@ -679,6 +734,56 @@ window.Auth = {
             
             console.log('Signup successful! Check email for confirmation.');
             
+            // Try to create/update user profile with email
+            if (data.user) {
+                try {
+                    console.log('📧 Creating/updating user profile with email...');
+                    
+                    // First try to get existing profile
+                    const { data: existingProfile } = await this.supabase
+                        .from('profiles')
+                        .select('id, email')
+                        .eq('id', data.user.id)
+                        .single();
+                    
+                    if (existingProfile) {
+                        // Update existing profile with email if it's missing
+                        if (!existingProfile.email) {
+                            await this.supabase
+                                .from('profiles')
+                                .update({ email: email })
+                                .eq('id', data.user.id);
+                            console.log('✅ Updated existing profile with email');
+                        }
+                    } else {
+                        // Create new profile with email
+                        await this.supabase
+                            .from('profiles')
+                            .insert({
+                                id: data.user.id,
+                                email: email,
+                                user_level: 'standard',
+                                export_count: 0,
+                                canvas_count: 0,
+                                upload_count: 0
+                            });
+                        console.log('✅ Created new profile with email');
+                        
+                        // Update global statistics
+                        await this.updateGlobalStats('new_user', 'standard');
+                        
+                        // Refresh analytics if open
+                        this.refreshAnalyticsIfOpen();
+                        
+                        // Show notification that stats were updated
+                        this.showNotification('Global statistics updated with new user!', 'success');
+                    }
+                } catch (profileError) {
+                    console.warn('⚠️ Could not create/update profile:', profileError.message);
+                    // Don't fail signup if profile creation fails
+                }
+            }
+            
             // Auto-switch to login after 3 seconds
             setTimeout(() => {
                 this.switchAuthForm('login');
@@ -815,13 +920,8 @@ window.Auth = {
         if (userSettingsModal) {
             userSettingsModal.classList.add('visible');
             
-            // Set email directly and simply
-            const emailElement = document.getElementById('user-email');
-            if (emailElement) {
-                const email = this.currentUser?.email || 'test@frameit.com';
-                emailElement.textContent = email;
-                console.log('📧 Email set to:', email);
-            }
+            // Update all email displays using the helper method
+            this.updateEmailDisplays();
             
             // Set other user fields
             this.setOtherUserFields();
@@ -972,6 +1072,12 @@ window.Auth = {
                     <div class="global-stats-section">
                         <h5><i class="fas fa-globe"></i> Global Statistics</h5>
                         <p class="section-description">View application-wide analytics and usage data.</p>
+                        <div class="dev-actions" style="margin-bottom: 16px;">
+                            <button onclick="window.Auth.syncExistingUsers()" class="btn primary-btn small-btn">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Sync Profile Data</span>
+                            </button>
+                        </div>
                         <div id="global-analytics-container">
                             <div class="analytics-loading">
                                 <i class="fas fa-spinner fa-spin"></i>
@@ -996,7 +1102,23 @@ window.Auth = {
             // Load analytics data for dev users automatically
             if (isDev) {
                 console.log('🎯 Loading analytics data automatically for dev user');
-                this.loadGlobalAnalytics();
+                
+                // Run one-time sync check for existing users if not already done
+                if (!this.hasRunSyncCheck) {
+                    console.log('🔧 Running one-time sync check for existing users...');
+                    this.hasRunSyncCheck = true;
+                    this.checkAndSyncIfNeeded().then(() => {
+                        // After sync check, do the regular backfill and load analytics
+                        this.backfillProfileEmails().then(() => {
+                            this.loadGlobalAnalytics();
+                        });
+                    });
+                } else {
+                    // Regular flow for subsequent opens
+                    this.backfillProfileEmails().then(() => {
+                        this.loadGlobalAnalytics();
+                    });
+                }
             }
         } else {
             // Update existing stats
@@ -1007,7 +1129,7 @@ window.Auth = {
         }
     },
     
-    // Load global analytics data directly into the account settings
+    // Load global analytics data
     async loadGlobalAnalytics() {
         console.log('📊 Loading global analytics data...');
         
@@ -1032,11 +1154,10 @@ window.Auth = {
 
             console.log('📊 Fetching analytics data from Supabase...');
 
-            // Fetch global stats and user breakdown in parallel
-            const [globalData, profilesData, usersData] = await Promise.all([
+            // Fetch global stats and user profiles
+            const [globalData, profilesData] = await Promise.all([
                 supabase.from('global').select('*').single(),
-                supabase.from('profiles').select('user_level, export_count, canvas_count, upload_count, created_at, id').not('user_level', 'is', null).limit(10),
-                supabase.auth.admin.listUsers()
+                supabase.from('profiles').select('user_level, export_count, canvas_count, upload_count, created_at, id, email').not('user_level', 'is', null).limit(10)
             ]);
 
             if (globalData.error) throw globalData.error;
@@ -1045,17 +1166,82 @@ window.Auth = {
             const globalStats = globalData.data;
             const profiles = profilesData.data;
             
-            // Map profiles with user emails
-            const recentUsers = profiles
-                .map(profile => {
-                    const user = usersData.data?.users?.find(u => u.id === profile.id);
+            // Try to get user emails from multiple sources
+            let recentUsers = [];
+            try {
+                console.log('🔍 Processing user profiles for email assignment...');
+                
+                // Try to get emails from admin API first, but handle gracefully if not available
+                let usersData = null;
+                try {
+                    console.log('🔍 Attempting to fetch user emails via admin API...');
+                    usersData = await supabase.auth.admin.listUsers();
+                    
+                    if (usersData.error) {
+                        console.warn('⚠️ Admin API access limited:', usersData.error.message);
+                        usersData = null;
+                    } else {
+                        console.log('✅ Successfully fetched user emails via admin API');
+                    }
+                } catch (adminError) {
+                    console.warn('⚠️ Admin API not available:', adminError.message);
+                    usersData = null;
+                }
+                
+                // Process profiles - use email from profile if available, fallback to admin API, then anonymous
+                recentUsers = profiles.map((profile) => {
+                    let email = profile.email; // Use profile email if available
+                    
+                    // If profile doesn't have email and admin API is available, try to get it
+                    if (!email && usersData?.data?.users) {
+                        const authUser = usersData.data.users.find(u => u.id === profile.id);
+                        email = authUser?.email;
+                        
+                        // If we found an email from admin API, update the profile for future use
+                        if (email) {
+                            console.log(`📧 Found email for profile ${profile.id.slice(0, 8)}... from admin API`);
+                            // Update profile with email (fire and forget)
+                            supabase
+                                .from('profiles')
+                                .update({ email: email })
+                                .eq('id', profile.id)
+                                .then(() => console.log('✅ Updated profile with email'))
+                                .catch(err => console.warn('⚠️ Could not update profile:', err.message));
+                        }
+                    }
+                    
+                    // If still no email, show as anonymous user
+                    if (!email) {
+                        email = `User ${profile.id.slice(0, 8)}...`;
+                    }
+                    
                     return {
                         ...profile,
-                        email: user?.email || 'Unknown'
+                        email: email
                     };
-                })
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                .slice(0, 5);
+                });
+                
+                // Sort by creation date
+                recentUsers = recentUsers
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 5);
+                    
+                console.log('✅ Successfully processed user profiles');
+                
+            } catch (processingError) {
+                console.warn('⚠️ Error processing user profiles:', processingError.message);
+                
+                // Fallback: Use profile data as-is
+                recentUsers = profiles
+                    .map(profile => ({
+                        ...profile,
+                        email: profile.email || `User ${profile.id.slice(0, 8)}...`
+                    }))
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 5);
+                    
+                console.log('📊 Using profile data as-is for recent users');
+            }
 
             // Hide loading and show content
             const loadingDiv = analyticsContainer.querySelector('.analytics-loading');
@@ -1103,8 +1289,12 @@ window.Auth = {
                                     <i class="fas fa-user"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="color: #ffffff; font-weight: 500; font-size: 14px; margin-bottom: 4px;">${this.formatUserLevel(user.user_level)} User • ${user.email}</div>
-                                    <div style="color: #888888; font-size: 12px;">Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity</div>
+                                    <div style="color: #ffffff; font-weight: 500; font-size: 14px; margin-bottom: 4px;">${user.email}</div>
+                                    <div style="color: #888888; font-size: 12px; margin-bottom: 2px;">ID: ${user.id}</div>
+                                    <div style="color: #888888; font-size: 12px;">
+                                        <span class="user-level-badge" style="display: inline-block; background: ${this.getUserLevelColor(user.user_level).bg}; color: ${this.getUserLevelColor(user.user_level).text}; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 8px; font-weight: 500;">${this.formatUserLevel(user.user_level)}</span>
+                                        Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
@@ -1143,6 +1333,16 @@ window.Auth = {
         };
         return levelMap[level] || 'Standard';
     },
+
+    // Get user level color
+    getUserLevelColor(level) {
+        const colors = {
+            'standard': { bg: '#10b981', text: 'white' },
+            'beta': { bg: '#3b82f6', text: 'white' },
+            'dev': { bg: '#8b5cf6', text: 'white' }
+        };
+        return colors[level] || colors['standard'];
+    },
     
     // Hide user settings modal
     hideUserSettings() {
@@ -1155,12 +1355,11 @@ window.Auth = {
     
     // Clear user settings forms
     clearUserSettingsForms() {
-        // Clear form inputs
+        // Clear form inputs (excluding the account settings email display)
         const inputs = document.querySelectorAll('#user-settings-modal input');
         inputs.forEach(input => {
-            if (input.type !== 'email' || input.id !== 'current-user-email') {
-                input.value = '';
-            }
+            // Don't clear the email display element (it's a span, not input anyway)
+            input.value = '';
         });
         
         // Clear error/success messages
@@ -1654,6 +1853,56 @@ window.Auth = {
             
             console.log('✅ Landing signup successful:', data);
             
+            // Try to create/update user profile with email
+            if (data.user) {
+                try {
+                    console.log('📧 Creating/updating user profile with email...');
+                    
+                    // First try to get existing profile
+                    const { data: existingProfile } = await this.supabase
+                        .from('profiles')
+                        .select('id, email')
+                        .eq('id', data.user.id)
+                        .single();
+                    
+                    if (existingProfile) {
+                        // Update existing profile with email if it's missing
+                        if (!existingProfile.email) {
+                            await this.supabase
+                                .from('profiles')
+                                .update({ email: email })
+                                .eq('id', data.user.id);
+                            console.log('✅ Updated existing profile with email');
+                        }
+                    } else {
+                        // Create new profile with email
+                        await this.supabase
+                            .from('profiles')
+                            .insert({
+                                id: data.user.id,
+                                email: email,
+                                user_level: 'standard',
+                                export_count: 0,
+                                canvas_count: 0,
+                                upload_count: 0
+                            });
+                        console.log('✅ Created new profile with email');
+                        
+                        // Update global statistics
+                        await this.updateGlobalStats('new_user', 'standard');
+                        
+                        // Refresh analytics if open
+                        this.refreshAnalyticsIfOpen();
+                        
+                        // Show notification that stats were updated
+                        this.showNotification('Global statistics updated with new user!', 'success');
+                    }
+                } catch (profileError) {
+                    console.warn('⚠️ Could not create/update profile:', profileError.message);
+                    // Don't fail signup if profile creation fails
+                }
+            }
+            
             // Show success message
             if (successElement) {
                 successElement.classList.remove('hidden');
@@ -1694,6 +1943,381 @@ window.Auth = {
             this.sendPasswordReset(userEmail);
         } else {
             this.sendPasswordReset(email);
+        }
+    },
+
+    // Update email displays throughout the app
+    updateEmailDisplays() {
+        if (!this.currentUser?.email) {
+            console.warn('⚠️ No user email available to update displays');
+            return;
+        }
+
+        const email = this.currentUser.email;
+        console.log('📧 Updating email displays to:', email);
+
+        // Update account button in toolbar
+        const accountBtn = document.getElementById('account-btn');
+        if (accountBtn) {
+            const accountSpan = accountBtn.querySelector('span');
+            if (accountSpan) {
+                accountSpan.textContent = email;
+                console.log('✅ Updated account button email');
+            }
+        }
+
+        // Update account settings modal if it's open
+        const accountSettingsEmail = document.getElementById('account-settings-email');
+        if (accountSettingsEmail) {
+            accountSettingsEmail.textContent = email;
+            console.log('✅ Updated account settings email');
+        }
+
+        // Update any other email displays as needed
+        const userEmailElements = document.querySelectorAll('[data-user-email]');
+        userEmailElements.forEach(element => {
+            element.textContent = email;
+        });
+    },
+
+    // Backfill emails for existing user profiles
+    async backfillProfileEmails() {
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not available for email backfill');
+            return;
+        }
+
+        try {
+            console.log('🔧 Starting email backfill for existing profiles...');
+            
+            // Get profiles without emails
+            const { data: profilesWithoutEmails, error: profilesError } = await this.supabase
+                .from('profiles')
+                .select('id, email')
+                .is('email', null);
+            
+            if (profilesError) {
+                console.error('❌ Error fetching profiles without emails:', profilesError);
+                return;
+            }
+            
+            if (!profilesWithoutEmails || profilesWithoutEmails.length === 0) {
+                console.log('✅ All profiles already have emails');
+                return;
+            }
+            
+            console.log(`📧 Found ${profilesWithoutEmails.length} profiles without emails`);
+            
+            // Try to get auth users to match with profiles
+            try {
+                const { data: authUsers, error: authError } = await this.supabase.auth.admin.listUsers();
+                
+                if (authError) {
+                    console.warn('⚠️ Cannot access admin API for email backfill:', authError.message);
+                    return;
+                }
+                
+                let updatedCount = 0;
+                
+                // Update each profile with its corresponding auth user email
+                for (const profile of profilesWithoutEmails) {
+                    const authUser = authUsers.users?.find(u => u.id === profile.id);
+                    
+                    if (authUser?.email) {
+                        try {
+                            await this.supabase
+                                .from('profiles')
+                                .update({ email: authUser.email })
+                                .eq('id', profile.id);
+                            
+                            updatedCount++;
+                            console.log(`✅ Updated profile ${profile.id.slice(0, 8)}... with email ${authUser.email}`);
+                        } catch (updateError) {
+                            console.warn(`⚠️ Failed to update profile ${profile.id.slice(0, 8)}...:`, updateError.message);
+                        }
+                    }
+                }
+                
+                console.log(`🎉 Email backfill complete: Updated ${updatedCount} out of ${profilesWithoutEmails.length} profiles`);
+                
+            } catch (adminError) {
+                console.warn('⚠️ Admin API not available for email backfill:', adminError.message);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error during email backfill:', error);
+        }
+    },
+
+    // Update global statistics
+    async updateGlobalStats(action, level) {
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not available for global stats update');
+            return;
+        }
+
+        try {
+            console.log(`🔄 Updating global stats: action=${action}, level=${level}`);
+            
+            // Try using the database function first
+            const { data, error } = await this.supabase.rpc('update_global_stats', {
+                action: action,
+                level: level
+            });
+            
+            if (error) {
+                if (error.message.includes('function update_global_stats() does not exist')) {
+                    console.warn('⚠️ Global stats function not available, using manual update');
+                    await this.manualUpdateGlobalStats(action, level);
+                } else {
+                    console.error('Failed to update global stats:', error);
+                }
+            } else {
+                console.log('✅ Global stats updated successfully');
+            }
+        } catch (error) {
+            console.error('❌ Error updating global stats:', error);
+        }
+    },
+
+    // Manual update of global statistics (fallback)
+    async manualUpdateGlobalStats(action, level) {
+        if (action !== 'new_user') return;
+        
+        try {
+            // Get current global stats
+            const { data: currentStats, error: fetchError } = await this.supabase
+                .from('global')
+                .select('*')
+                .single();
+            
+            if (fetchError) {
+                console.error('Failed to fetch current global stats:', fetchError);
+                return;
+            }
+            
+            // Calculate new values
+            const updates = {
+                total_users: currentStats.total_users + 1
+            };
+            
+            if (level === 'standard') {
+                updates.standard_users = currentStats.standard_users + 1;
+            } else if (level === 'beta') {
+                updates.beta_users = currentStats.beta_users + 1;
+            }
+            
+            // Update global stats
+            const { error: updateError } = await this.supabase
+                .from('global')
+                .update(updates)
+                .eq('id', currentStats.id);
+            
+            if (updateError) {
+                console.error('Failed to manually update global stats:', updateError);
+            } else {
+                console.log('✅ Global stats updated manually');
+            }
+        } catch (error) {
+            console.error('❌ Error in manual global stats update:', error);
+        }
+    },
+
+    // Refresh analytics if open
+    refreshAnalyticsIfOpen() {
+        // Check if user settings modal is open and has analytics section
+        const userSettingsModal = document.getElementById('user-settings-modal');
+        const analyticsContainer = document.getElementById('global-analytics-container');
+        
+        if (userSettingsModal && userSettingsModal.classList.contains('visible') && analyticsContainer) {
+            console.log('🔄 Refreshing analytics data...');
+            
+            // Add a small delay to ensure database updates are complete, then backfill emails and reload
+            setTimeout(() => {
+                this.backfillProfileEmails().then(() => {
+                    this.loadGlobalAnalytics();
+                });
+            }, 1000);
+        }
+    },
+
+    // Show notification
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 400px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        `;
+        notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i> ${message}`;
+        document.body.appendChild(notification);
+        
+        // Remove notification after 6 seconds for longer messages, 4 for short ones
+        const duration = message.length > 100 ? 6000 : 4000;
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, duration);
+    },
+
+    // Sync existing users (migration for users created before this system)
+    async syncExistingUsers() {
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not available for user sync');
+            return;
+        }
+
+        try {
+            console.log('🔧 Starting user sync (client-side)...');
+            this.showNotification('Starting user sync process...', 'info');
+
+            // Step 1: Ensure current user has proper profile
+            let currentUserFixed = false;
+            if (this.currentUser) {
+                await this.ensureCurrentUserProfile();
+                currentUserFixed = true;
+                console.log('✅ Ensured current user profile exists');
+            }
+
+            // Step 2: Get all existing profiles to analyze the data
+            const { data: existingProfiles, error: profilesError } = await this.supabase
+                .from('profiles')
+                .select('id, email, user_level, export_count, canvas_count, upload_count, created_at');
+            
+            if (profilesError) {
+                console.error('❌ Error fetching existing profiles:', profilesError);
+                this.showNotification('Error accessing profile data: ' + profilesError.message, 'error');
+                return;
+            }
+
+            console.log(`📊 Found ${existingProfiles.length} existing profiles`);
+
+            // Step 3: Count profiles without emails
+            const profilesWithoutEmails = existingProfiles.filter(p => !p.email);
+            console.log(`📊 Found ${profilesWithoutEmails.length} profiles without emails`);
+
+            // Step 4: Recalculate and update global statistics based on existing profiles
+            await this.recalculateGlobalStats();
+
+            // Step 5: Show completion summary
+            let summary = `User sync complete!\n• Analyzed ${existingProfiles.length} profiles`;
+            
+            if (currentUserFixed) {
+                summary += `\n• Fixed current user profile`;
+            }
+            
+            if (profilesWithoutEmails.length > 0) {
+                summary += `\n• Found ${profilesWithoutEmails.length} profiles without emails`;
+                summary += `\n• These will be fixed when users log in`;
+            }
+            
+            summary += `\n• Recalculated global statistics`;
+            
+            console.log('🎉 ' + summary.replace(/\n/g, ' '));
+            this.showNotification(summary.replace(/\n/g, '<br>'), 'success');
+
+            // Step 6: Refresh analytics if open
+            this.refreshAnalyticsIfOpen();
+
+        } catch (error) {
+            console.error('❌ Error during user sync:', error);
+            this.showNotification('User sync failed: ' + error.message, 'error');
+        }
+    },
+
+    // Recalculate global statistics from scratch
+    async recalculateGlobalStats() {
+        try {
+            console.log('📊 Recalculating global statistics...');
+
+            // Get all profiles with counts
+            const { data: allProfiles, error: profilesError } = await this.supabase
+                .from('profiles')
+                .select('user_level, export_count, canvas_count, upload_count');
+            
+            if (profilesError) {
+                console.error('❌ Error fetching profiles for stats calculation:', profilesError);
+                return;
+            }
+
+            // Calculate totals
+            const stats = {
+                total_users: allProfiles.length,
+                standard_users: allProfiles.filter(p => p.user_level === 'standard').length,
+                beta_users: allProfiles.filter(p => p.user_level === 'beta').length,
+                dev_users: allProfiles.filter(p => p.user_level === 'dev').length,
+                total_exports: allProfiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
+                total_canvases: allProfiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
+                total_uploads: allProfiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
+            };
+
+            console.log('📊 Calculated stats:', stats);
+
+            // Update global stats table
+            const { error: updateError } = await this.supabase
+                .from('global')
+                .update(stats)
+                .eq('id', 1); // Assuming global stats row has id = 1
+
+            if (updateError) {
+                console.error('❌ Error updating global stats:', updateError);
+            } else {
+                console.log('✅ Global statistics recalculated and updated');
+            }
+
+        } catch (error) {
+            console.error('❌ Error recalculating global stats:', error);
+        }
+    },
+
+    // Check if sync is needed and run it automatically
+    async checkAndSyncIfNeeded() {
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not available for sync check');
+            return;
+        }
+
+        try {
+            console.log('🔍 Checking if user sync is needed...');
+
+            // Check current user profile and profiles without emails
+            const [currentUserCheck, profilesData] = await Promise.all([
+                this.currentUser ? this.supabase
+                    .from('profiles')
+                    .select('id, email')
+                    .eq('id', this.currentUser.id)
+                    .single() : Promise.resolve({ data: null }),
+                this.supabase.from('profiles').select('id, email', { count: 'exact' }).is('email', null)
+            ]);
+
+            const profilesWithoutEmails = profilesData.count || 0;
+            const currentUserNeedsProfile = this.currentUser && (!currentUserCheck.data || !currentUserCheck.data.email);
+
+            console.log(`📊 Profiles without emails: ${profilesWithoutEmails}`);
+            console.log(`📊 Current user needs profile fix: ${currentUserNeedsProfile}`);
+
+            // If there are profiles without emails or current user needs fixing, run sync
+            if (profilesWithoutEmails > 0 || currentUserNeedsProfile) {
+                console.log('🔧 Running sync to fix profile issues...');
+                await this.syncExistingUsers();
+            } else {
+                console.log('✅ User sync not needed, profiles look good');
+            }
+
+        } catch (error) {
+            console.warn('⚠️ Error checking sync status:', error.message);
         }
     },
 }; 
