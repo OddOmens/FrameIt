@@ -11,8 +11,8 @@ window.FrameItConfig = {
     
     // Supabase configuration
     supabase: {
-        url: 'https://vgopglmcspquqbjuuuah.supabase.co',
-        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnb3BnbG1jc3BxdXFianV1dWFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDMwMjQsImV4cCI6MjA2NDI3OTAyNH0.7Hes6y1WhMRWeKxakdC2MLPLYr8x4wkRxUmSOE4_YuI'
+        url: 'https://jhvprlsabmijwufnvvpk.supabase.co',
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpodnBybHNhYm1pand1Zm52dnBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MTA1MTYsImV4cCI6MjA2NDQ4NjUxNn0.DWi3yus6NrfV_i3TmhdBYHOqz_MIDukyCZrLq1LZKuw'
     },
     
     // Authentication Configuration
