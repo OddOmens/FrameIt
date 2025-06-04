@@ -62,56 +62,46 @@ window.App = {
     },
     
     // Initialize the application
-    init() {
-        // Set initial values from Config
-        this.state.cornerRadius = Config.defaultCornerRadius;
-        this.state.padding = Config.defaultPadding;
+    async init() {
+        console.log('Initializing FrameIt App...');
         
-        // Initialize UI
+        // Initialize UI components first
         UI.init();
         
-        // Initialize Canvas Renderer
+        // Initialize canvas renderer
         CanvasRenderer.init(document.getElementById('preview-canvas'));
         
-        // Initialize Analytics
-        if (window.Analytics) {
-            window.Analytics.init();
-        }
+        // Load persistent data first
+        this.loadFromLocalStorage();
         
-        // Load background images
-        this.loadBackgroundImages();
-        
-        // Load saved settings
-        this.loadSettings();
-        
-        // Set initial resolution
-        this.updateCanvasSize();
-        
-        // Load uploaded images for gallery
-        this.loadGalleryImages();
+        // Setup templates and resolutions
+        UI.renderTemplates();
+        UI.setupResolutionOptions();
         
         // Enable export from start (can create designs without images)
         document.getElementById('export-btn').disabled = false;
         
-        // Hide upload prompt initially to show canvas
-        document.getElementById('image-drop-zone').classList.add('hidden');
+        // Completely hide upload prompt - start with clean canvas
+        const dropZone = document.getElementById('image-drop-zone');
+        if (dropZone) {
+            dropZone.style.display = 'none';
+        }
         
         // Initialize with background and render initial preview
         this.renderPreview();
         
-        // Add current canvas to gallery
-        this.addCurrentCanvasToGallery();
+        // Update gallery display
+        UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
         
-        // Add help button click handler
-        const helpBtn = document.getElementById('help-btn');
-        if (helpBtn) {
-            helpBtn.addEventListener('click', () => UI.showHelpModal());
+        // Update text layers display
+        if (this.state.textLayers && this.state.textLayers.length > 0) {
+            UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
         }
         
-        // Add Dev Analytics button for dev users (called by Analytics module when profile loads)
-        this.createDevAnalyticsButton();
+        // Save initial state
+        this.saveToLocalStorage();
         
-        console.log('✅ FrameIt initialized successfully');
+        console.log('FrameIt App initialized successfully');
     },
     
     // Save current state for undo
@@ -266,7 +256,10 @@ window.App = {
                 'noiseBlendMode',
                 'noiseScale',
                 'noiseInvert',
-                'resolution'
+                'resolution',
+                'watermarkOpacity',
+                'watermarkScale',
+                'watermarkPosition'
             ];
             
             validKeys.forEach(key => {
@@ -338,7 +331,10 @@ window.App = {
             noiseBlendMode: this.state.noiseBlendMode,
             noiseScale: this.state.noiseScale,
             noiseInvert: this.state.noiseInvert,
-            resolution: this.state.resolution
+            resolution: this.state.resolution,
+            watermarkOpacity: this.state.watermarkOpacity,
+            watermarkScale: this.state.watermarkScale,
+            watermarkPosition: this.state.watermarkPosition
         };
         
         Utils.saveToStorage(Config.storageKeys.settings, settingsToSave);
@@ -361,69 +357,6 @@ window.App = {
         
         Promise.all(promises)
             .then(async images => {
-                // Track image upload analytics for each file
-                console.log(`📊 Processing ${files.length} uploaded files for analytics`);
-                console.log('📊 Current user check:', window.Auth?.getCurrentUser());
-                console.log('📊 Analytics module check:', window.Analytics);
-                
-                // Use a proper async loop instead of forEach
-                for (let index = 0; index < files.length; index++) {
-                    try {
-                        console.log(`📊 === UPLOAD ${index + 1} TRACKING START ===`);
-                        console.log(`📊 File being processed:`, files[index].name, files[index].size, 'bytes');
-                        
-                        // Check if Analytics is available and properly initialized
-                        if (window.Analytics && window.Analytics.trackImageUpload) {
-                            console.log(`📊 Tracking upload ${index + 1} of ${files.length}`);
-                            console.log(`📊 About to call trackImageUpload for file ${index + 1}`);
-                            console.log(`📊 Analytics state before call:`, window.Analytics.state);
-                            console.log(`📊 Current user before call:`, window.Auth?.getCurrentUser());
-                            console.log(`📊 User ID:`, window.Auth?.getCurrentUser()?.id);
-                            console.log(`📊 Supabase available:`, !!window.Analytics.getSupabase());
-                            
-                            // Ensure Analytics is initialized
-                            if (!window.Analytics.state || !window.Analytics.state.initialized) {
-                                console.log('📊 Analytics not initialized, initializing now...');
-                                await window.Analytics.init();
-                                console.log('📊 Analytics initialized, new state:', window.Analytics.state);
-                            }
-                            
-                            console.log(`📊 Calling trackImageUpload() now...`);
-                            const startTime = Date.now();
-                            const result = await window.Analytics.trackImageUpload();
-                            const endTime = Date.now();
-                            console.log(`📊 trackImageUpload() returned after ${endTime - startTime}ms:`, result);
-                            
-                            if (result && result.success) {
-                                console.log(`📊 ✅ Upload ${index + 1} tracked successfully:`, result);
-                                console.log(`📊 ✅ New upload count:`, result.data?.new_upload_count);
-                            } else {
-                                console.log(`📊 ⚠️ Upload ${index + 1} tracking failed:`, result);
-                                console.log(`📊 ⚠️ Failure reason:`, result?.reason || result?.error);
-                            }
-                        } else {
-                            console.log(`📊 ❌ Analytics or trackImageUpload not available:`, {
-                                analyticsExists: !!window.Analytics,
-                                trackImageUploadExists: !!(window.Analytics && window.Analytics.trackImageUpload),
-                                analyticsInitialized: window.Analytics?.state?.initialized,
-                                analyticsState: window.Analytics?.state
-                            });
-                        }
-                        
-                        console.log(`📊 === UPLOAD ${index + 1} TRACKING END ===`);
-                        
-                    } catch (analyticsError) {
-                        console.error(`📊 ❌ Failed to track upload ${index + 1}:`, analyticsError);
-                        console.error(`📊 Upload tracking error details:`, {
-                            message: analyticsError.message,
-                            stack: analyticsError.stack,
-                            analyticsState: window.Analytics?.state,
-                            authUser: window.Auth?.getCurrentUser(),
-                            fileName: files[index]?.name
-                        });
-                    }
-                }
-                
                 // Set the first image as the selected image for current canvas
                 this.state.selectedImage = images[0];
                 
@@ -451,12 +384,58 @@ window.App = {
                                 console.log(`📊 Tracking canvas ${i + 1} creation`);
                                 await window.Analytics.trackCanvasCreated();
                                 console.log(`📊 New canvas ${i + 1} creation tracked successfully`);
+                            } else if (window.Auth && window.Auth.trackCanvasCreated) {
+                                console.log(`📊 Using Auth module fallback for canvas ${i + 1} creation`);
+                                await window.Auth.trackCanvasCreated();
+                                console.log(`📊 New canvas ${i + 1} creation tracked via Auth module`);
                             }
                         } catch (analyticsError) {
                             console.error(`📊 Failed to track canvas ${i + 1} creation:`, analyticsError);
                         }
                     }
                 }
+                
+                // Track image upload analytics for each successfully loaded file
+                console.log(`📊 Tracking ${files.length} successfully uploaded images`);
+                console.log(`📊 Auth module available:`, !!window.Auth);
+                console.log(`📊 Auth trackImageUpload available:`, !!(window.Auth && window.Auth.trackImageUpload));
+                console.log(`📊 Analytics module available:`, !!window.Analytics);
+                console.log(`📊 Analytics trackImageUpload available:`, !!(window.Analytics && window.Analytics.trackImageUpload));
+                
+                for (let index = 0; index < files.length; index++) {
+                    try {
+                        console.log(`📊 === STARTING UPLOAD TRACKING ${index + 1} ===`);
+                        
+                        if (window.Analytics && window.Analytics.trackImageUpload) {
+                            console.log(`📊 Calling Analytics.trackImageUpload()...`);
+                            const result = await window.Analytics.trackImageUpload();
+                            console.log(`📊 Analytics result:`, result);
+                            if (result && result.success) {
+                                console.log(`📊 ✅ Upload ${index + 1} tracked successfully via Analytics`);
+                            } else {
+                                console.log(`📊 ⚠️ Upload ${index + 1} tracking failed via Analytics:`, result);
+                            }
+                        } else if (window.Auth && window.Auth.trackImageUpload) {
+                            console.log(`📊 Calling Auth.trackImageUpload()...`);
+                            const result = await window.Auth.trackImageUpload();
+                            console.log(`📊 Auth result:`, result);
+                            if (result && result.success) {
+                                console.log(`📊 ✅ Upload ${index + 1} tracked via Auth module`);
+                            } else {
+                                console.log(`📊 ⚠️ Upload ${index + 1} tracking failed via Auth:`, result);
+                            }
+                        } else {
+                            console.log(`📊 ❌ No upload tracking available - neither Analytics nor Auth has trackImageUpload`);
+                        }
+                        
+                        console.log(`📊 === FINISHED UPLOAD TRACKING ${index + 1} ===`);
+                        
+                    } catch (error) {
+                        console.error(`📊 ❌ Failed to track upload ${index + 1}:`, error);
+                    }
+                }
+                
+                // Upload tracking happens earlier in UI.js when files are selected
                 
                 // Show clear button and hide upload prompt
                 document.getElementById('image-drop-zone').classList.add('hidden');
@@ -504,34 +483,31 @@ window.App = {
         this.state.currentCanvasId = id;
         this.state.selectedCanvasId = id;
         
-        // Load canvas data
-        this.state.selectedImage = canvas.image;
-        this.state.textLayers = canvas.textLayers || [];
+        // Clear text editor and selection completely before switching
         this.state.selectedTextLayerId = null;
+        UI.hideTextEditor();
         
-        // Apply saved settings if available
+        // Load canvas data - deep copy to prevent reference issues
+        this.state.selectedImage = canvas.image;
+        this.state.textLayers = canvas.textLayers ? JSON.parse(JSON.stringify(canvas.textLayers)) : [];
+        
+        // Apply canvas settings
         if (canvas.settings) {
             this.applySettings(canvas.settings);
         }
         
-        // Show/hide clear button based on whether there's an image
-        if (this.state.selectedImage) {
-            // Show upload button since image exists
-        } else {
-            // No image, clear button is not shown
-        }
-        
-        // Hide upload prompt
-        document.getElementById('image-drop-zone').classList.add('hidden');
-        
-        // Render the canvas
-        this.renderPreview();
-        
-        // Update gallery selection
+        // Update UI
+        UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
         UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
         
-        // Update UI button states
-        UI.updateButtonStates();
+        // Re-render canvas
+        this.renderPreview();
+        
+        // Save settings and to localStorage
+        this.saveSettings();
+        this.saveToLocalStorage();
+        
+        console.log('Canvas selected:', id);
     },
     
     // Get current settings for saving
@@ -567,7 +543,12 @@ window.App = {
             rotation: this.state.rotation,
             isFlippedHorizontally: this.state.isFlippedHorizontally,
             isFlippedVertically: this.state.isFlippedVertically,
-            resolution: this.state.resolution
+            resolution: this.state.resolution,
+            watermarkImage: this.state.watermarkImage,
+            watermarkFilename: this.state.watermarkFilename,
+            watermarkOpacity: this.state.watermarkOpacity,
+            watermarkScale: this.state.watermarkScale,
+            watermarkPosition: this.state.watermarkPosition
         };
     },
     
@@ -613,6 +594,11 @@ window.App = {
             this.state.canvasWidth = settings.resolution.width;
             this.state.canvasHeight = settings.resolution.height;
             this.updateCanvasSize();
+            
+            // Update resolution selection in UI
+            if (UI && UI.updateResolutionSelection) {
+                UI.updateResolutionSelection(`${settings.resolution.width}x${settings.resolution.height}`);
+            }
         }
         
         // Load background image if needed
@@ -683,8 +669,40 @@ window.App = {
         // Update UI selections
         UI.updateBackgroundSelection(this.state.backgroundColor, this.state.backgroundGradientId, this.state.backgroundImageId);
         
+        // Update watermark UI controls
+        if (document.getElementById('watermark-opacity-slider')) {
+            document.getElementById('watermark-opacity-slider').value = this.state.watermarkOpacity;
+            document.getElementById('watermark-opacity-value').textContent = `${Math.round(this.state.watermarkOpacity * 100)}%`;
+        }
+        if (document.getElementById('watermark-scale-slider')) {
+            document.getElementById('watermark-scale-slider').value = this.state.watermarkScale;
+            document.getElementById('watermark-scale-value').textContent = `${Math.round(this.state.watermarkScale * 100)}%`;
+        }
+        if (document.getElementById('watermark-position-select')) {
+            document.getElementById('watermark-position-select').value = this.state.watermarkPosition;
+        }
+        
         this.renderPreview();
         this.saveSettings();
+        
+        // Apply watermark settings if available
+        if (settings.watermarkImage) {
+            this.state.watermarkImage = settings.watermarkImage;
+            this.state.watermarkFilename = settings.watermarkFilename;
+            
+            // Show watermark preview and controls in UI
+            if (UI && UI.showWatermarkPreview && UI.showWatermarkControls) {
+                UI.showWatermarkPreview(settings.watermarkImage, settings.watermarkFilename || 'Watermark');
+                UI.showWatermarkControls();
+            }
+        } else {
+            this.state.watermarkImage = null;
+            this.state.watermarkFilename = null;
+        }
+        
+        this.state.watermarkOpacity = settings.watermarkOpacity || 0.5;
+        this.state.watermarkScale = settings.watermarkScale || 1.0;
+        this.state.watermarkPosition = settings.watermarkPosition || 'bottom-right';
     },
     
     // Add to history without persisting to localStorage
@@ -745,28 +763,29 @@ window.App = {
         UI.renderHistory(this.state.history);
     },
     
-    // Set canvas resolution
+    // Set canvas resolution and re-render
     setResolution(width, height, id) {
-        this.saveStateForUndo();
+        this.state.resolution = { width, height };
         
-        this.state.resolution = { id: id || 'custom', width, height };
-        this.state.canvasWidth = width;
-        this.state.canvasHeight = height;
-        
-        // Update canvas size
+        // Update the export canvas size immediately
         this.updateCanvasSize();
         
-        // Re-render with new dimensions
-        this.renderPreview();
-        
-        // Track resolution change
-        if (window.Analytics && window.Analytics.trackExport) {
-            // Use trackExport as a general activity tracker since we don't have specific resolution tracking
-            console.log('📊 Resolution changed to:', width, 'x', height);
+        // Update UI to show selected resolution
+        if (UI && UI.updateResolutionSelection) {
+            UI.updateResolutionSelection(`${width}x${height}`);
         }
         
-        // Update UI to reflect the new resolution
-        UI.updateResolutionSelection(width);
+        // Save the state for undo functionality
+        this.saveStateForUndo();
+        
+        // Re-render the current image with new dimensions
+        this.renderPreview();
+        
+        // Save settings
+        this.saveSettings();
+        
+        // Update UI button states
+        UI.updateButtonStates();
     },
     
     // Load gallery images - modified to not persist images
@@ -823,58 +842,57 @@ window.App = {
     
     // Add a new text layer
     addTextLayer(text = 'Your Text', options = {}) {
-        console.log('Adding text layer...');
-        
-        const id = `text_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const id = this.generateTextLayerId();
         
         const textLayer = {
             id: id,
             text: text,
-            position: { x: 50, y: 50 },
-            fontSize: options.fontSize || 24,
-            fontFamily: options.fontFamily || 'Arial',
-            color: options.color || '#000000',
+            position: { x: 0.5, y: 0.5 }, // Use normalized position (center of canvas)
+            fontSize: options.fontSize || 36,
+            fontFamily: options.fontFamily || "'Inter', sans-serif",
+            color: options.color || '#FFFFFF',
             bold: options.bold || false,
             italic: options.italic || false,
             underline: options.underline || false,
-            strokeColor: options.strokeColor || '#FFFFFF',
-            strokeWidth: options.strokeWidth || 0,
-            opacity: options.opacity || 1.0,
-            rotation: options.rotation || 0,
-            alignment: options.alignment || 'left',
-            letterSpacing: options.letterSpacing || 0,
-            lineHeight: options.lineHeight || 1.2,
-            background: options.background || null,
-            shadow: options.shadow || null
+            align: options.align || 'center',
+            opacity: options.opacity !== undefined ? options.opacity : 1,
+            shadow: true, // Always enabled
+            shadowColor: options.shadowColor || '#000000',
+            shadowBlur: options.shadowBlur || 3,
+            shadowOpacity: options.shadowOpacity !== undefined ? options.shadowOpacity : 0, // Default to 0 opacity
+            shadowOffsetX: options.shadowOffsetX || 2,
+            shadowOffsetY: options.shadowOffsetY || 2,
+            background: true, // Always enabled
+            backgroundColor: options.backgroundColor || '#333333',
+            backgroundOpacity: options.backgroundOpacity !== undefined ? options.backgroundOpacity : 0, // Default to 0 opacity
+            backgroundRadius: options.backgroundRadius || 4,
+            padding: options.padding || 10,
+            visible: options.visible !== undefined ? options.visible : true,
+            zIndex: this.getNextTextLayerZIndex()
         };
         
         this.state.textLayers.push(textLayer);
+        
+        // Clear cache since layers changed
+        this._clearTextLayerCache();
+        
+        // Select the new text layer
         this.state.selectedTextLayerId = id;
         
-        // Show text editor for the new layer
-        if (UI.showTextEditor) {
-            UI.showTextEditor(textLayer);
-        }
+        // Update UI
+        UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
+        UI.showTextEditor(textLayer);
         
-        // Auto-expand Text Layers section
-        const textLayersSection = document.querySelector('.panel-section[data-section="text-layers"]');
-        if (textLayersSection) {
-            textLayersSection.classList.add('expanded');
-            const collapseBtn = textLayersSection.querySelector('.collapse-btn i');
-            if (collapseBtn) {
-                collapseBtn.className = 'fas fa-chevron-down';
-            }
-        }
-        
-        // Render the text on canvas
+        // Render preview with the new text layer
         this.renderPreview();
         
-        // Track text layer addition
-        if (window.Analytics && window.Analytics.trackExport) {
-            console.log('📊 Text layer added');
-        }
+        // Save state for undo
+        this.saveStateForUndo();
         
-        return textLayer;
+        // Save to localStorage
+        this.saveToLocalStorage();
+        
+        return id;
     },
     
     // Select a text layer for editing
@@ -893,7 +911,30 @@ window.App = {
     
     // Get text layer by ID
     getTextLayerById(id) {
-        return this.state.textLayers.find(layer => layer.id === id);
+        if (!this.state.textLayers || !id) return null;
+        
+        // Cache text layer lookups for better performance
+        if (!this._textLayerCache) {
+            this._textLayerCache = new Map();
+        }
+        
+        // Check cache first
+        let textLayer = this._textLayerCache.get(id);
+        if (textLayer) {
+            // Verify it's still in the current layers
+            const exists = this.state.textLayers.find(layer => layer.id === id);
+            if (exists === textLayer) {
+                return textLayer;
+            }
+        }
+        
+        // Find and cache the text layer
+        textLayer = this.state.textLayers.find(layer => layer.id === id);
+        if (textLayer) {
+            this._textLayerCache.set(id, textLayer);
+        }
+        
+        return textLayer;
     },
     
     // Update a text layer
@@ -919,6 +960,9 @@ window.App = {
         if (this.state.selectedTextLayerId === id) {
             UI.updateTextEditor(this.state.textLayers[index]);
         }
+        
+        // Save to localStorage after text layer update
+        this.saveToLocalStorage();
     },
     
     // Toggle text layer visibility
@@ -986,20 +1030,12 @@ window.App = {
     // Update text layer position
     updateTextLayerPosition(id, x, y) {
         const textLayer = this.getTextLayerById(id);
-        if (!textLayer) return;
-        
-        // Get font size to calculate padding
-        const fontSize = textLayer.fontSize || 36;
-        // Padding based on font size (larger fonts need more space from edges)
-        const edgePadding = Math.min(0.1, fontSize / 1000); // Scale with font size, max 10% of canvas
-        
-        // Constrain to canvas with padding (0-1 normalized values)
-        const normalizedX = Math.max(edgePadding, Math.min(1 - edgePadding, x));
-        const normalizedY = Math.max(edgePadding, Math.min(1 - edgePadding, y));
-        
-        this.updateTextLayer(id, {
-            position: { x: normalizedX, y: normalizedY }
-        });
+        if (textLayer) {
+            textLayer.position = { x, y };
+            // Don't call renderPreview here - the dragging code handles immediate rendering
+            // Just save to localStorage periodically
+            this.saveToLocalStorage();
+        }
     },
     
     // Bring text layer to front
@@ -1200,8 +1236,11 @@ window.App = {
         
         this.state.selectedCanvasId = this.state.currentCanvasId;
         
-        // Update gallery
+        // Force gallery re-render with updated thumbnails
         UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
+        
+        // Save to localStorage after canvas update
+        this.saveToLocalStorage();
     },
     
     // Create a new canvas
@@ -1260,6 +1299,10 @@ window.App = {
                 if (window.Analytics && window.Analytics.trackCanvasCreated) {
                     const result = await window.Analytics.trackCanvasCreated();
                     console.log('📊 Manual canvas creation tracked successfully:', result);
+                } else if (window.Auth && window.Auth.trackCanvasCreated) {
+                    console.log('📊 Using Auth module fallback for manual canvas creation');
+                    const result = await window.Auth.trackCanvasCreated();
+                    console.log('📊 Manual canvas creation tracked via Auth module:', result);
                 }
             } catch (analyticsError) {
                 console.error('📊 Failed to track manual canvas creation:', analyticsError);
@@ -1292,6 +1335,24 @@ window.App = {
         document.getElementById('bg-lens-slider') && (document.getElementById('bg-lens-slider').value = 0);
         document.getElementById('noise-overlay-select').value = 'none';
         document.getElementById('noise-options').style.display = 'none';
+        
+        // Reset watermark controls
+        if (document.getElementById('watermark-opacity-slider')) {
+            document.getElementById('watermark-opacity-slider').value = 0.5;
+            document.getElementById('watermark-opacity-value').textContent = '50%';
+        }
+        if (document.getElementById('watermark-scale-slider')) {
+            document.getElementById('watermark-scale-slider').value = 1;
+            document.getElementById('watermark-scale-value').textContent = '100%';
+        }
+        if (document.getElementById('watermark-position-select')) {
+            document.getElementById('watermark-position-select').value = 'bottom-right';
+        }
+        
+        // Hide watermark controls
+        if (UI && UI.hideWatermarkControls) {
+            UI.hideWatermarkControls();
+        }
         
         // Update background selection
         UI.updateBackgroundSelection('#FFFFFF', null, null);
@@ -1833,62 +1894,107 @@ window.App = {
         this.saveSettings();
     },
 
-    // Render preview (main rendering function)
+    // Render preview (main rendering function) with throttling for performance
     renderPreview() {
-        // Get the selected image if any
-        const image = this.state.selectedImage;
-        
-        // Get background gradient if selected
-        let backgroundGradient = null;
-        if (this.state.backgroundGradientId) {
-            const allGradients = Config.getAllGradients();
-            backgroundGradient = allGradients.find(g => g.id === this.state.backgroundGradientId);
+        // Throttle render calls for better performance
+        if (this._isRendering) {
+            this._pendingRender = true;
+            return;
         }
         
-        // Get noise overlay if selected
-        let noiseOverlay = null;
-        if (this.state.noiseOverlayId) {
-            noiseOverlay = Config.noiseOverlayTypes.find(n => n.id === this.state.noiseOverlayId);
-        }
+        this._isRendering = true;
+        this._pendingRender = false;
         
-        // Call the canvas renderer
-        CanvasRenderer.renderMockup({
-            image: image,
-            backgroundColor: this.state.backgroundColor,
-            backgroundGradient: backgroundGradient,
-            backgroundImage: this.state.backgroundImage,
-            backgroundBlurRadius: this.state.backgroundBlurRadius,
-            backgroundTwirlAmount: this.state.backgroundTwirlAmount,
-            backgroundSaturation: this.state.backgroundSaturation,
-            backgroundHueRotation: this.state.backgroundHueRotation,
-            backgroundContrast: this.state.backgroundContrast,
-            backgroundBrightness: this.state.backgroundBrightness,
-            backgroundWaveAmount: this.state.backgroundWaveAmount,
-            backgroundRippleAmount: this.state.backgroundRippleAmount,
-            backgroundZoomAmount: this.state.backgroundZoomAmount,
-            backgroundShakeAmount: this.state.backgroundShakeAmount,
-            backgroundLensAmount: this.state.backgroundLensAmount,
-            noiseOverlay: noiseOverlay,
-            noiseOverlayIntensity: this.state.noiseOverlayIntensity,
-            noiseOpacity: this.state.noiseOpacity,
-            noiseBlendMode: this.state.noiseBlendMode,
-            noiseScale: this.state.noiseScale,
-            noiseInvert: this.state.noiseInvert,
-            cornerRadius: this.state.cornerRadius,
-            padding: this.state.padding,
-            shadowOpacity: this.state.shadowOpacity,
-            shadowRadius: this.state.shadowRadius,
-            shadowOffsetX: this.state.shadowOffsetX,
-            shadowOffsetY: this.state.shadowOffsetY,
-            shadowColor: this.state.shadowColor,
-            rotation: this.state.rotation,
-            isFlippedHorizontally: this.state.isFlippedHorizontally,
-            isFlippedVertically: this.state.isFlippedVertically,
-            textLayers: this.state.textLayers,
-            watermarkImage: this.state.watermarkImage,
-            watermarkOpacity: this.state.watermarkOpacity,
-            watermarkScale: this.state.watermarkScale,
-            watermarkPosition: this.state.watermarkPosition
+        // Use requestAnimationFrame for smooth rendering
+        requestAnimationFrame(() => {
+            try {
+                // Get the selected image if any
+                const image = this.state.selectedImage;
+                
+                // Get background gradient if selected
+                let backgroundGradient = null;
+                if (this.state.backgroundGradientId) {
+                    const allGradients = Config.getAllGradients();
+                    backgroundGradient = allGradients.find(g => g.id === this.state.backgroundGradientId);
+                }
+                
+                // Get noise overlay if selected
+                let noiseOverlay = null;
+                if (this.state.noiseOverlayId) {
+                    noiseOverlay = Config.noiseOverlayTypes.find(n => n.id === this.state.noiseOverlayId);
+                }
+                
+                // Call the canvas renderer
+                CanvasRenderer.renderMockup({
+                    image: image,
+                    backgroundColor: this.state.backgroundColor,
+                    backgroundGradient: backgroundGradient,
+                    backgroundImage: this.state.backgroundImage, 
+                    backgroundBlurRadius: this.state.backgroundBlurRadius,
+                    backgroundTwirlAmount: this.state.backgroundTwirlAmount,
+                    backgroundSaturation: this.state.backgroundSaturation,
+                    backgroundHueRotation: this.state.backgroundHueRotation,
+                    backgroundContrast: this.state.backgroundContrast,
+                    backgroundBrightness: this.state.backgroundBrightness,
+                    backgroundWaveAmount: this.state.backgroundWaveAmount,
+                    backgroundRippleAmount: this.state.backgroundRippleAmount,
+                    backgroundZoomAmount: this.state.backgroundZoomAmount,
+                    backgroundShakeAmount: this.state.backgroundShakeAmount,
+                    backgroundLensAmount: this.state.backgroundLensAmount,
+                    noiseOverlay: noiseOverlay ? {
+                        ...noiseOverlay,
+                        intensity: this.state.noiseOverlayIntensity,
+                        opacity: this.state.noiseOpacity,
+                        blendMode: this.state.noiseBlendMode,
+                        scale: this.state.noiseScale,
+                        invert: this.state.noiseInvert
+                    } : null,
+                    cornerRadius: this.state.cornerRadius,
+                    padding: this.state.padding,
+                    shadowOpacity: this.state.shadowOpacity,
+                    shadowRadius: this.state.shadowRadius,
+                    shadowOffsetX: this.state.shadowOffsetX,
+                    shadowOffsetY: this.state.shadowOffsetY,
+                    shadowColor: this.state.shadowColor,
+                    rotation: this.state.rotation,
+                    isFlippedHorizontally: this.state.isFlippedHorizontally,
+                    isFlippedVertically: this.state.isFlippedVertically,
+                    watermarkImage: this.state.watermarkImage,
+                    watermarkOpacity: this.state.watermarkOpacity,
+                    watermarkScale: this.state.watermarkScale,
+                    watermarkPosition: this.state.watermarkPosition,
+                    watermarkType: this.state.watermarkType,
+                    watermarkText: this.state.watermarkText,
+                    watermarkTextFont: this.state.watermarkTextFont,
+                    watermarkTextSize: this.state.watermarkTextSize,
+                    watermarkTextColor: this.state.watermarkTextColor,
+                    watermarkTextBold: this.state.watermarkTextBold,
+                    watermarkTextItalic: this.state.watermarkTextItalic,
+                    watermarkTextShadow: this.state.watermarkTextShadow,
+                    watermarkTextShadowColor: this.state.watermarkTextShadowColor,
+                    watermarkTextShadowBlur: this.state.watermarkTextShadowBlur,
+                    textLayers: this.state.textLayers,
+                    selectedTextLayerId: this.state.selectedTextLayerId
+                });
+                
+                // Update gallery thumbnail automatically
+                this.addCurrentCanvasToGallery();
+                
+                // Periodically save to localStorage (throttled to avoid excessive saves)
+                if (!this._saveTimeout) {
+                    this._saveTimeout = setTimeout(() => {
+                        this.saveToLocalStorage();
+                        this._saveTimeout = null;
+                    }, 1000); // Save after 1 second of no changes
+                }
+            } finally {
+                this._isRendering = false;
+                
+                // If another render was requested while we were rendering, do it now
+                if (this._pendingRender) {
+                    setTimeout(() => this.renderPreview(), 0);
+                }
+            }
         });
     },
 
@@ -2105,6 +2211,356 @@ window.App = {
                 }
             }, 100); // Small delay to ensure all processes are complete
         }
+    },
+    
+    // Set watermark image
+    setWatermarkImage(image, filename) {
+        this.saveStateForUndo();
+        this.state.watermarkImage = image;
+        this.state.watermarkFilename = filename;
+        
+        // Store in current canvas settings for persistence
+        this.addCurrentCanvasToGallery();
+        
+        this.renderPreview();
+        this.saveSettings();
+        console.log('✅ Watermark image set:', filename);
+    },
+    
+    // Set watermark opacity
+    setWatermarkOpacity(opacity) {
+        this.state.watermarkOpacity = Number(opacity);
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set watermark scale
+    setWatermarkScale(scale) {
+        this.state.watermarkScale = Number(scale);
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set watermark position
+    setWatermarkPosition(position) {
+        this.saveStateForUndo();
+        this.state.watermarkPosition = position;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Clear watermark
+    clearWatermark() {
+        this.saveStateForUndo();
+        this.state.watermarkImage = null;
+        this.state.watermarkFilename = null;
+        
+        // Update current canvas
+        this.addCurrentCanvasToGallery();
+        
+        this.renderPreview();
+        this.saveSettings();
+        console.log('✅ Watermark cleared');
+    },
+    
+    // Apply a template configuration
+    applyTemplate(templateId) {
+        console.log('Applying template:', templateId);
+        
+        // Find the template in the config
+        const template = Config.templates.find(t => t.id === templateId);
+        if (!template || !template.settings) {
+            console.error('Template not found or has no settings:', templateId);
+            UI.showError('Template not found');
+            return;
+        }
+        
+        // Save current state for undo
+        this.saveStateForUndo();
+        
+        // Only apply background and noise settings from templates
+        const templateSettings = template.settings;
+        
+        // Background settings
+        if (templateSettings.backgroundColor) {
+            this.state.backgroundColor = templateSettings.backgroundColor;
+            this.state.backgroundGradientId = null; // Clear gradient when setting color
+        }
+        
+        if (templateSettings.backgroundGradientId) {
+            this.state.backgroundGradientId = templateSettings.backgroundGradientId;
+            this.state.backgroundColor = null; // Clear color when setting gradient
+        }
+        
+        // Noise/texture settings
+        if (templateSettings.noiseOverlayId !== undefined) {
+            this.state.noiseOverlayId = templateSettings.noiseOverlayId;
+        }
+        
+        if (templateSettings.noiseOpacity !== undefined) {
+            this.state.noiseOpacity = templateSettings.noiseOpacity;
+        }
+        
+        if (templateSettings.noiseBlendMode !== undefined) {
+            this.state.noiseBlendMode = templateSettings.noiseBlendMode;
+        }
+        
+        if (templateSettings.noiseOverlayIntensity !== undefined) {
+            this.state.noiseOverlayIntensity = templateSettings.noiseOverlayIntensity;
+        }
+        
+        if (templateSettings.noiseScale !== undefined) {
+            this.state.noiseScale = templateSettings.noiseScale;
+        }
+        
+        if (templateSettings.noiseInvert !== undefined) {
+            this.state.noiseInvert = templateSettings.noiseInvert;
+        }
+        
+        // Update template selection in UI
+        UI.updateTemplateSelection(templateId);
+        
+        // Update background UI
+        UI.updateBackgroundSelection(this.state.backgroundColor, this.state.backgroundGradientId);
+        
+        // Update noise UI elements
+        if (document.getElementById('noise-overlay-select')) {
+            document.getElementById('noise-overlay-select').value = this.state.noiseOverlayId || 'none';
+        }
+        
+        if (document.getElementById('noise-opacity-slider')) {
+            document.getElementById('noise-opacity-slider').value = this.state.noiseOpacity;
+            document.getElementById('noise-opacity-value').textContent = `${Math.round(this.state.noiseOpacity * 100)}%`;
+        }
+        
+        if (document.getElementById('noise-blend-mode')) {
+            document.getElementById('noise-blend-mode').value = this.state.noiseBlendMode;
+        }
+        
+        if (document.getElementById('noise-intensity-slider')) {
+            document.getElementById('noise-intensity-slider').value = this.state.noiseOverlayIntensity;
+            document.getElementById('noise-intensity-value').textContent = `${Math.round(this.state.noiseOverlayIntensity * 100)}%`;
+        }
+        
+        if (document.getElementById('noise-scale-slider')) {
+            document.getElementById('noise-scale-slider').value = this.state.noiseScale;
+            document.getElementById('noise-scale-value').textContent = `${Math.round(this.state.noiseScale * 100)}%`;
+        }
+        
+        if (document.getElementById('noise-invert-toggle')) {
+            document.getElementById('noise-invert-toggle').checked = this.state.noiseInvert;
+        }
+        
+        // Show/hide noise options based on selection
+        const noiseOptions = document.getElementById('noise-options');
+        if (noiseOptions) {
+            if (this.state.noiseOverlayId && this.state.noiseOverlayId !== 'none') {
+                noiseOptions.style.display = 'block';
+            } else {
+                noiseOptions.style.display = 'none';
+            }
+        }
+        
+        // Re-render the preview with new background/noise settings only
+        this.renderPreview();
+        
+        // Save the updated settings
+        this.saveSettings();
+        
+        // Show success notification
+        UI.showSuccess(`Template "${template.name}" applied to background`);
+        
+        console.log('Template applied successfully - background and noise only');
+    },
+    
+    // Save app state to localStorage
+    saveToLocalStorage() {
+        try {
+            const dataToSave = {
+                canvases: this.state.canvases,
+                currentCanvasId: this.state.currentCanvasId,
+                selectedCanvasId: this.state.selectedCanvasId,
+                textLayers: this.state.textLayers,
+                selectedTextLayerId: this.state.selectedTextLayerId,
+                settings: this.getCurrentSettings(),
+                lastSaved: new Date().toISOString()
+            };
+            
+            localStorage.setItem('frameit_persistent_data', JSON.stringify(dataToSave));
+            console.log('Data saved to localStorage');
+        } catch (error) {
+            console.error('Failed to save to localStorage:', error);
+        }
+    },
+    
+    // Load app state from localStorage
+    loadFromLocalStorage() {
+        try {
+            const savedData = localStorage.getItem('frameit_persistent_data');
+            if (!savedData) {
+                console.log('No saved data found, using defaults');
+                this.initializeDefaultState();
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            console.log('Loading saved data from:', data.lastSaved);
+            
+            // Restore canvases
+            if (data.canvases && Array.isArray(data.canvases)) {
+                this.state.canvases = data.canvases;
+            }
+            
+            // Restore current canvas ID
+            if (data.currentCanvasId) {
+                this.state.currentCanvasId = data.currentCanvasId;
+            }
+            
+            // Restore selected canvas ID
+            if (data.selectedCanvasId) {
+                this.state.selectedCanvasId = data.selectedCanvasId;
+            }
+            
+            // Restore text layers
+            if (data.textLayers && Array.isArray(data.textLayers)) {
+                this.state.textLayers = data.textLayers;
+            }
+            
+            // Restore selected text layer ID
+            if (data.selectedTextLayerId) {
+                this.state.selectedTextLayerId = data.selectedTextLayerId;
+            }
+            
+            // Restore settings
+            if (data.settings) {
+                this.applySettings(data.settings);
+            }
+            
+            console.log('Successfully loaded persistent data');
+        } catch (error) {
+            console.error('Failed to load from localStorage:', error);
+            this.initializeDefaultState();
+        }
+    },
+    
+    // Initialize default state when no saved data exists
+    initializeDefaultState() {
+        // Set initial values from Config
+        this.state.cornerRadius = Config.defaultCornerRadius;
+        this.state.padding = Config.defaultPadding;
+        
+        // Initialize Analytics
+        if (window.Analytics) {
+            window.Analytics.init();
+        }
+        
+        // Load background images
+        this.loadBackgroundImages();
+        
+        // Load saved settings
+        this.loadSettings();
+        
+        // Set initial resolution
+        this.updateCanvasSize();
+        
+        // Load uploaded images for gallery
+        this.loadGalleryImages();
+        
+        // Add current canvas to gallery
+        this.addCurrentCanvasToGallery();
+        
+        // Add help button click handler
+        const helpBtn = document.getElementById('help-btn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', () => UI.showHelpModal());
+        }
+        
+        // Add Dev Analytics button for dev users (called by Analytics module when profile loads)
+        this.createDevAnalyticsButton();
+        
+        console.log('✅ FrameIt initialized with defaults');
+        
+        // Initialize zoom controls after UI is ready
+        UI.initZoomControls();
+        
+        // Update UI with initial state
+        UI.updateButtonStates();
+        
+        // Set initial resolution selection in UI
+        const { width, height } = this.state.resolution;
+        if (UI && UI.updateResolutionSelection) {
+            UI.updateResolutionSelection(`${width}x${height}`);
+        }
+        
+        // Show dev features based on user level
+        if (this.state.userLevel === 'developer') {
+            console.log('👤 Dev user');
+            this.showDevAnalyticsButton();
+        } else {
+            console.log('👤 Non-dev user');
+            this.hideDevFeatures();
+        }
+    },
+    
+    // Clear localStorage data
+    clearPersistentData() {
+        try {
+            localStorage.removeItem('frameit_persistent_data');
+            console.log('Persistent data cleared');
+        } catch (error) {
+            console.error('Failed to clear persistent data:', error);
+        }
+    },
+    
+    // Clear text layer cache when layers change
+    _clearTextLayerCache() {
+        if (this._textLayerCache) {
+            this._textLayerCache.clear();
+        }
+    },
+    
+    // Remove a text layer
+    removeTextLayer(id) {
+        const index = this.state.textLayers.findIndex(layer => layer.id === id);
+        if (index === -1) return;
+        
+        // Save state for undo before removal
+        this.saveStateForUndo();
+        
+        // Remove the layer
+        this.state.textLayers.splice(index, 1);
+        
+        // Clear cache since layers changed
+        this._clearTextLayerCache();
+        
+        // Clear selection if this layer was selected
+        if (this.state.selectedTextLayerId === id) {
+            this.state.selectedTextLayerId = null;
+            UI.hideTextEditor();
+        }
+        
+        // Update UI
+        UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
+        
+        // Re-render canvas
+        this.renderPreview();
+        
+        // Save settings
+        this.saveSettings();
+    },
+    
+    // Generate unique text layer ID
+    generateTextLayerId() {
+        return `text_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    },
+    
+    // Get next z-index for text layers
+    getNextTextLayerZIndex() {
+        if (!this.state.textLayers || this.state.textLayers.length === 0) {
+            return 0;
+        }
+        const maxZ = Math.max(...this.state.textLayers.map(layer => layer.zIndex || 0));
+        return maxZ + 1;
     }
 };
 

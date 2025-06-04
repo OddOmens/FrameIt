@@ -67,7 +67,18 @@ window.CanvasRenderer = {
             watermarkOpacity,
             watermarkScale,
             watermarkPosition,
-            textLayers
+            watermarkType,
+            watermarkText,
+            watermarkTextFont,
+            watermarkTextSize,
+            watermarkTextColor,
+            watermarkTextBold,
+            watermarkTextItalic,
+            watermarkTextShadow,
+            watermarkTextShadowColor,
+            watermarkTextShadowBlur,
+            textLayers,
+            selectedTextLayerId
         } = options;
         
         // Ensure all numeric values are actually numbers
@@ -140,13 +151,47 @@ window.CanvasRenderer = {
         }
         
         // Draw watermark if available
-        if (watermarkImage) {
-            this.drawWatermark(
-                watermarkImage,
-                watermarkOpacity,
-                watermarkScale,
-                watermarkPosition
-            );
+        if (watermarkImage || (watermarkType === 'text' && watermarkText)) {
+            let watermarkData = null;
+            
+            if (watermarkType === 'text' && watermarkText) {
+                // Create text watermark data structure
+                watermarkData = {
+                    type: 'text',
+                    text: watermarkText,
+                    font: watermarkTextFont || "'Inter', sans-serif",
+                    size: watermarkTextSize || 24,
+                    color: watermarkTextColor || '#FFFFFF',
+                    bold: watermarkTextBold || false,
+                    italic: watermarkTextItalic || false,
+                    shadow: watermarkTextShadow || false,
+                    shadowColor: watermarkTextShadowColor || '#000000',
+                    shadowBlur: watermarkTextShadowBlur || 3
+                };
+            } else if (watermarkImage) {
+                // Create image watermark data structure
+                watermarkData = {
+                    type: 'image',
+                    image: watermarkImage
+                };
+            }
+            
+            if (watermarkData) {
+                this.drawWatermark(
+                    watermarkData,
+                    watermarkOpacity,
+                    watermarkScale,
+                    watermarkPosition
+                );
+            }
+        }
+        
+        // Draw selection bounds for selected text layer (for visual feedback)
+        if (selectedTextLayerId && textLayers) {
+            const selectedLayer = textLayers.find(layer => layer.id === selectedTextLayerId);
+            if (selectedLayer && selectedLayer.visible) {
+                this.drawTextSelectionBounds(selectedLayer);
+            }
         }
         
         return this.canvas;
@@ -707,11 +752,21 @@ window.CanvasRenderer = {
     },
     
     // Draw watermark
-    drawWatermark(watermarkImage, opacity, scale, position) {
-        if (!watermarkImage) return;
+    drawWatermark(watermarkData, opacity, scale, position) {
+        if (!watermarkData) return;
         
         const { width: canvasWidth, height: canvasHeight } = this.canvas;
         
+        // Check if it's a text watermark or image watermark
+        if (watermarkData.type === 'text' && watermarkData.text) {
+            this.drawTextWatermark(watermarkData, opacity, position, canvasWidth, canvasHeight);
+        } else if (watermarkData.type === 'image' && watermarkData.image) {
+            this.drawImageWatermark(watermarkData.image, opacity, scale, position, canvasWidth, canvasHeight);
+        }
+    },
+    
+    // Draw image watermark
+    drawImageWatermark(watermarkImage, opacity, scale, position, canvasWidth, canvasHeight) {
         // Calculate watermark dimensions based on scale
         const baseWidth = canvasWidth * 0.3; // 30% of canvas width
         const watermarkWidth = baseWidth * scale;
@@ -741,6 +796,52 @@ window.CanvasRenderer = {
             watermarkWidth,
             watermarkHeight
         );
+        
+        // Restore context
+        this.ctx.restore();
+    },
+    
+    // Draw text watermark
+    drawTextWatermark(watermarkData, opacity, position, canvasWidth, canvasHeight) {
+        // Save context
+        this.ctx.save();
+        
+        // Set up font style
+        let fontStyle = '';
+        if (watermarkData.bold) fontStyle += 'bold ';
+        if (watermarkData.italic) fontStyle += 'italic ';
+        
+        this.ctx.font = `${fontStyle}${watermarkData.size}px ${watermarkData.font}`;
+        
+        // Set text color with opacity
+        this.ctx.fillStyle = Utils.adjustColorOpacity(watermarkData.color, opacity);
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'top';
+        
+        // Apply text shadow if enabled
+        if (watermarkData.shadow) {
+            this.ctx.shadowColor = watermarkData.shadowColor;
+            this.ctx.shadowBlur = watermarkData.shadowBlur;
+            this.ctx.shadowOffsetX = 0;
+            this.ctx.shadowOffsetY = 0;
+        }
+        
+        // Measure text dimensions
+        const textMetrics = this.ctx.measureText(watermarkData.text);
+        const textWidth = textMetrics.width;
+        const textHeight = watermarkData.size;
+        
+        // Calculate position coordinates
+        const positionCoords = Utils.calculateWatermarkPosition(
+            position,
+            textWidth,
+            textHeight,
+            canvasWidth,
+            canvasHeight
+        );
+        
+        // Draw the text watermark
+        this.ctx.fillText(watermarkData.text, positionCoords.x, positionCoords.y);
         
         // Restore context
         this.ctx.restore();
@@ -811,18 +912,21 @@ window.CanvasRenderer = {
             maxLineWidth = Math.max(maxLineWidth, metrics.width);
         });
         
-        // Draw background if enabled
-        if (overlay.backgroundColor) {
+        // Draw background if enabled and has opacity
+        if (overlay.background && overlay.backgroundColor && overlay.backgroundOpacity > 0) {
             const padding = overlay.padding || 10;
             const bgX = x - (overlay.align === 'center' ? maxLineWidth / 2 : (overlay.align === 'right' ? maxLineWidth : 0)) - padding;
             const bgY = y - totalHeight / 2 - padding;
             const bgWidth = maxLineWidth + padding * 2;
             const bgHeight = totalHeight + padding * 2;
             
-            // Calculate border radius - scale with font size but keep within reasonable bounds
-            const borderRadius = Math.min(15, Math.max(5, overlay.fontSize / 12));
+            // Get border radius from the overlay or use default
+            const borderRadius = overlay.backgroundRadius || 4;
             
-            this.ctx.fillStyle = Utils.adjustColorOpacity(overlay.backgroundColor, opacity * 0.8);
+            // Get background opacity, defaulting to 1 if not specified
+            const backgroundOpacity = overlay.backgroundOpacity !== undefined ? overlay.backgroundOpacity : 1;
+            
+            this.ctx.fillStyle = Utils.adjustColorOpacity(overlay.backgroundColor, backgroundOpacity);
             this.ctx.beginPath();
             this.ctx.roundRect(bgX, bgY, bgWidth, bgHeight, borderRadius);
             this.ctx.fill();
@@ -831,9 +935,13 @@ window.CanvasRenderer = {
             this.ctx.fillStyle = Utils.adjustColorOpacity(overlay.color || '#FFFFFF', opacity);
         }
         
-        // Apply text shadow if enabled
-        if (overlay.shadow) {
-            this.ctx.shadowColor = overlay.shadowColor || 'rgba(0, 0, 0, 0.5)';
+        // Apply text shadow if enabled and has opacity
+        if (overlay.shadow && overlay.shadowOpacity > 0) {
+            const shadowOpacity = overlay.shadowOpacity || 1;
+            const shadowColor = overlay.shadowColor || 'rgba(0, 0, 0, 0.5)';
+            
+            // Apply opacity to shadow color
+            this.ctx.shadowColor = Utils.adjustColorOpacity(shadowColor, shadowOpacity);
             this.ctx.shadowBlur = overlay.shadowBlur || 3;
             this.ctx.shadowOffsetX = overlay.shadowOffsetX || 2;
             this.ctx.shadowOffsetY = overlay.shadowOffsetY || 2;
@@ -1278,5 +1386,89 @@ window.CanvasRenderer = {
         } catch (error) {
             console.error('Failed to invert canvas:', error);
         }
+    },
+
+    // Draw text selection bounds
+    drawTextSelectionBounds(layer) {
+        if (!layer || !layer.text || !layer.visible) return;
+        
+        const { width, height } = this.canvas;
+        
+        // Save context state
+        this.ctx.save();
+        
+        // Setup text style to measure text (same as drawTextOverlay)
+        let fontStyle = '';
+        if (layer.bold) fontStyle += 'bold ';
+        if (layer.italic) fontStyle += 'italic ';
+        this.ctx.font = `${fontStyle}${layer.fontSize}px ${layer.fontFamily || 'Arial, sans-serif'}`;
+        
+        // Calculate position in canvas coordinates
+        const x = width * layer.position.x;
+        const y = height * layer.position.y;
+        
+        // Calculate maximum width for text wrapping (90% of canvas width)
+        const maxWidth = width * 0.9;
+        
+        // Get wrapped text lines
+        const textLines = this.getWrappedTextLines(layer.text, maxWidth, layer.fontSize);
+        
+        // Calculate text dimensions
+        const textHeight = layer.fontSize * 1.2;
+        const totalHeight = textHeight * textLines.length;
+        
+        // Find the widest line
+        let maxLineWidth = 0;
+        textLines.forEach(line => {
+            const metrics = this.ctx.measureText(line);
+            maxLineWidth = Math.max(maxLineWidth, metrics.width);
+        });
+        
+        // Add background padding if background is enabled
+        const padding = (layer.background && layer.backgroundOpacity > 0) ? 
+            (layer.padding || 10) : 8; // Add minimum padding for selection bounds
+        
+        // Calculate bounds based on text alignment
+        let left, right, top, bottom;
+        
+        if (layer.align === 'left') {
+            left = x - padding;
+            right = x + maxLineWidth + padding;
+        } else if (layer.align === 'right') {
+            left = x - maxLineWidth - padding;
+            right = x + padding;
+        } else { // center (default)
+            left = x - maxLineWidth / 2 - padding;
+            right = x + maxLineWidth / 2 + padding;
+        }
+        
+        top = y - totalHeight / 2 - padding;
+        bottom = y + totalHeight / 2 + padding;
+        
+        // Draw selection bounds
+        this.ctx.strokeStyle = 'rgba(67, 160, 71, 0.8)'; // Use accent color
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([5, 5]); // Dashed line
+        
+        this.ctx.beginPath();
+        this.ctx.rect(left, top, right - left, bottom - top);
+        this.ctx.stroke();
+        
+        // Draw corner handles
+        const handleSize = 8;
+        this.ctx.fillStyle = 'rgba(67, 160, 71, 1)';
+        this.ctx.setLineDash([]); // Solid for handles
+        
+        // Top-left handle
+        this.ctx.fillRect(left - handleSize/2, top - handleSize/2, handleSize, handleSize);
+        // Top-right handle
+        this.ctx.fillRect(right - handleSize/2, top - handleSize/2, handleSize, handleSize);
+        // Bottom-left handle
+        this.ctx.fillRect(left - handleSize/2, bottom - handleSize/2, handleSize, handleSize);
+        // Bottom-right handle
+        this.ctx.fillRect(right - handleSize/2, bottom - handleSize/2, handleSize, handleSize);
+        
+        // Restore context state
+        this.ctx.restore();
     }
 }; 

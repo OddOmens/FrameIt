@@ -167,12 +167,10 @@ window.UI = {
         // New text layer controls
         this.elements.bringToFrontBtn = document.getElementById('bring-to-front-btn');
         this.elements.sendToBackBtn = document.getElementById('send-to-back-btn');
-        this.elements.textShadowToggle = document.getElementById('text-shadow-toggle');
         this.elements.textShadowOptions = document.getElementById('text-shadow-options');
         this.elements.textShadowColor = document.getElementById('text-shadow-color');
         this.elements.textShadowBlurSlider = document.getElementById('text-shadow-blur-slider');
         this.elements.textShadowBlurValue = document.getElementById('text-shadow-blur-value');
-        this.elements.textBgToggle = document.getElementById('text-bg-toggle');
         this.elements.textBgOptions = document.getElementById('text-bg-options');
         this.elements.textBgColor = document.getElementById('text-bg-color');
         this.elements.textPaddingSlider = document.getElementById('text-padding-slider');
@@ -234,8 +232,45 @@ window.UI = {
         this.setupShadowPositionControl();
         
         // File input change
-        this.elements.fileInput.addEventListener('change', (e) => {
+        this.elements.fileInput.addEventListener('change', async (e) => {
             if (e.target.files.length > 0) {
+                // Track image upload for each selected file
+                console.log(`📊 Tracking ${e.target.files.length} selected files for upload`);
+                
+                for (let i = 0; i < e.target.files.length; i++) {
+                    try {
+                        console.log(`📊 === TRACKING FILE SELECTION ${i + 1} ===`);
+                        
+                        if (window.Analytics && window.Analytics.trackImageUpload) {
+                            console.log(`📊 Calling Analytics.trackImageUpload()...`);
+                            const result = await window.Analytics.trackImageUpload();
+                            console.log(`📊 Analytics result:`, result);
+                            if (result && result.success) {
+                                console.log(`📊 ✅ File ${i + 1} upload tracked via Analytics`);
+                            } else {
+                                console.log(`📊 ⚠️ File ${i + 1} upload tracking failed via Analytics:`, result);
+                            }
+                        } else if (window.Auth && window.Auth.trackImageUpload) {
+                            console.log(`📊 Calling Auth.trackImageUpload()...`);
+                            const result = await window.Auth.trackImageUpload();
+                            console.log(`📊 Auth result:`, result);
+                            if (result && result.success) {
+                                console.log(`📊 ✅ File ${i + 1} upload tracked via Auth module`);
+                            } else {
+                                console.log(`📊 ⚠️ File ${i + 1} upload tracking failed via Auth:`, result);
+                            }
+                        } else {
+                            console.log(`📊 ❌ No upload tracking available`);
+                        }
+                        
+                        console.log(`📊 === FINISHED TRACKING FILE SELECTION ${i + 1} ===`);
+                        
+                    } catch (error) {
+                        console.error(`📊 ❌ Failed to track file ${i + 1} selection:`, error);
+                    }
+                }
+                
+                // Now proceed with the normal file handling
                 window.App.handleFileSelect(e.target.files);
                 // Reset the file input value to allow uploading the same file again
                 e.target.value = '';
@@ -289,13 +324,13 @@ window.UI = {
         this.elements.customWidthInput.addEventListener('input', () => this.handleCustomWidthChange());
         this.elements.customHeightInput.addEventListener('input', () => this.handleCustomHeightChange());
         
-        // Shadow color input needs extra handling for proper updates
+        // Shadow color input needs extra handling for proper updates with optimization
         this.elements.shadowColorInput.addEventListener('change', (e) => {
             // On change event (when color picker is closed) we force update the preview
             window.App.setShadowColor(e.target.value);
         });
         
-        // Throttle the input event for better performance
+        // Optimized throttle for shadow color input
         let shadowColorTimeout;
         this.elements.shadowColorInput.addEventListener('input', (e) => {
             // Update color display immediately for visual feedback
@@ -305,7 +340,7 @@ window.UI = {
             clearTimeout(shadowColorTimeout);
             shadowColorTimeout = setTimeout(() => {
                 window.App.setShadowColor(e.target.value);
-            }, 50); // 50ms throttle
+            }, 16); // 16ms throttle for ~60fps
         });
         
         // Zoom controls
@@ -358,11 +393,27 @@ window.UI = {
             });
         }
 
+        // Text color input with optimized performance
         if (this.elements.textColorInput) {
+            let textColorTimeout;
             this.elements.textColorInput.addEventListener('input', (e) => {
                 if (!window.App.state.selectedTextLayerId) return;
+                
+                // Immediate visual feedback - update the input display
                 const color = e.target.value;
-                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { color });
+                
+                // Throttle the expensive text layer update
+                clearTimeout(textColorTimeout);
+                textColorTimeout = setTimeout(() => {
+                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { color });
+                }, 16); // ~60fps throttle
+            });
+            
+            // Final update when color picker is closed
+            this.elements.textColorInput.addEventListener('change', (e) => {
+                if (!window.App.state.selectedTextLayerId) return;
+                clearTimeout(textColorTimeout);
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { color: e.target.value });
             });
         }
 
@@ -464,31 +515,47 @@ window.UI = {
             });
         }
         
-        // Text shadow toggle
-        if (this.elements.textShadowToggle) {
-            this.elements.textShadowToggle.addEventListener('change', (e) => {
-                if (!window.App.state.selectedTextLayerId) return;
-                const shadow = e.target.checked;
-                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadow });
-                
-                // Show/hide shadow options
-                if (this.elements.textShadowOptions) {
-                    this.elements.textShadowOptions.style.display = shadow ? 'block' : 'none';
-                }
-            });
-            
-            // Initialize shadow options display
-            if (this.elements.textShadowOptions) {
-                this.elements.textShadowOptions.style.display = 'none';
-            }
+        // Text shadow toggle - now always enabled, just for visual consistency
+        if (this.elements.textShadowOptions) {
+            // Remove the event listener since it's always enabled
+            // The toggle will be checked and disabled in showTextEditor
         }
         
-        // Text shadow color
+        // Text shadow color with optimized performance
         if (this.elements.textShadowColor) {
+            let shadowColorTimeout;
             this.elements.textShadowColor.addEventListener('input', (e) => {
                 if (!window.App.state.selectedTextLayerId) return;
+                
+                // Immediate visual feedback
                 const shadowColor = e.target.value;
-                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadowColor });
+                
+                // Throttle the expensive update
+                clearTimeout(shadowColorTimeout);
+                shadowColorTimeout = setTimeout(() => {
+                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadowColor });
+                }, 16); // ~60fps throttle
+            });
+            
+            // Final update when color picker is closed
+            this.elements.textShadowColor.addEventListener('change', (e) => {
+                if (!window.App.state.selectedTextLayerId) return;
+                clearTimeout(shadowColorTimeout);
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadowColor: e.target.value });
+            });
+        }
+        
+        // Text shadow opacity slider
+        const textShadowOpacitySlider = document.getElementById('text-shadow-opacity-slider');
+        const textShadowOpacityValue = document.getElementById('text-shadow-opacity-value');
+        if (textShadowOpacitySlider) {
+            textShadowOpacitySlider.addEventListener('input', (e) => {
+                if (!window.App.state.selectedTextLayerId) return;
+                const opacity = parseFloat(e.target.value);
+                if (textShadowOpacityValue) {
+                    textShadowOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+                }
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadowOpacity: opacity });
             });
         }
         
@@ -502,37 +569,61 @@ window.UI = {
             });
         }
         
-        // Text background toggle
-        if (this.elements.textBgToggle) {
-            this.elements.textBgToggle.addEventListener('change', (e) => {
-                if (!window.App.state.selectedTextLayerId) return;
-                
-                if (e.target.checked) {
-                    // Get current background color from input
-                    const backgroundColor = this.elements.textBgColor.value || '#333333';
-                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundColor });
-                } else {
-                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundColor: null });
-                }
-                
-                // Show/hide background options
-                if (this.elements.textBgOptions) {
-                    this.elements.textBgOptions.style.display = e.target.checked ? 'block' : 'none';
-                }
-            });
-            
-            // Initialize background options display
-            if (this.elements.textBgOptions) {
-                this.elements.textBgOptions.style.display = 'none';
-            }
+        // Text background toggle - now always enabled, just for visual consistency  
+        if (this.elements.textBgOptions) {
+            // Remove the event listener since it's always enabled
+            // The toggle will be checked and disabled in showTextEditor
         }
         
-        // Text background color
+        // Text background color with optimized performance
         if (this.elements.textBgColor) {
+            let bgColorTimeout;
             this.elements.textBgColor.addEventListener('input', (e) => {
                 if (!window.App.state.selectedTextLayerId) return;
+                
+                // Immediate visual feedback
                 const backgroundColor = e.target.value;
-                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundColor });
+                
+                // Throttle the expensive update
+                clearTimeout(bgColorTimeout);
+                bgColorTimeout = setTimeout(() => {
+                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundColor });
+                }, 16); // ~60fps throttle
+            });
+            
+            // Final update when color picker is closed
+            this.elements.textBgColor.addEventListener('change', (e) => {
+                if (!window.App.state.selectedTextLayerId) return;
+                clearTimeout(bgColorTimeout);
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundColor: e.target.value });
+            });
+        }
+        
+        // Text background opacity slider
+        const textBgOpacitySlider = document.getElementById('text-bg-opacity-slider');
+        const textBgOpacityValue = document.getElementById('text-bg-opacity-value');
+        if (textBgOpacitySlider) {
+            textBgOpacitySlider.addEventListener('input', (e) => {
+                if (!window.App.state.selectedTextLayerId) return;
+                const opacity = parseFloat(e.target.value);
+                if (textBgOpacityValue) {
+                    textBgOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+                }
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundOpacity: opacity });
+            });
+        }
+        
+        // Text background border radius slider
+        const textBgRadiusSlider = document.getElementById('text-bg-radius-slider');
+        const textBgRadiusValue = document.getElementById('text-bg-radius-value');
+        if (textBgRadiusSlider) {
+            textBgRadiusSlider.addEventListener('input', (e) => {
+                if (!window.App.state.selectedTextLayerId) return;
+                const radius = parseInt(e.target.value);
+                if (textBgRadiusValue) {
+                    textBgRadiusValue.textContent = `${radius}px`;
+                }
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundRadius: radius });
             });
         }
         
@@ -745,6 +836,197 @@ window.UI = {
         document.getElementById('add-image-btn')?.addEventListener('click', () => {
             document.getElementById('file-input').click();
         });
+        
+        // Watermark controls
+        this.setupWatermarkControls();
+    },
+    
+    // Setup watermark controls
+    setupWatermarkControls() {
+        const watermarkUploadArea = document.getElementById('watermark-upload-area');
+        const watermarkFileInput = document.getElementById('watermark-file-input');
+        const clearWatermarkBtn = document.getElementById('clear-watermark-btn');
+        const watermarkOpacitySlider = document.getElementById('watermark-opacity-slider');
+        const watermarkScaleSlider = document.getElementById('watermark-scale-slider');
+        const watermarkPositionSelect = document.getElementById('watermark-position-select');
+        const resetWatermarkOpacityBtn = document.getElementById('reset-watermark-opacity-btn');
+        const resetWatermarkScaleBtn = document.getElementById('reset-watermark-scale-btn');
+        
+        if (watermarkUploadArea) {
+            // Click to upload
+            watermarkUploadArea.addEventListener('click', () => {
+                watermarkFileInput?.click();
+            });
+            
+            // Drag and drop
+            watermarkUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                watermarkUploadArea.classList.add('dragover');
+            });
+            
+            watermarkUploadArea.addEventListener('dragleave', () => {
+                watermarkUploadArea.classList.remove('dragover');
+            });
+            
+            watermarkUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                watermarkUploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleWatermarkUpload(files[0]);
+                }
+            });
+        }
+        
+        if (watermarkFileInput) {
+            watermarkFileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    this.handleWatermarkUpload(e.target.files[0]);
+                }
+            });
+        }
+        
+        if (clearWatermarkBtn) {
+            clearWatermarkBtn.addEventListener('click', () => {
+                this.clearWatermark();
+            });
+        }
+        
+        if (watermarkOpacitySlider) {
+            watermarkOpacitySlider.addEventListener('input', (e) => {
+                const opacity = parseFloat(e.target.value);
+                document.getElementById('watermark-opacity-value').textContent = `${Math.round(opacity * 100)}%`;
+                window.App.setWatermarkOpacity(opacity);
+            });
+        }
+        
+        if (watermarkScaleSlider) {
+            watermarkScaleSlider.addEventListener('input', (e) => {
+                const scale = parseFloat(e.target.value);
+                document.getElementById('watermark-scale-value').textContent = `${Math.round(scale * 100)}%`;
+                window.App.setWatermarkScale(scale);
+            });
+        }
+        
+        if (watermarkPositionSelect) {
+            watermarkPositionSelect.addEventListener('change', (e) => {
+                window.App.setWatermarkPosition(e.target.value);
+            });
+        }
+        
+        if (resetWatermarkOpacityBtn) {
+            resetWatermarkOpacityBtn.addEventListener('click', () => {
+                watermarkOpacitySlider.value = 0.5;
+                document.getElementById('watermark-opacity-value').textContent = '50%';
+                window.App.setWatermarkOpacity(0.5);
+            });
+        }
+        
+        if (resetWatermarkScaleBtn) {
+            resetWatermarkScaleBtn.addEventListener('click', () => {
+                watermarkScaleSlider.value = 1;
+                document.getElementById('watermark-scale-value').textContent = '100%';
+                window.App.setWatermarkScale(1);
+            });
+        }
+    },
+    
+    // Handle watermark upload
+    handleWatermarkUpload(file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            this.showError('Please select an image file for the watermark.');
+            return;
+        }
+        
+        // Show loading state
+        this.showLoading('Processing watermark...');
+        
+        // Load the image
+        Utils.loadImageFromFile(file)
+            .then(image => {
+                // Set the watermark in the app
+                window.App.setWatermarkImage(image, file.name);
+                
+                // Show preview and controls
+                this.showWatermarkPreview(image, file.name);
+                this.showWatermarkControls();
+                
+                this.hideLoading();
+                this.showSuccess('Watermark uploaded successfully!');
+            })
+            .catch(error => {
+                console.error('Failed to load watermark:', error);
+                this.showError('Failed to load watermark image. Please try another file.');
+                this.hideLoading();
+            });
+    },
+    
+    // Show watermark preview
+    showWatermarkPreview(image, filename) {
+        const preview = document.getElementById('watermark-preview');
+        const previewImg = document.getElementById('watermark-preview-img');
+        const filenameSpan = document.getElementById('watermark-filename');
+        
+        if (preview && previewImg && filenameSpan) {
+            // Create a data URL for the preview
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set a reasonable preview size
+            const maxSize = 160;
+            const aspectRatio = image.width / image.height;
+            
+            if (aspectRatio > 1) {
+                canvas.width = Math.min(maxSize, image.width);
+                canvas.height = canvas.width / aspectRatio;
+            } else {
+                canvas.height = Math.min(maxSize, image.height);
+                canvas.width = canvas.height * aspectRatio;
+            }
+            
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            previewImg.src = canvas.toDataURL();
+            
+            filenameSpan.textContent = filename;
+            preview.classList.remove('hidden');
+        }
+    },
+    
+    // Show watermark controls
+    showWatermarkControls() {
+        const controls = document.getElementById('watermark-controls');
+        if (controls) {
+            controls.classList.remove('hidden');
+        }
+    },
+    
+    // Hide watermark controls
+    hideWatermarkControls() {
+        const controls = document.getElementById('watermark-controls');
+        const preview = document.getElementById('watermark-preview');
+        
+        if (controls) {
+            controls.classList.add('hidden');
+        }
+        if (preview) {
+            preview.classList.add('hidden');
+        }
+    },
+    
+    // Clear watermark
+    clearWatermark() {
+        window.App.clearWatermark();
+        this.hideWatermarkControls();
+        
+        // Reset file input
+        const fileInput = document.getElementById('watermark-file-input');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        this.showSuccess('Watermark removed');
     },
     
     // Setup shadow position control
@@ -900,7 +1182,7 @@ window.UI = {
     },
     
     // Handle drop event for files
-    handleDrop(e) {
+    async handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
         
@@ -908,6 +1190,43 @@ window.UI = {
         this.elements.imageDropZone.classList.remove('drag-over');
         
         if (e.dataTransfer.files.length > 0) {
+            // Track image upload for each dropped file
+            console.log(`📊 Tracking ${e.dataTransfer.files.length} dropped files for upload`);
+            
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                try {
+                    console.log(`📊 === TRACKING DROPPED FILE ${i + 1} ===`);
+                    
+                    if (window.Analytics && window.Analytics.trackImageUpload) {
+                        console.log(`📊 Calling Analytics.trackImageUpload()...`);
+                        const result = await window.Analytics.trackImageUpload();
+                        console.log(`📊 Analytics result:`, result);
+                        if (result && result.success) {
+                            console.log(`📊 ✅ Dropped file ${i + 1} upload tracked via Analytics`);
+                        } else {
+                            console.log(`📊 ⚠️ Dropped file ${i + 1} upload tracking failed via Analytics:`, result);
+                        }
+                    } else if (window.Auth && window.Auth.trackImageUpload) {
+                        console.log(`📊 Calling Auth.trackImageUpload()...`);
+                        const result = await window.Auth.trackImageUpload();
+                        console.log(`📊 Auth result:`, result);
+                        if (result && result.success) {
+                            console.log(`📊 ✅ Dropped file ${i + 1} upload tracked via Auth module`);
+                        } else {
+                            console.log(`📊 ⚠️ Dropped file ${i + 1} upload tracking failed via Auth:`, result);
+                        }
+                    } else {
+                        console.log(`📊 ❌ No upload tracking available`);
+                    }
+                    
+                    console.log(`📊 === FINISHED TRACKING DROPPED FILE ${i + 1} ===`);
+                    
+                } catch (error) {
+                    console.error(`📊 ❌ Failed to track dropped file ${i + 1}:`, error);
+                }
+            }
+            
+            // Now proceed with the normal file handling
             window.App.handleFileSelect(e.dataTransfer.files);
         }
     },
@@ -957,12 +1276,16 @@ window.UI = {
     
     // Show the image drop zone
     showDropZone() {
-        this.elements.imageDropZone.classList.remove('hidden');
+        // Remove this functionality - no longer show upload overlay
+        return;
     },
     
     // Hide the image drop zone
     hideDropZone() {
-        this.elements.imageDropZone.classList.add('hidden');
+        const dropZone = document.getElementById('image-drop-zone');
+        if (dropZone) {
+            dropZone.style.display = 'none';
+        }
     },
     
     // Update UI button states based on application state
@@ -1358,8 +1681,9 @@ window.UI = {
         const settings = canvas.settings || {};
         if (settings.backgroundGradientId) {
             // Draw gradient background
-            const gradient = Utils.getGradientById(settings.backgroundGradientId);
-            if (gradient) {
+            const allGradients = Config.getAllGradients();
+            const gradient = allGradients.find(g => g.id === settings.backgroundGradientId);
+            if (gradient && gradient.colors && gradient.colors.length >= 2) {
                 const canvasGradient = ctx.createLinearGradient(0, 0, 200, 200);
                 canvasGradient.addColorStop(0, gradient.colors[0]);
                 canvasGradient.addColorStop(1, gradient.colors[1]);
@@ -1377,18 +1701,32 @@ window.UI = {
             ctx.fillRect(0, 0, 200, 200);
         }
         
-        // Add indicators
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.lineWidth = 1;
-        
-        // Add text indicator if there are text layers
+        // Add text indicators if there are text layers
         if (canvas.textLayers && canvas.textLayers.length > 0) {
-            ctx.font = 'bold 20px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('T', 100, 100);
-            ctx.strokeText('T', 100, 100);
+            canvas.textLayers.forEach((layer, index) => {
+                if (!layer.visible) return;
+                
+                ctx.save();
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = layer.color || '#ffffff';
+                
+                // Position text layers in thumbnail
+                const x = (layer.position?.x || 0.5) * 200;
+                const y = (layer.position?.y || 0.5) * 200;
+                
+                // Add slight shadow for readability
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 2;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                
+                // Draw abbreviated text
+                const text = (layer.text || 'Text').substring(0, 10);
+                ctx.fillText(text, x, y);
+                ctx.restore();
+            });
         }
         
         return tempCanvas.toDataURL();
@@ -1464,34 +1802,11 @@ window.UI = {
         return `<div class="platform-icons">${icons}</div>`;
     },
 
-    // Updates selected resolution option
-    updateResolutionSelection(resolutionId) {
-        // Remove all selected states
-        document.querySelectorAll('.resolution-option').forEach(el => {
-            el.classList.remove('selected');
-            el.querySelector('.check-icon i').className = 'far fa-circle';
-        });
-        
-        // Add selected state to the chosen resolution
-        const resOption = document.querySelector(`.resolution-option[data-width="${resolutionId}"]`);
-        if (resOption) {
-            resOption.classList.add('selected');
-            resOption.querySelector('.check-icon i').className = 'fas fa-check-circle';
-            
-            // Make sure the category is expanded
-            const category = resOption.closest('.category-content');
-            if (category && category.classList.contains('hidden')) {
-                const categoryId = category.dataset.category;
-                this.toggleCategory(categoryId);
-            }
-        }
-    },
-
     // Setup resolution option clicks
     setupResolutionOptions() {
         const resolutionOptions = document.querySelectorAll('.resolution-option');
         
-        resolutionOptions.forEach(option => {
+        resolutionOptions.forEach((option, index) => {
             option.addEventListener('click', () => {
                 const width = parseInt(option.dataset.width, 10);
                 const height = parseInt(option.dataset.height, 10);
@@ -1500,31 +1815,43 @@ window.UI = {
                     // Update the app state with new dimensions
                     App.setResolution(width, height);
                     
-                    // Update UI to show selected resolution
-                    this.updateSelectedResolution(option);
+                    // Update UI to show selected resolution - use the standardized method
+                    this.updateResolutionSelection(`${width}x${height}`);
                 }
             });
         });
     },
 
-    // Update the UI to show selected resolution
-    updateSelectedResolution(selectedOption) {
-        // Remove selection from all options
+    // Updates selected resolution option
+    updateResolutionSelection(resolutionKey) {
+        // Remove all selected states
         const allOptions = document.querySelectorAll('.resolution-option');
-        allOptions.forEach(option => {
-            option.classList.remove('selected');
-            const checkIcon = option.querySelector('.check-icon i');
-            if (checkIcon) {
-                checkIcon.className = 'far fa-circle';
-            }
+        
+        allOptions.forEach(el => {
+            el.classList.remove('selected');
         });
         
-        // Add selection to the clicked option
-        selectedOption.classList.add('selected');
-        const checkIcon = selectedOption.querySelector('.check-icon i');
-        if (checkIcon) {
-            checkIcon.className = 'fas fa-check-circle';
+        // Find the matching resolution option by width and height
+        const resolutionOptions = document.querySelectorAll('.resolution-option');
+        
+        resolutionOptions.forEach(option => {
+            const width = option.dataset.width;
+            const height = option.dataset.height;
+            const optionKey = `${width}x${height}`;
+            
+            if (optionKey === resolutionKey) {
+                option.classList.add('selected');
+                
+                // Make sure the category containing this option is visible
+                const categoryContent = option.closest('.category-content');
+                if (categoryContent && categoryContent.classList.contains('hidden')) {
+                    const categoryId = categoryContent.dataset.category;
+                    if (categoryId) {
+                        this.toggleCategory(categoryId);
         }
+                }
+            }
+        });
     },
     
     // Shows a loading indicator over the canvas
@@ -2104,45 +2431,173 @@ window.UI = {
         const canvas = document.getElementById('preview-canvas');
         if (!canvas) return;
         
-        // Function to get normalized canvas coordinates
+        // Cache canvas rect for better performance
+        let canvasRect = null;
+        let lastRectUpdate = 0;
+        const RECT_CACHE_TIME = 100; // Cache for 100ms
+        
+        // Cache for text bounds to avoid recalculation
+        let textBoundsCache = new Map();
+        let lastBoundsCacheUpdate = 0;
+        const BOUNDS_CACHE_TIME = 200; // Cache bounds for 200ms
+        
+        // Function to get normalized canvas coordinates with caching
         const getNormalizedCoordinates = (clientX, clientY) => {
-            const rect = canvas.getBoundingClientRect();
+            const now = Date.now();
+            if (!canvasRect || (now - lastRectUpdate) > RECT_CACHE_TIME) {
+                canvasRect = canvas.getBoundingClientRect();
+                lastRectUpdate = now;
+            }
+            
             // Convert screen coordinates to canvas coordinates
-            const canvasX = clientX - rect.left;
-            const canvasY = clientY - rect.top;
+            const canvasX = clientX - canvasRect.left;
+            const canvasY = clientY - canvasRect.top;
+            
             // Normalize to 0-1 range
             return {
-                x: canvasX / rect.width,
-                y: canvasY / rect.height
+                x: canvasX / canvasRect.width,
+                y: canvasY / canvasRect.height
             };
+        };
+        
+        // Simplified text bounds calculation that's cached
+        const getTextLayerBounds = (textLayer) => {
+            if (!textLayer || !textLayer.text || !textLayer.visible) return null;
+            
+            const cacheKey = `${textLayer.id}-${textLayer.fontSize}-${textLayer.text.substring(0, 50)}`;
+            const now = Date.now();
+            
+            // Check cache first
+            if (textBoundsCache.has(cacheKey) && (now - lastBoundsCacheUpdate) < BOUNDS_CACHE_TIME) {
+                const cached = textBoundsCache.get(cacheKey);
+                // Update position but keep cached dimensions
+                return {
+                    ...cached,
+                    centerX: textLayer.position.x,
+                    centerY: textLayer.position.y,
+                    left: textLayer.position.x - cached.halfWidth,
+                    right: textLayer.position.x + cached.halfWidth,
+                    top: textLayer.position.y - cached.halfHeight,
+                    bottom: textLayer.position.y + cached.halfHeight
+                };
+            }
+            
+            // Only create temp canvas if not cached
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Apply font settings
+            let fontStyle = '';
+            if (textLayer.bold) fontStyle += 'bold ';
+            if (textLayer.italic) fontStyle += 'italic ';
+            tempCtx.font = `${fontStyle}${textLayer.fontSize}px ${textLayer.fontFamily || 'Arial, sans-serif'}`;
+            
+            // Simplified text measurement - just get approximate width
+            const textMetrics = tempCtx.measureText(textLayer.text.split('\n')[0] || textLayer.text);
+            const textWidth = textMetrics.width;
+            const textHeight = textLayer.fontSize * 1.5; // Approximate height
+            
+            // Add padding if background exists
+            const padding = (textLayer.backgroundOpacity > 0) ? (textLayer.padding || 10) : 10;
+            
+            const halfWidth = (textWidth / 2 + padding) / canvas.width;
+            const halfHeight = (textHeight / 2 + padding) / canvas.height;
+            
+            // Cache the dimensions
+            const bounds = {
+                halfWidth,
+                halfHeight,
+                centerX: textLayer.position.x,
+                centerY: textLayer.position.y,
+                left: textLayer.position.x - halfWidth,
+                right: textLayer.position.x + halfWidth,
+                top: textLayer.position.y - halfHeight,
+                bottom: textLayer.position.y + halfHeight
+            };
+            
+            textBoundsCache.set(cacheKey, { halfWidth, halfHeight });
+            lastBoundsCacheUpdate = now;
+            
+            return bounds;
+        };
+        
+        // Function to find text layer at given coordinates
+        const findTextLayerAtCoordinates = (coords) => {
+            if (!window.App.state.textLayers) return null;
+            
+            // Check all text layers (reverse order to check top layers first)
+            const sortedLayers = [...window.App.state.textLayers].reverse();
+            
+            for (const textLayer of sortedLayers) {
+                const bounds = getTextLayerBounds(textLayer);
+                if (!bounds) continue;
+                
+                // Check if click is within text bounds
+                if (coords.x >= bounds.left && coords.x <= bounds.right &&
+                    coords.y >= bounds.top && coords.y <= bounds.bottom) {
+                    return textLayer;
+                }
+            }
+            
+            return null;
         };
         
         // Mouse events for text layer dragging
         let isDraggingText = false;
         let currentTextLayerId = null;
         let dragUpdateTimeout;
+        let renderTimeout;
+        let pendingRender = false;
+        
+        // Optimized render function for dragging
+        const scheduleRender = () => {
+            if (pendingRender) return;
+            pendingRender = true;
+            
+            requestAnimationFrame(() => {
+                if (isDraggingText) {
+                    window.App.renderPreview();
+                }
+                pendingRender = false;
+            });
+        };
         
         canvas.addEventListener('mousedown', (e) => {
-            // Only proceed if we have a selected text layer
-            if (!window.App.state.selectedTextLayerId) return;
-            
             // Get the normalized coordinates
             const coords = getNormalizedCoordinates(e.clientX, e.clientY);
             
-            // Get the selected text layer
-            const textLayer = window.App.getTextLayerById(window.App.state.selectedTextLayerId);
-            if (!textLayer) return;
+            // Find text layer at click position
+            const clickedTextLayer = findTextLayerAtCoordinates(coords);
             
-            // Check if click is near the text layer's position (within a reasonable area)
-            const clickRadius = 0.1; // 10% of canvas size
-            const distX = Math.abs(coords.x - textLayer.position.x);
-            const distY = Math.abs(coords.y - textLayer.position.y);
-            
-            if (distX <= clickRadius && distY <= clickRadius) {
+            if (clickedTextLayer) {
+                // Select the clicked text layer
+                window.App.selectTextLayer(clickedTextLayer.id);
+                
+                // Show brief feedback
+                this.showNotification(`Selected: "${clickedTextLayer.text.substring(0, 15)}${clickedTextLayer.text.length > 15 ? '...' : ''}"`, 'success', 1000);
+                
                 // Start dragging this text layer
                 isDraggingText = true;
-                currentTextLayerId = textLayer.id;
+                currentTextLayerId = clickedTextLayer.id;
+                
+                // Clear caches for better performance during drag
+                textBoundsCache.clear();
+                
                 e.stopPropagation(); // Prevent canvas dragging
+                e.preventDefault();
+            }
+        });
+        
+        // Add hover cursor detection to canvas
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDraggingText) {
+                // Throttle hover detection for better performance
+                clearTimeout(renderTimeout);
+                renderTimeout = setTimeout(() => {
+                    const coords = getNormalizedCoordinates(e.clientX, e.clientY);
+                    const hoveredTextLayer = findTextLayerAtCoordinates(coords);
+                    canvas.style.cursor = hoveredTextLayer ? 'pointer' : 'default';
+                }, 50); // Throttle hover detection
             }
         });
         
@@ -2151,11 +2606,22 @@ window.UI = {
                 // Get the normalized coordinates
                 const coords = getNormalizedCoordinates(e.clientX, e.clientY);
                 
-                // Throttle position updates for better performance
+                // Get the text layer from cache
+                const textLayer = window.App.getTextLayerById(currentTextLayerId);
+                if (!textLayer) return;
+                
+                // Update position immediately for responsive dragging
+                textLayer.position = { x: coords.x, y: coords.y };
+                
+                // Schedule optimized render
+                scheduleRender();
+                
+                // Throttle the state save for better performance
                 clearTimeout(dragUpdateTimeout);
                 dragUpdateTimeout = setTimeout(() => {
                     window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
-                }, 16); // ~60fps throttle
+                }, 150); // Less frequent state saves
+                
                 e.preventDefault();
             }
         });
@@ -2164,57 +2630,87 @@ window.UI = {
             if (isDraggingText) {
                 // Ensure final position update
                 clearTimeout(dragUpdateTimeout);
+                clearTimeout(renderTimeout);
+                
+                if (currentTextLayerId) {
+                    const textLayer = window.App.getTextLayerById(currentTextLayerId);
+                    if (textLayer) {
+                        window.App.updateTextLayerPosition(currentTextLayerId, textLayer.position.x, textLayer.position.y);
+                        window.App.renderPreview(); // Final render
+                    }
+                }
+                // Reset cursor after dragging
+                canvas.style.cursor = 'default';
             }
             isDraggingText = false;
             currentTextLayerId = null;
+            // Clear caches when dragging ends
+            canvasRect = null;
+            textBoundsCache.clear();
         });
         
-        // Touch events for mobile
+        // Touch events for mobile (simplified)
         canvas.addEventListener('touchstart', (e) => {
-            // Only proceed if we have a selected text layer
-            if (!window.App.state.selectedTextLayerId || e.touches.length !== 1) return;
+            if (e.touches.length !== 1) return;
             
-            // Get the normalized coordinates
             const coords = getNormalizedCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+            const touchedTextLayer = findTextLayerAtCoordinates(coords);
             
-            // Get the selected text layer
-            const textLayer = window.App.getTextLayerById(window.App.state.selectedTextLayerId);
-            if (!textLayer) return;
-            
-            // Check if touch is near the text layer's position
-            const touchRadius = 0.15; // 15% of canvas size (larger for touch)
-            const distX = Math.abs(coords.x - textLayer.position.x);
-            const distY = Math.abs(coords.y - textLayer.position.y);
-            
-            if (distX <= touchRadius && distY <= touchRadius) {
-                // Start dragging this text layer
+            if (touchedTextLayer) {
+                window.App.selectTextLayer(touchedTextLayer.id);
+                this.showNotification(`Selected: "${touchedTextLayer.text.substring(0, 15)}${touchedTextLayer.text.length > 15 ? '...' : ''}"`, 'success', 1000);
+                
                 isDraggingText = true;
-                currentTextLayerId = textLayer.id;
-                e.stopPropagation(); // Prevent canvas dragging
+                currentTextLayerId = touchedTextLayer.id;
+                textBoundsCache.clear();
+                
+                e.stopPropagation();
+                e.preventDefault();
             }
         }, { passive: false });
         
         document.addEventListener('touchmove', (e) => {
             if (isDraggingText && currentTextLayerId && e.touches.length === 1) {
-                // Get the normalized coordinates
                 const coords = getNormalizedCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+                const textLayer = window.App.getTextLayerById(currentTextLayerId);
                 
-                // Throttle position updates for better performance
-                clearTimeout(dragUpdateTimeout);
-                dragUpdateTimeout = setTimeout(() => {
-                    window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
-                }, 16); // ~60fps throttle
+                if (textLayer) {
+                    textLayer.position = { x: coords.x, y: coords.y };
+                    scheduleRender();
+                    
+                    clearTimeout(dragUpdateTimeout);
+                    dragUpdateTimeout = setTimeout(() => {
+                        window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
+                    }, 150);
+                }
+                
                 e.preventDefault();
             }
         }, { passive: false });
         
         document.addEventListener('touchend', () => {
             if (isDraggingText) {
-                // Ensure final position update
                 clearTimeout(dragUpdateTimeout);
+                clearTimeout(renderTimeout);
+                
+                if (currentTextLayerId) {
+                    const textLayer = window.App.getTextLayerById(currentTextLayerId);
+                    if (textLayer) {
+                        window.App.updateTextLayerPosition(currentTextLayerId, textLayer.position.x, textLayer.position.y);
+                        window.App.renderPreview();
+                    }
+                }
             }
             isDraggingText = false;
             currentTextLayerId = null;
+            canvasRect = null;
+            textBoundsCache.clear();
+        });
+        
+        // Clear caches on window resize
+        window.addEventListener('resize', () => {
+            canvasRect = null;
+            textBoundsCache.clear();
         });
     },
     
@@ -2316,89 +2812,195 @@ window.UI = {
     showTextEditor(textLayer) {
         if (!this.elements.textEditor || !textLayer) return;
         
-        // Ensure the Text Layers section is expanded
-        const textLayersSection = document.querySelector('.settings-section:has(.text-layers-list)');
+        // Find the Text Layers section more reliably
+        let textLayersSection = null;
+        
+        // Try multiple methods to find the section
+        const sections = document.querySelectorAll('.settings-section');
+        for (const section of sections) {
+            const textLayersList = section.querySelector('#text-layers-list');
+            if (textLayersList) {
+                textLayersSection = section;
+                break;
+            }
+        }
+        
+        // Fallback: look for section containing "Text Layers" header
+        if (!textLayersSection) {
+            for (const section of sections) {
+                const header = section.querySelector('.section-header h5');
+                if (header && header.textContent.trim() === 'Text Layers') {
+                    textLayersSection = section;
+                    break;
+                }
+            }
+        }
+        
+        // Expand the text layers section if it's collapsed
         if (textLayersSection && textLayersSection.classList.contains('collapsed')) {
             this.toggleSettingsSection(textLayersSection);
+            
+            // Wait for the section to expand before showing editor
+            setTimeout(() => {
+                this.showTextEditorContent(textLayer);
+            }, 350); // Wait for CSS transition
+        } else {
+            this.showTextEditorContent(textLayer);
         }
+    },
+    
+    // Separated content population for better timing control
+    showTextEditorContent(textLayer) {
+        if (!this.elements.textEditor || !textLayer) return;
         
         // Show the editor
         this.elements.textEditor.classList.remove('hidden');
         
-        // Set the values
-        if (this.elements.textContent) {
-            this.elements.textContent.value = textLayer.text || '';
-        }
-        
-        if (this.elements.fontSizeSlider) {
-            this.elements.fontSizeSlider.value = textLayer.fontSize || 36;
-            this.elements.fontSizeValue.textContent = `${textLayer.fontSize || 36}px`;
-        }
-        
-        if (this.elements.fontFamilySelect) {
-            this.elements.fontFamilySelect.value = textLayer.fontFamily || 'Arial, sans-serif';
-        }
-        
-        if (this.elements.textColorInput) {
-            this.elements.textColorInput.value = textLayer.color || '#FFFFFF';
-        }
-        
-        if (this.elements.textOpacitySlider) {
-            this.elements.textOpacitySlider.value = textLayer.opacity !== undefined ? textLayer.opacity : 1;
-            this.elements.textOpacityValue.textContent = `${Math.round((textLayer.opacity !== undefined ? textLayer.opacity : 1) * 100)}%`;
-        }
-        
-        // Set alignment buttons
-        this.updateAlignmentButtons(textLayer.align || 'center');
-        
-        // Set style buttons
-        if (this.elements.boldBtn) {
-            this.elements.boldBtn.classList.toggle('active', textLayer.bold || false);
-        }
-        
-        if (this.elements.italicBtn) {
-            this.elements.italicBtn.classList.toggle('active', textLayer.italic || false);
-        }
-        
-        if (this.elements.underlineBtn) {
-            this.elements.underlineBtn.classList.toggle('active', textLayer.underline || false);
-        }
-        
-        // Initialize shadow controls
-        if (this.elements.textShadowToggle) {
-            this.elements.textShadowToggle.checked = textLayer.shadow || false;
-            
-            if (this.elements.textShadowOptions) {
-                this.elements.textShadowOptions.style.display = textLayer.shadow ? 'block' : 'none';
-            }
-            
-            if (this.elements.textShadowColor) {
-                this.elements.textShadowColor.value = textLayer.shadowColor || '#000000';
-            }
-            
-            if (this.elements.textShadowBlurSlider) {
-                this.elements.textShadowBlurSlider.value = textLayer.shadowBlur || 3;
-                this.elements.textShadowBlurValue.textContent = `${textLayer.shadowBlur || 3}px`;
-            }
-        }
-        
-        // Initialize background controls
-        if (this.elements.textBgToggle) {
-            this.elements.textBgToggle.checked = !!textLayer.backgroundColor;
-            
-            if (this.elements.textBgOptions) {
-                this.elements.textBgOptions.style.display = textLayer.backgroundColor ? 'block' : 'none';
-            }
-            
-            if (this.elements.textBgColor) {
-                this.elements.textBgColor.value = textLayer.backgroundColor || '#333333';
-            }
-            
-            if (this.elements.textPaddingSlider) {
-                this.elements.textPaddingSlider.value = textLayer.padding || 10;
-                this.elements.textPaddingValue.textContent = `${textLayer.padding || 10}px`;
-            }
-        }
+        // Force layout recalculation to ensure proper expansion
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                // Set the text content
+                if (this.elements.textContent) {
+                    this.elements.textContent.value = textLayer.text || '';
+                }
+                
+                // Set font size
+                if (this.elements.fontSizeSlider) {
+                    this.elements.fontSizeSlider.value = textLayer.fontSize || 36;
+                    const fontSizeValue = document.getElementById('font-size-value');
+                    if (fontSizeValue) {
+                        fontSizeValue.textContent = `${textLayer.fontSize || 36}px`;
+                    }
+                }
+                
+                // Set font family
+                if (this.elements.fontFamilySelect) {
+                    this.elements.fontFamilySelect.value = textLayer.fontFamily || "'Inter', sans-serif";
+                }
+                
+                // Set text color
+                if (this.elements.textColorInput) {
+                    this.elements.textColorInput.value = textLayer.color || '#FFFFFF';
+                }
+                
+                // Set text opacity
+                if (this.elements.textOpacitySlider) {
+                    this.elements.textOpacitySlider.value = textLayer.opacity !== undefined ? textLayer.opacity : 1;
+                    const opacityValue = document.getElementById('text-opacity-value');
+                    if (opacityValue) {
+                        opacityValue.textContent = `${Math.round((textLayer.opacity || 1) * 100)}%`;
+                    }
+                }
+                
+                // Set alignment buttons
+                this.updateAlignmentButtons(textLayer.align || 'center');
+                
+                // Set style buttons (bold, italic, underline)
+                const boldBtn = document.getElementById('bold-btn');
+                const italicBtn = document.getElementById('italic-btn');
+                const underlineBtn = document.getElementById('underline-btn');
+                
+                if (boldBtn) {
+                    boldBtn.classList.toggle('active', textLayer.bold || false);
+                }
+                if (italicBtn) {
+                    italicBtn.classList.toggle('active', textLayer.italic || false);
+                }
+                if (underlineBtn) {
+                    underlineBtn.classList.toggle('active', textLayer.underline || false);
+                }
+                
+                // Set shadow settings - always enabled now, options always visible
+                const shadowOptions = document.getElementById('text-shadow-options');
+                if (shadowOptions) {
+                    shadowOptions.style.display = 'block'; // Always visible
+                    shadowOptions.classList.add('visible');
+                }
+                
+                // Set shadow color, blur, and opacity
+                const shadowColorInput = document.getElementById('text-shadow-color');
+                const shadowBlurSlider = document.getElementById('text-shadow-blur-slider');
+                const shadowBlurValue = document.getElementById('text-shadow-blur-value');
+                const shadowOpacitySlider = document.getElementById('text-shadow-opacity-slider');
+                const shadowOpacityValue = document.getElementById('text-shadow-opacity-value');
+                
+                if (shadowColorInput) {
+                    shadowColorInput.value = textLayer.shadowColor || '#000000';
+                }
+                if (shadowBlurSlider) {
+                    shadowBlurSlider.value = textLayer.shadowBlur || 3;
+                    if (shadowBlurValue) {
+                        shadowBlurValue.textContent = `${textLayer.shadowBlur || 3}px`;
+                    }
+                }
+                if (shadowOpacitySlider) {
+                    const opacity = textLayer.shadowOpacity !== undefined ? textLayer.shadowOpacity : 0;
+                    shadowOpacitySlider.value = opacity;
+                    if (shadowOpacityValue) {
+                        shadowOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+                    }
+                }
+                
+                // Set background settings - always enabled now, options always visible
+                const backgroundOptions = document.getElementById('text-bg-options');
+                if (backgroundOptions) {
+                    backgroundOptions.style.display = 'block'; // Always visible
+                    backgroundOptions.classList.add('visible');
+                }
+                
+                // Set background color and padding
+                const bgColorInput = document.getElementById('text-bg-color');
+                const paddingSlider = document.getElementById('text-padding-slider');
+                const paddingValue = document.getElementById('text-padding-value');
+                const bgOpacitySlider = document.getElementById('text-bg-opacity-slider');
+                const bgOpacityValue = document.getElementById('text-bg-opacity-value');
+                const bgRadiusSlider = document.getElementById('text-bg-radius-slider');
+                const bgRadiusValue = document.getElementById('text-bg-radius-value');
+                
+                if (bgColorInput) {
+                    bgColorInput.value = textLayer.backgroundColor || '#333333';
+                }
+                if (paddingSlider) {
+                    paddingSlider.value = textLayer.padding || 10;
+                }
+                if (paddingValue) {
+                    paddingValue.textContent = `${textLayer.padding || 10}px`;
+                }
+                if (bgOpacitySlider) {
+                    bgOpacitySlider.value = textLayer.backgroundOpacity !== undefined ? textLayer.backgroundOpacity : 0;
+                }
+                if (bgOpacityValue) {
+                    bgOpacityValue.textContent = `${Math.round((textLayer.backgroundOpacity || 0) * 100)}%`;
+                }
+                if (bgRadiusSlider) {
+                    bgRadiusSlider.value = textLayer.backgroundRadius || 4;
+                }
+                if (bgRadiusValue) {
+                    bgRadiusValue.textContent = `${textLayer.backgroundRadius || 4}px`;
+                }
+                
+                // Force the parent container to recalculate its height
+                const textLayersSection = this.elements.textEditor.closest('.settings-section');
+                if (textLayersSection) {
+                    const content = textLayersSection.querySelector('.section-content');
+                    if (content) {
+                        // Temporarily remove max-height constraint to allow natural expansion
+                        const originalMaxHeight = content.style.maxHeight;
+                        content.style.maxHeight = 'none';
+                        
+                        // Force layout recalculation
+                        content.offsetHeight;
+                        
+                        // Restore max-height constraint
+                        setTimeout(() => {
+                            content.style.maxHeight = originalMaxHeight || '2000px';
+                        }, 50);
+                    }
+                }
+                
+                console.log('Text editor populated with values:', textLayer);
+            });
+        });
     },
     
     // Hide the text editor
@@ -2577,7 +3179,6 @@ window.UI = {
         option.dataset.height = resolution.height;
         
         option.innerHTML = `
-            <span class="check-icon"><i class="far fa-circle"></i></span>
             <span class="resolution-name">${resolution.name}</span>
             ${this.generatePlatformIcons(resolution.platforms)}
         `;
@@ -2612,7 +3213,7 @@ window.UI = {
             resolutionCategories.appendChild(categoryDiv);
         });
         
-        // Setup event listeners
+        // Setup resolution option clicks
         this.setupResolutionOptions();
     },
     
@@ -2668,4 +3269,4 @@ window.UI = {
             localStorage.setItem(storageKey, isCollapsed ? 'expanded' : 'collapsed');
         }
     }
-}; 
+};

@@ -39,6 +39,20 @@ window.Config = {
                     width: 1080, 
                     height: 1920, 
                     platforms: ['instagram', 'facebook', 'linkedin', 'pinterest']
+                },
+                { 
+                    id: 'linkedin-post', 
+                    name: '1200×627 (LinkedIn)', 
+                    width: 1200, 
+                    height: 627, 
+                    platforms: ['linkedin']
+                },
+                { 
+                    id: 'substack', 
+                    name: '1200×800 (Substack)', 
+                    width: 1200, 
+                    height: 800, 
+                    platforms: []
                 }
             ]
         }

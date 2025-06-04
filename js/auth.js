@@ -1108,17 +1108,15 @@ window.Auth = {
                     console.log('🔧 Running one-time sync check for existing users...');
                     this.hasRunSyncCheck = true;
                     this.checkAndSyncIfNeeded().then(() => {
-                        // After sync check, do the regular backfill and load analytics
-                        this.backfillProfileEmails().then(() => {
-                            this.loadGlobalAnalytics();
-                        });
+                        // After sync check, load analytics directly
+                        this.loadGlobalAnalytics();
                     });
                 } else {
                     // Regular flow for subsequent opens
-                    this.backfillProfileEmails().then(() => {
-                        this.loadGlobalAnalytics();
-                    });
+                    this.loadGlobalAnalytics();
                 }
+            } else {
+                console.log('📊 Non-dev user');
             }
         } else {
             // Update existing stats
@@ -1134,116 +1132,61 @@ window.Auth = {
         console.log('📊 Loading global analytics data...');
         
         const analyticsContainer = document.getElementById('global-analytics-container');
+        console.log('📊 Analytics container found:', !!analyticsContainer);
+        
         if (!analyticsContainer) {
             console.log('❌ Analytics container not found');
             return;
         }
 
         try {
-            // Wait for Analytics module to be ready
-            if (!window.Analytics || !window.Analytics.getSupabase) {
-                console.log('⏳ Waiting for Analytics module...');
-                setTimeout(() => this.loadGlobalAnalytics(), 1000);
-                return;
-            }
-
-            const supabase = window.Analytics.getSupabase();
+            // Use the Auth module's supabase instance
+            const supabase = this.supabase;
+            console.log('📊 Using Auth supabase instance:', !!supabase);
+            
             if (!supabase) {
-                throw new Error('Supabase not available');
+                throw new Error('Supabase not available in Auth module');
             }
 
             console.log('📊 Fetching analytics data from Supabase...');
 
-            // Fetch global stats and user profiles
-            const [globalData, profilesData] = await Promise.all([
-                supabase.from('global').select('*').single(),
-                supabase.from('profiles').select('user_level, export_count, canvas_count, upload_count, created_at, id, email').not('user_level', 'is', null).limit(10)
-            ]);
+            // Fetch only global stats (no longer need profiles for recent users)
+            const { data: globalData, error: globalError } = await supabase
+                .from('global')
+                .select('*')
+                .single();
 
-            if (globalData.error) throw globalData.error;
-            if (profilesData.error) throw profilesData.error;
+            console.log('📊 Raw data received:', { 
+                globalData: globalData, 
+                globalError: globalError
+            });
 
-            const globalStats = globalData.data;
-            const profiles = profilesData.data;
-            
-            // Try to get user emails from multiple sources
-            let recentUsers = [];
-            try {
-                console.log('🔍 Processing user profiles for email assignment...');
+            let globalStats;
+
+            if (globalError) {
+                console.error('Global data error:', globalError);
                 
-                // Try to get emails from admin API first, but handle gracefully if not available
-                let usersData = null;
-                try {
-                    console.log('🔍 Attempting to fetch user emails via admin API...');
-                    usersData = await supabase.auth.admin.listUsers();
-                    
-                    if (usersData.error) {
-                        console.warn('⚠️ Admin API access limited:', usersData.error.message);
-                        usersData = null;
-                    } else {
-                        console.log('✅ Successfully fetched user emails via admin API');
-                    }
-                } catch (adminError) {
-                    console.warn('⚠️ Admin API not available:', adminError.message);
-                    usersData = null;
-                }
-                
-                // Process profiles - use email from profile if available, fallback to admin API, then anonymous
-                recentUsers = profiles.map((profile) => {
-                    let email = profile.email; // Use profile email if available
-                    
-                    // If profile doesn't have email and admin API is available, try to get it
-                    if (!email && usersData?.data?.users) {
-                        const authUser = usersData.data.users.find(u => u.id === profile.id);
-                        email = authUser?.email;
-                        
-                        // If we found an email from admin API, update the profile for future use
-                        if (email) {
-                            console.log(`📧 Found email for profile ${profile.id.slice(0, 8)}... from admin API`);
-                            // Update profile with email (fire and forget)
-                            supabase
-                                .from('profiles')
-                                .update({ email: email })
-                                .eq('id', profile.id)
-                                .then(() => console.log('✅ Updated profile with email'))
-                                .catch(err => console.warn('⚠️ Could not update profile:', err.message));
-                        }
-                    }
-                    
-                    // If still no email, show as anonymous user
-                    if (!email) {
-                        email = `User ${profile.id.slice(0, 8)}...`;
-                    }
-                    
-                    return {
-                        ...profile,
-                        email: email
+                // If global table doesn't exist, create default stats
+                if (globalError.code === 'PGRST116' || globalError.message.includes('does not exist')) {
+                    console.log('📊 Global stats table not found, using default values');
+                    globalStats = {
+                        total_users: 1,
+                        standard_users: 1,
+                        beta_users: 0,
+                        total_exports: 0,
+                        total_canvases: 0,
+                        total_uploads: 0
                     };
-                });
-                
-                // Sort by creation date
-                recentUsers = recentUsers
-                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                    .slice(0, 5);
-                    
-                console.log('✅ Successfully processed user profiles');
-                
-            } catch (processingError) {
-                console.warn('⚠️ Error processing user profiles:', processingError.message);
-                
-                // Fallback: Use profile data as-is
-                recentUsers = profiles
-                    .map(profile => ({
-                        ...profile,
-                        email: profile.email || `User ${profile.id.slice(0, 8)}...`
-                    }))
-                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                    .slice(0, 5);
-                    
-                console.log('📊 Using profile data as-is for recent users');
+                } else {
+                    throw globalError;
+                }
+            } else {
+                globalStats = globalData;
             }
+            
+            console.log('📊 Processed data:', { globalStats });
 
-            // Hide loading and show content
+            // Hide loading and show content (removed recent users section)
             const loadingDiv = analyticsContainer.querySelector('.analytics-loading');
             const contentDiv = analyticsContainer.querySelector('.analytics-content');
             
@@ -1279,25 +1222,6 @@ window.Auth = {
                             <div class="stat-value">${globalStats.total_uploads}</div>
                             <div class="stat-label">Total Uploads</div>
                         </div>
-                    </div>
-                    
-                    <h6 style="color: #a1a1aa; font-size: 14px; margin: 24px 0 12px 0; font-weight: 600;">Recent Users</h6>
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        ${recentUsers.map(user => `
-                            <div style="background: #333333; border: 1px solid #444444; padding: 16px; margin-bottom: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
-                                <div style="background: #444444; color: #888888; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="color: #ffffff; font-weight: 500; font-size: 14px; margin-bottom: 4px;">${user.email}</div>
-                                    <div style="color: #888888; font-size: 12px; margin-bottom: 2px;">ID: ${user.id}</div>
-                                    <div style="color: #888888; font-size: 12px;">
-                                        <span class="user-level-badge" style="display: inline-block; background: ${this.getUserLevelColor(user.user_level).bg}; color: ${this.getUserLevelColor(user.user_level).text}; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 8px; font-weight: 500;">${this.formatUserLevel(user.user_level)}</span>
-                                        Joined ${new Date(user.created_at).toLocaleDateString()} • ${user.export_count + user.canvas_count + user.upload_count} total activity
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
                     </div>
                 `;
             }
@@ -2132,11 +2056,9 @@ window.Auth = {
         if (userSettingsModal && userSettingsModal.classList.contains('visible') && analyticsContainer) {
             console.log('🔄 Refreshing analytics data...');
             
-            // Add a small delay to ensure database updates are complete, then backfill emails and reload
+            // Add a small delay to ensure database updates are complete, then reload analytics
             setTimeout(() => {
-                this.backfillProfileEmails().then(() => {
-                    this.loadGlobalAnalytics();
-                });
+                this.loadGlobalAnalytics();
             }, 1000);
         }
     },
@@ -2257,7 +2179,6 @@ window.Auth = {
                 total_users: allProfiles.length,
                 standard_users: allProfiles.filter(p => p.user_level === 'standard').length,
                 beta_users: allProfiles.filter(p => p.user_level === 'beta').length,
-                dev_users: allProfiles.filter(p => p.user_level === 'dev').length,
                 total_exports: allProfiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
                 total_canvases: allProfiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
                 total_uploads: allProfiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
@@ -2280,6 +2201,21 @@ window.Auth = {
         } catch (error) {
             console.error('❌ Error recalculating global stats:', error);
         }
+    },
+
+    // Calculate stats from profiles when global table not available
+    calculateStatsFromProfiles(profiles) {
+        const stats = {
+            total_users: profiles.length,
+            standard_users: profiles.filter(p => p.user_level === 'standard').length,
+            beta_users: profiles.filter(p => p.user_level === 'beta').length,
+            total_exports: profiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
+            total_canvases: profiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
+            total_uploads: profiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
+        };
+        
+        console.log('📊 Calculated stats from profiles:', stats);
+        return stats;
     },
 
     // Check if sync is needed and run it automatically
@@ -2318,6 +2254,246 @@ window.Auth = {
 
         } catch (error) {
             console.warn('⚠️ Error checking sync status:', error.message);
+        }
+    },
+
+    // Track image upload (fallback when Analytics module not available)
+    async trackImageUpload() {
+        if (!this.supabase || !this.currentUser) {
+            console.warn('⚠️ Cannot track upload - no auth or user');
+            return { success: false, reason: 'Not authenticated' };
+        }
+
+        try {
+            console.log('📊 Auth: Tracking image upload for user:', this.currentUser.id);
+            
+            // First try using the database function
+            const { data, error } = await this.supabase.rpc('increment_upload_count', {
+                user_id: this.currentUser.id
+            });
+
+            if (error) {
+                if (error.message.includes('function increment_upload_count() does not exist')) {
+                    console.warn('⚠️ Upload count function not available, using manual update');
+                    return await this.manualUpdateUploadCount();
+                } else {
+                    throw error;
+                }
+            }
+
+            console.log('✅ Upload tracked successfully:', data);
+            
+            // Refresh analytics if open
+            this.refreshAnalyticsIfOpen();
+            
+            return { success: true, data: data };
+
+        } catch (error) {
+            console.error('❌ Failed to track upload:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // Manual upload count update (fallback)
+    async manualUpdateUploadCount() {
+        try {
+            console.log('📊 Starting manual upload count update...');
+            console.log('📊 Current user:', this.currentUser?.id);
+            
+            // Get current profile
+            const { data: profile, error: fetchError } = await this.supabase
+                .from('profiles')
+                .select('upload_count')
+                .eq('id', this.currentUser.id)
+                .single();
+
+            console.log('📊 Current profile fetch result:', { profile, fetchError });
+
+            if (fetchError) {
+                console.error('Failed to fetch current upload count:', fetchError);
+                return { success: false, error: fetchError.message };
+            }
+
+            const newUploadCount = (profile.upload_count || 0) + 1;
+            console.log('📊 Updating upload count from', profile.upload_count, 'to', newUploadCount);
+
+            // Update profile
+            const { data: updateData, error: updateError } = await this.supabase
+                .from('profiles')
+                .update({ upload_count: newUploadCount })
+                .eq('id', this.currentUser.id)
+                .select();
+
+            console.log('📊 Profile update result:', { updateData, updateError });
+
+            if (updateError) {
+                console.error('Failed to update upload count:', updateError);
+                return { success: false, error: updateError.message };
+            }
+
+            console.log('✅ Upload count updated manually to:', newUploadCount);
+            
+            // Update global stats
+            console.log('📊 Updating global upload count...');
+            await this.updateGlobalUploadCount();
+            
+            // Refresh analytics if open
+            this.refreshAnalyticsIfOpen();
+
+            return { success: true, data: { new_upload_count: newUploadCount } };
+
+        } catch (error) {
+            console.error('❌ Manual upload count update failed:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // Update global upload count
+    async updateGlobalUploadCount() {
+        try {
+            console.log('📊 Starting global upload count update...');
+            
+            const { data: currentStats, error: fetchError } = await this.supabase
+                .from('global')
+                .select('total_uploads')
+                .single();
+
+            console.log('📊 Current global stats fetch result:', { currentStats, fetchError });
+
+            if (fetchError) {
+                console.warn('Could not fetch global stats for upload update:', fetchError);
+                return;
+            }
+
+            const newTotalUploads = (currentStats.total_uploads || 0) + 1;
+            console.log('📊 Updating global uploads from', currentStats.total_uploads, 'to', newTotalUploads);
+
+            const { data: updateData, error: updateError } = await this.supabase
+                .from('global')
+                .update({ total_uploads: newTotalUploads })
+                .eq('id', 1)
+                .select();
+
+            console.log('📊 Global stats update result:', { updateData, updateError });
+
+            if (updateError) {
+                console.warn('Could not update global upload count:', updateError);
+            } else {
+                console.log('✅ Global upload count updated successfully');
+            }
+
+        } catch (error) {
+            console.warn('Error updating global upload count:', error);
+        }
+    },
+
+    // Track canvas creation (fallback when Analytics module not available)
+    async trackCanvasCreated() {
+        if (!this.supabase || !this.currentUser) {
+            console.warn('⚠️ Cannot track canvas creation - no auth or user');
+            return { success: false, reason: 'Not authenticated' };
+        }
+
+        try {
+            console.log('📊 Auth: Tracking canvas creation for user:', this.currentUser.id);
+            
+            // First try using the database function
+            const { data, error } = await this.supabase.rpc('increment_canvas_count', {
+                user_id: this.currentUser.id
+            });
+
+            if (error) {
+                if (error.message.includes('function increment_canvas_count() does not exist')) {
+                    console.warn('⚠️ Canvas count function not available, using manual update');
+                    return await this.manualUpdateCanvasCount();
+                } else {
+                    throw error;
+                }
+            }
+
+            console.log('✅ Canvas creation tracked successfully:', data);
+            
+            // Refresh analytics if open
+            this.refreshAnalyticsIfOpen();
+            
+            return { success: true, data: data };
+
+        } catch (error) {
+            console.error('❌ Failed to track canvas creation:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // Manual canvas count update (fallback)
+    async manualUpdateCanvasCount() {
+        try {
+            // Get current profile
+            const { data: profile, error: fetchError } = await this.supabase
+                .from('profiles')
+                .select('canvas_count')
+                .eq('id', this.currentUser.id)
+                .single();
+
+            if (fetchError) {
+                console.error('Failed to fetch current canvas count:', fetchError);
+                return { success: false, error: fetchError.message };
+            }
+
+            const newCanvasCount = (profile.canvas_count || 0) + 1;
+
+            // Update profile
+            const { error: updateError } = await this.supabase
+                .from('profiles')
+                .update({ canvas_count: newCanvasCount })
+                .eq('id', this.currentUser.id);
+
+            if (updateError) {
+                console.error('Failed to update canvas count:', updateError);
+                return { success: false, error: updateError.message };
+            }
+
+            console.log('✅ Canvas count updated manually to:', newCanvasCount);
+            
+            // Update global stats
+            await this.updateGlobalCanvasCount();
+            
+            // Refresh analytics if open
+            this.refreshAnalyticsIfOpen();
+
+            return { success: true, data: { new_canvas_count: newCanvasCount } };
+
+        } catch (error) {
+            console.error('❌ Manual canvas count update failed:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // Update global canvas count
+    async updateGlobalCanvasCount() {
+        try {
+            const { data: currentStats, error: fetchError } = await this.supabase
+                .from('global')
+                .select('total_canvases')
+                .single();
+
+            if (fetchError) {
+                console.warn('Could not fetch global stats for canvas update:', fetchError);
+                return;
+            }
+
+            const { error: updateError } = await this.supabase
+                .from('global')
+                .update({ total_canvases: (currentStats.total_canvases || 0) + 1 })
+                .eq('id', currentStats.id);
+
+            if (updateError) {
+                console.warn('Could not update global canvas count:', updateError);
+            } else {
+                console.log('✅ Global canvas count updated');
+            }
+
+        } catch (error) {
+            console.warn('Error updating global canvas count:', error);
         }
     },
 }; 
