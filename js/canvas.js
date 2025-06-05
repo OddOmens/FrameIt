@@ -1011,61 +1011,69 @@ window.CanvasRenderer = {
     },
     
     // Create a thumbnail from an image object
-    createThumbnail(image, maxWidth = 100, maxHeight = 100, cornerRadius = 8) {
-        if (!image) return '';
-        
+    createThumbnail(image, maxWidth = 100, maxHeight = 100, cornerRadius = 0) {
         try {
+            // Validate the image parameter
+            if (!image) {
+                console.error('Error: No image provided to createThumbnail');
+                return '';
+            }
+            
+            // Check if the image is a valid drawable object
+            if (!(image instanceof HTMLImageElement || 
+                  image instanceof HTMLCanvasElement || 
+                  image instanceof HTMLVideoElement ||
+                  image instanceof ImageBitmap ||
+                  image instanceof OffscreenCanvas ||
+                  image instanceof SVGImageElement)) {
+                console.error('Error: Invalid image type provided to createThumbnail:', typeof image, image);
+                return '';
+            }
+            
+            // Check if image has valid dimensions
+            const imgWidth = image.width || image.naturalWidth || 0;
+            const imgHeight = image.height || image.naturalHeight || 0;
+            
+            if (imgWidth <= 0 || imgHeight <= 0) {
+                console.error('Error: Image has invalid dimensions:', imgWidth, 'x', imgHeight);
+                return '';
+            }
+            
+            // Create thumbnail canvas
             const thumbnailCanvas = document.createElement('canvas');
             const thumbCtx = thumbnailCanvas.getContext('2d');
             
-            // Calculate thumbnail size
-            const imageAspect = image.width / image.height;
-            const thumbAspect = maxWidth / maxHeight;
+            // Calculate aspect ratios
+            const imageAspect = imgWidth / imgHeight;
+            const maxAspect = maxWidth / maxHeight;
             
             let thumbWidth, thumbHeight;
             
-            if (imageAspect > thumbAspect) {
-                // Image is wider than thumbnail
+            if (imageAspect > maxAspect) {
+                // Image is wider than max dimensions
                 thumbWidth = maxWidth;
-                thumbHeight = thumbWidth / imageAspect;
+                thumbHeight = maxWidth / imageAspect;
             } else {
-                // Image is taller than thumbnail
+                // Image is taller than max dimensions
                 thumbHeight = maxHeight;
-                thumbWidth = thumbHeight * imageAspect;
+                thumbWidth = maxHeight * imageAspect;
             }
-            
-            // Make sure dimensions are valid numbers
-            thumbWidth = Math.max(1, Math.round(thumbWidth));
-            thumbHeight = Math.max(1, Math.round(thumbHeight));
             
             // Set thumbnail dimensions
             thumbnailCanvas.width = thumbWidth;
             thumbnailCanvas.height = thumbHeight;
             
-            // Enable high quality image smoothing
+            // Enable smooth scaling
             thumbCtx.imageSmoothingEnabled = true;
             thumbCtx.imageSmoothingQuality = 'high';
             
-            // Create a rounded rectangle path
-            cornerRadius = Math.min(cornerRadius, thumbWidth / 2, thumbHeight / 2);
-            thumbCtx.beginPath();
-            thumbCtx.moveTo(cornerRadius, 0);
-            thumbCtx.lineTo(thumbWidth - cornerRadius, 0);
-            thumbCtx.arc(thumbWidth - cornerRadius, cornerRadius, cornerRadius, -Math.PI / 2, 0, false);
-            thumbCtx.lineTo(thumbWidth, thumbHeight - cornerRadius);
-            thumbCtx.arc(thumbWidth - cornerRadius, thumbHeight - cornerRadius, cornerRadius, 0, Math.PI / 2, false);
-            thumbCtx.lineTo(cornerRadius, thumbHeight);
-            thumbCtx.arc(cornerRadius, thumbHeight - cornerRadius, cornerRadius, Math.PI / 2, Math.PI, false);
-            thumbCtx.lineTo(0, cornerRadius);
-            thumbCtx.arc(cornerRadius, cornerRadius, cornerRadius, Math.PI, 3 * Math.PI / 2, false);
-            thumbCtx.closePath();
-            
-            // Fill with a background color
-            thumbCtx.fillStyle = '#000';
-            thumbCtx.fill();
-            
-            // Clip to the rounded shape
-            thumbCtx.clip();
+            // Apply corner radius if specified
+            if (cornerRadius > 0) {
+                // Create clipping path for rounded corners
+                thumbCtx.beginPath();
+                thumbCtx.roundRect(0, 0, thumbWidth, thumbHeight, cornerRadius);
+                thumbCtx.clip();
+            }
             
             // Clear the canvas before drawing
             thumbCtx.clearRect(0, 0, thumbWidth, thumbHeight);

@@ -58,7 +58,10 @@ window.App = {
         history: [],
         undoManager: new Models.UndoManager(),
         canvasWidth: 1080,
-        canvasHeight: 1350
+        canvasHeight: 1350,
+        watermarkText: '',
+        watermarkFontSize: 16,
+        watermarkColor: '#000000'
     },
     
     // Initialize the application
@@ -102,6 +105,26 @@ window.App = {
         this.saveToLocalStorage();
         
         console.log('FrameIt App initialized successfully');
+        
+        // Initialize zoom controls after UI is ready
+        UI.initZoomControls();
+        
+        // Update UI with initial state
+        UI.updateButtonStates();
+        
+        // Force enable export buttons to ensure they're always clickable
+        const exportBtn = document.getElementById('export-btn');
+        const exportAllBtn = document.getElementById('export-all-btn');
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            exportBtn.style.pointerEvents = 'auto';
+            console.log('✅ Export button force-enabled');
+        }
+        if (exportAllBtn) {
+            exportAllBtn.disabled = false;
+            exportAllBtn.style.pointerEvents = 'auto';
+            console.log('✅ Export All button force-enabled');
+        }
     },
     
     // Save current state for undo
@@ -137,7 +160,12 @@ window.App = {
             noiseOpacity: this.state.noiseOpacity,
             noiseBlendMode: this.state.noiseBlendMode,
             noiseScale: this.state.noiseScale,
-            noiseInvert: this.state.noiseInvert
+            noiseInvert: this.state.noiseInvert,
+            watermarkText: this.state.watermarkText,
+            watermarkFontSize: this.state.watermarkFontSize,
+            watermarkColor: this.state.watermarkColor,
+            watermarkOpacity: this.state.watermarkOpacity,
+            watermarkPosition: this.state.watermarkPosition
         };
         
         this.state.undoManager.saveState(stateToSave);
@@ -334,7 +362,10 @@ window.App = {
             resolution: this.state.resolution,
             watermarkOpacity: this.state.watermarkOpacity,
             watermarkScale: this.state.watermarkScale,
-            watermarkPosition: this.state.watermarkPosition
+            watermarkPosition: this.state.watermarkPosition,
+            watermarkText: this.state.watermarkText,
+            watermarkFontSize: this.state.watermarkFontSize,
+            watermarkColor: this.state.watermarkColor
         };
         
         Utils.saveToStorage(Config.storageKeys.settings, settingsToSave);
@@ -357,8 +388,33 @@ window.App = {
         
         Promise.all(promises)
             .then(async images => {
+                // Determine if this is adding to an existing canvas (has current canvas ID or any gallery entries)
+                const hasExistingCanvas = this.state.currentCanvasId || this.state.canvases.length > 0;
+                
+                // Special case: if uploading multiple images, ALL should get random backgrounds
+                const isMultiUpload = images.length > 1;
+                
                 // Set the first image as the selected image for current canvas
                 this.state.selectedImage = images[0];
+                
+                // Apply canvas size from image
+                this.updateCanvasSize();
+                
+                // Apply random background/noise for:
+                // 1. Completely NEW canvases (no existing canvas at all)
+                // 2. Multi-uploads (all canvases should get random styling)
+                if (!hasExistingCanvas || isMultiUpload) {
+                    console.log('🎲 Auto-selecting random background and noise for canvas...');
+                    try {
+                        this.selectRandomBackground();
+                        this.selectRandomNoise();
+                        console.log('✅ Random background and noise applied successfully');
+                    } catch (error) {
+                        console.error('❌ Failed to apply random background/noise:', error);
+                    }
+                } else {
+                    console.log('🔄 Adding image to existing canvas - keeping current settings');
+                }
                 
                 // If we have multiple files, create new canvases for each additional image
                 if (images.length > 1) {
@@ -367,40 +423,89 @@ window.App = {
                     
                     // Create new canvases for additional images
                     for (let i = 1; i < images.length; i++) {
-                        const newCanvasId = `canvas_${Date.now()}_${i}`;
-                        const newCanvas = {
-                            id: newCanvasId,
-                            date: new Date().toISOString(),
-                            image: images[i],
-                            settings: this.getCurrentSettings(),
-                            textLayers: [...this.state.textLayers],
-                            isCurrentCanvas: false
-                        };
-                        this.state.canvases.unshift(newCanvas);
+                        // Generate random background and noise for this specific canvas
+                        let randomBackgroundColor = null;
+                        let randomGradientId = null;
+                        let randomNoiseId = 'none';
                         
-                        // Track canvas creation for each new canvas - use proper async/await
-                        try {
-                            if (window.Analytics && window.Analytics.trackCanvasCreated) {
-                                console.log(`📊 Tracking canvas ${i + 1} creation`);
-                                await window.Analytics.trackCanvasCreated();
-                                console.log(`📊 New canvas ${i + 1} creation tracked successfully`);
-                            } else if (window.Auth && window.Auth.trackCanvasCreated) {
-                                console.log(`📊 Using Auth module fallback for canvas ${i + 1} creation`);
-                                await window.Auth.trackCanvasCreated();
-                                console.log(`📊 New canvas ${i + 1} creation tracked via Auth module`);
+                        // Safely generate random background with detailed logging
+                        console.log(`🎲 Generating random settings for canvas ${i + 1}...`);
+                        
+                        if (window.Config) {
+                            // Randomly choose between color and gradient
+                            const useGradient = Math.random() > 0.5;
+                            console.log(`   - Using ${useGradient ? 'gradient' : 'color'}`);
+                            
+                            if (useGradient) {
+                                // Use getAllGradients() method to get all available gradients
+                                const allGradients = window.Config.getAllGradients();
+                                console.log(`   - Available gradients: ${allGradients.length}`);
+                                if (allGradients.length > 0) {
+                                    const randomGradient = allGradients[Math.floor(Math.random() * allGradients.length)];
+                                    randomGradientId = randomGradient.id;
+                                    randomBackgroundColor = null; // Clear color when using gradient
+                                    console.log(`   - Selected gradient: ${randomGradientId}`);
+                                }
+                            } else {
+                                // Use colorPresets for background colors
+                                const colorPresets = window.Config.colorPresets || [];
+                                console.log(`   - Available colors: ${colorPresets.length}`);
+                                if (colorPresets.length > 0) {
+                                    randomBackgroundColor = colorPresets[Math.floor(Math.random() * colorPresets.length)];
+                                    randomGradientId = null; // Clear gradient when using color
+                                    console.log(`   - Selected color: ${randomBackgroundColor}`);
+                                }
                             }
-                        } catch (analyticsError) {
-                            console.error(`📊 Failed to track canvas ${i + 1} creation:`, analyticsError);
+                            
+                            // Generate random noise
+                            if (window.Config.noiseOverlayTypes) {
+                                const availableNoise = window.Config.noiseOverlayTypes.filter(type => type.id !== 'none');
+                                console.log(`   - Available noise options: ${availableNoise.length}`);
+                                if (availableNoise.length > 0) {
+                                    const randomNoise = availableNoise[Math.floor(Math.random() * availableNoise.length)];
+                                    randomNoiseId = randomNoise.id;
+                                    console.log(`   - Selected noise: ${randomNoiseId}`);
+                                }
+                            }
+                        } else {
+                            console.warn('   - Config not available!');
                         }
+                        
+                        // Create new canvas with this image and random settings
+                        const newCanvas = {
+                            id: Date.now() + i,
+                            image: images[i],
+                            settings: {
+                                ...this.getDefaultSettings(),
+                                // Apply random background - ensure proper values
+                                backgroundColor: randomBackgroundColor || '#FFFFFF',
+                                backgroundGradientId: randomGradientId || null,
+                                // Apply random noise
+                                noiseOverlayId: randomNoiseId || 'none',
+                                noiseOpacity: randomNoiseId !== 'none' ? 0.7 : 0,
+                                noiseIntensity: 1.0,
+                                noiseScale: 1.0,
+                                noiseBlendMode: 'multiply',
+                                noiseInvert: false
+                            },
+                            textLayers: []
+                        };
+                        
+                        // Add to gallery
+                        this.state.canvases.push(newCanvas);
+                        
+                        console.log(`✅ Created canvas ${i + 1}:`);
+                        console.log(`   - Background color: ${newCanvas.settings.backgroundColor}`);
+                        console.log(`   - Background gradient: ${newCanvas.settings.backgroundGradientId}`);
+                        console.log(`   - Noise: ${newCanvas.settings.noiseOverlayId}`);
                     }
+                    
+                    // Update gallery display
+                    window.UI.renderGallery(this.state.canvases, this.state.currentCanvasId);
                 }
                 
                 // Track image upload analytics for each successfully loaded file
                 console.log(`📊 Tracking ${files.length} successfully uploaded images`);
-                console.log(`📊 Auth module available:`, !!window.Auth);
-                console.log(`📊 Auth trackImageUpload available:`, !!(window.Auth && window.Auth.trackImageUpload));
-                console.log(`📊 Analytics module available:`, !!window.Analytics);
-                console.log(`📊 Analytics trackImageUpload available:`, !!(window.Analytics && window.Analytics.trackImageUpload));
                 
                 for (let index = 0; index < files.length; index++) {
                     try {
@@ -435,8 +540,6 @@ window.App = {
                     }
                 }
                 
-                // Upload tracking happens earlier in UI.js when files are selected
-                
                 // Show clear button and hide upload prompt
                 document.getElementById('image-drop-zone').classList.add('hidden');
                 
@@ -445,6 +548,13 @@ window.App = {
                 
                 // Update current canvas in gallery
                 this.addCurrentCanvasToGallery();
+                
+                // Show appropriate notification
+                if (!hasExistingCanvas) {
+                    UI.showNotification('Random background and texture applied!', 'success', 2000);
+                } else {
+                    UI.showNotification(`${images.length} image${images.length > 1 ? 's' : ''} added successfully!`, 'success', 2000);
+                }
                 
                 // Hide loading state
                 UI.hideLoading();
@@ -548,7 +658,10 @@ window.App = {
             watermarkFilename: this.state.watermarkFilename,
             watermarkOpacity: this.state.watermarkOpacity,
             watermarkScale: this.state.watermarkScale,
-            watermarkPosition: this.state.watermarkPosition
+            watermarkPosition: this.state.watermarkPosition,
+            watermarkText: this.state.watermarkText,
+            watermarkFontSize: this.state.watermarkFontSize,
+            watermarkColor: this.state.watermarkColor
         };
     },
     
@@ -703,6 +816,9 @@ window.App = {
         this.state.watermarkOpacity = settings.watermarkOpacity || 0.5;
         this.state.watermarkScale = settings.watermarkScale || 1.0;
         this.state.watermarkPosition = settings.watermarkPosition || 'bottom-right';
+        this.state.watermarkText = settings.watermarkText || '';
+        this.state.watermarkFontSize = settings.watermarkFontSize || 16;
+        this.state.watermarkColor = settings.watermarkColor || '#000000';
     },
     
     // Add to history without persisting to localStorage
@@ -1287,6 +1403,17 @@ window.App = {
         
         // Render empty canvas
         this.renderPreview();
+        
+        // Automatically select random background and noise for new canvas
+        console.log('🎲 Auto-selecting random background and noise for new canvas...');
+        try {
+            this.selectRandomBackground();
+            this.selectRandomNoise();
+            UI.showNotification('New canvas with random styling created!', 'success', 2000);
+            console.log('✅ Random background and noise applied to new canvas');
+        } catch (error) {
+            console.error('❌ Failed to apply random background/noise to new canvas:', error);
+        }
         
         // Update gallery immediately to show the new canvas
         if (window.UI && window.UI.renderGallery) {
@@ -1963,16 +2090,16 @@ window.App = {
                     watermarkOpacity: this.state.watermarkOpacity,
                     watermarkScale: this.state.watermarkScale,
                     watermarkPosition: this.state.watermarkPosition,
-                    watermarkType: this.state.watermarkType,
+                    watermarkType: 'text',
                     watermarkText: this.state.watermarkText,
-                    watermarkTextFont: this.state.watermarkTextFont,
-                    watermarkTextSize: this.state.watermarkTextSize,
-                    watermarkTextColor: this.state.watermarkTextColor,
-                    watermarkTextBold: this.state.watermarkTextBold,
-                    watermarkTextItalic: this.state.watermarkTextItalic,
-                    watermarkTextShadow: this.state.watermarkTextShadow,
-                    watermarkTextShadowColor: this.state.watermarkTextShadowColor,
-                    watermarkTextShadowBlur: this.state.watermarkTextShadowBlur,
+                    watermarkTextFont: this.state.watermarkTextFont || "'Inter', sans-serif",
+                    watermarkTextSize: this.state.watermarkTextSize || 16,
+                    watermarkTextColor: this.state.watermarkTextColor || '#FFFFFF',
+                    watermarkTextBold: this.state.watermarkTextBold || false,
+                    watermarkTextItalic: this.state.watermarkTextItalic || false,
+                    watermarkTextShadow: this.state.watermarkTextShadow || false,
+                    watermarkTextShadowColor: this.state.watermarkTextShadowColor || '#000000',
+                    watermarkTextShadowBlur: this.state.watermarkTextShadowBlur || 3,
                     textLayers: this.state.textLayers,
                     selectedTextLayerId: this.state.selectedTextLayerId
                 });
@@ -2252,16 +2379,14 @@ window.App = {
     // Clear watermark
     clearWatermark() {
         this.saveStateForUndo();
+        this.state.watermarkText = '';
         this.state.watermarkImage = null;
         this.state.watermarkFilename = null;
-        
-        // Update current canvas
-        this.addCurrentCanvasToGallery();
-        
         this.renderPreview();
         this.saveSettings();
         console.log('✅ Watermark cleared');
     },
+    
     
     // Apply a template configuration
     applyTemplate(templateId) {
@@ -2561,6 +2686,99 @@ window.App = {
         }
         const maxZ = Math.max(...this.state.textLayers.map(layer => layer.zIndex || 0));
         return maxZ + 1;
+    },
+    
+    // Get default settings for new canvases
+    getDefaultSettings() {
+        return {
+            cornerRadius: 25,
+            padding: 75,
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            shadowOffsetX: 0,
+            shadowOffsetY: 4,
+            shadowColor: '#000000',
+            backgroundColor: '#FFFFFF',
+            backgroundGradientId: null,
+            backgroundImageId: null,
+            backgroundBlurRadius: 0,
+            backgroundTwirlAmount: 0,
+            backgroundSaturation: 100,
+            backgroundHueRotation: 0,
+            backgroundContrast: 100,
+            backgroundBrightness: 100,
+            backgroundWaveAmount: 0,
+            backgroundRippleAmount: 0,
+            backgroundZoomAmount: 100,
+            backgroundShakeAmount: 0,
+            backgroundLensAmount: 0,
+            noiseOverlayId: 'none',
+            noiseOverlayIntensity: 1.0,
+            noiseOpacity: 0.7,
+            noiseBlendMode: 'multiply',
+            noiseScale: 1.0,
+            noiseInvert: false,
+            rotation: 0,
+            isFlippedHorizontally: false,
+            isFlippedVertically: false,
+            resolution: { width: 1080, height: 1080, name: 'Square (1:1)', id: 'square' },
+            watermarkImage: null,
+            watermarkFilename: null,
+            watermarkOpacity: 0.7,
+            watermarkScale: 1.0,
+            watermarkPosition: 'bottom-right',
+            watermarkText: '',
+            watermarkType: 'text',
+            watermarkTextFont: "'Inter', sans-serif",
+            watermarkTextSize: 16,
+            watermarkTextColor: '#FFFFFF',
+            watermarkTextBold: false,
+            watermarkTextItalic: false,
+            watermarkTextShadow: false,
+            watermarkTextShadowColor: '#000000',
+            watermarkTextShadowBlur: 3
+        };
+    },
+    
+    // Set watermark text
+    setWatermarkText(text) {
+        this.saveStateForUndo();
+        this.state.watermarkText = text;
+        
+        // Store in current canvas settings for persistence
+        this.addCurrentCanvasToGallery();
+        
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set watermark opacity
+    setWatermarkOpacity(opacity) {
+        this.state.watermarkOpacity = Number(opacity);
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set watermark font size
+    setWatermarkFontSize(fontSize) {
+        this.state.watermarkTextSize = Number(fontSize);
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set watermark color
+    setWatermarkColor(color) {
+        this.state.watermarkTextColor = color;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set watermark position
+    setWatermarkPosition(position) {
+        this.saveStateForUndo();
+        this.state.watermarkPosition = position;
+        this.renderPreview();
+        this.saveSettings();
     }
 };
 

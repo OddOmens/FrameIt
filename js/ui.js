@@ -11,7 +11,145 @@ window.UI = {
     },
     
     // DOM Elements
-    elements: {},
+    elements: {
+        // Canvas and preview
+        canvas: document.getElementById('preview-canvas'),
+        canvasPreview: document.getElementById('canvas-preview'),
+        uploadBtn: document.getElementById('upload-btn'),
+        galleryUploadBtn: document.getElementById('gallery-upload-btn'),
+        addImageBtn: document.getElementById('add-image-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        exportAllBtn: document.getElementById('export-all-btn'),
+        applyToAllBtn: document.getElementById('apply-to-all-btn'),
+        
+        // New dropdown elements
+        actionsDropdownBtn: document.getElementById('actions-dropdown-btn'),
+        actionsDropdownMenu: document.getElementById('actions-dropdown-menu'),
+        clearAllCanvasesBtn: document.getElementById('clear-all-canvases-btn'),
+        clearAllWatermarksBtn: document.getElementById('clear-all-watermarks-btn'),
+        
+        // Watermark apply to all
+        applyWatermarkToAllBtn: document.getElementById('apply-watermark-to-all-btn'),
+        
+        // Image drop zone
+        imageDropZone: document.getElementById('image-drop-zone'),
+        fileInput: document.getElementById('file-input'),
+        
+        // Buttons
+        randomBgBtn: document.getElementById('random-bg-btn'),
+        randomNoiseBtn: document.getElementById('random-noise-btn'),
+        flipHBtn: document.getElementById('flip-h-btn'),
+        flipVBtn: document.getElementById('flip-v-btn'),
+        
+        // Reset buttons
+        resetBlurBtn: document.getElementById('reset-blur-btn'),
+        resetCornerBtn: document.getElementById('reset-corner-btn'),
+        resetPaddingBtn: document.getElementById('reset-padding-btn'),
+        resetShadowOpacityBtn: document.getElementById('reset-shadow-opacity-btn'),
+        resetShadowRadiusBtn: document.getElementById('reset-shadow-radius-btn'),
+        resetShadowOffsetXBtn: document.getElementById('reset-shadow-offset-x-btn'),
+        resetShadowOffsetYBtn: document.getElementById('reset-shadow-offset-y-btn'),
+        resetShadowColorBtn: document.getElementById('reset-shadow-color-btn'),
+        resetRotationBtn: document.getElementById('reset-rotation-btn'),
+        
+        // Sliders
+        bgBlurSlider: document.getElementById('bg-blur-slider'),
+        cornerRadiusSlider: document.getElementById('corner-radius-slider'),
+        paddingSlider: document.getElementById('padding-slider'),
+        shadowOpacitySlider: document.getElementById('shadow-opacity-slider'),
+        shadowRadiusSlider: document.getElementById('shadow-radius-slider'),
+        shadowOffsetXSlider: document.getElementById('shadow-offset-x-slider'),
+        shadowOffsetYSlider: document.getElementById('shadow-offset-y-slider'),
+        shadowColorInput: document.getElementById('shadow-color-input'),
+        rotationSlider: document.getElementById('rotation-slider'),
+        
+        // Value displays
+        blurValue: document.getElementById('blur-value'),
+        cornerRadiusValue: document.getElementById('corner-radius-value'),
+        paddingValue: document.getElementById('padding-value'),
+        shadowOpacityValue: document.getElementById('shadow-opacity-value'),
+        shadowRadiusValue: document.getElementById('shadow-radius-value'),
+        shadowOffsetXValue: document.getElementById('shadow-offset-x-value'),
+        shadowOffsetYValue: document.getElementById('shadow-offset-y-value'),
+        shadowColorValue: document.getElementById('shadow-color-value'),
+        rotationValue: document.getElementById('rotation-value'),
+        
+        // Shadow position control
+        shadowPositionGrid: document.querySelector('.shadow-position-grid'),
+        shadowPositionHandle: document.getElementById('shadow-position-handle'),
+        
+        // Containers
+        colorSwatches: document.getElementById('color-swatches'),
+        gradientSwatches: document.getElementById('gradient-swatches'),
+        abstractGradients: document.getElementById('abstract-gradients'),
+        refractions: document.getElementById('refractions'),
+        blackLiquid: document.getElementById('black-liquid'),
+        categoryHeaders: document.querySelectorAll('.category-header'),
+        galleryContainer: document.getElementById('gallery-container'),
+        galleryContent: document.getElementById('gallery-content'),
+        
+        // Modal elements
+        historyModal: document.getElementById('history-modal'),
+        modalCloseBtn: document.querySelector('.modal-close-btn'),
+        historyItems: document.getElementById('history-items'),
+        emptyHistory: document.getElementById('empty-history'),
+        clearHistoryBtn: document.getElementById('clear-history-btn'),
+        
+        // Export settings modal elements
+        exportSettingsModal: document.getElementById('export-settings-modal'),
+        exportSettingsCloseBtn: document.getElementById('export-settings-close-btn'),
+        exportDimensionSelect: document.getElementById('export-dimension-select'),
+        customSizeControls: document.getElementById('custom-size-controls'),
+        customWidthInput: document.getElementById('custom-width'),
+        customHeightInput: document.getElementById('custom-height'),
+        maintainAspectRatio: document.getElementById('maintain-aspect-ratio'),
+        exportFormatSelect: document.getElementById('export-format-select'),
+        exportQualitySelect: document.getElementById('export-quality-select'),
+        qualityContainer: document.getElementById('quality-container'),
+        cancelExportBtn: document.getElementById('cancel-export-btn'),
+        confirmExportBtn: document.getElementById('confirm-export-btn'),
+        
+        // Sidebar panels
+        galleryPanel: document.querySelector('.gallery-bar'),
+        controlPanels: document.querySelector('.control-panels'),
+        
+        // Zoom controls
+        zoomInBtn: document.getElementById('zoom-in-btn'),
+        zoomOutBtn: document.getElementById('zoom-out-btn'),
+        zoomResetBtn: document.getElementById('zoom-reset-btn'),
+        
+        // Text layers elements
+        textLayersList: document.getElementById('text-layers-list'),
+        addTextBtn: document.getElementById('add-text-btn'),
+        textEditor: document.getElementById('text-editor'),
+        textContent: document.getElementById('text-content'),
+        fontSizeSlider: document.getElementById('font-size-slider'),
+        fontSizeValue: document.getElementById('font-size-value'),
+        fontFamilySelect: document.getElementById('font-family-select'),
+        textColorInput: document.getElementById('text-color-input'),
+        textOpacitySlider: document.getElementById('text-opacity-slider'),
+        textOpacityValue: document.getElementById('text-opacity-value'),
+        alignLeftBtn: document.getElementById('align-left-btn'),
+        alignCenterBtn: document.getElementById('align-center-btn'),
+        alignRightBtn: document.getElementById('align-right-btn'),
+        boldBtn: document.getElementById('bold-btn'),
+        italicBtn: document.getElementById('italic-btn'),
+        underlineBtn: document.getElementById('underline-btn'),
+        deleteTextBtn: document.getElementById('delete-text-btn'),
+        duplicateTextBtn: document.getElementById('duplicate-text-btn'),
+        
+        // New text layer controls
+        bringToFrontBtn: document.getElementById('bring-to-front-btn'),
+        sendToBackBtn: document.getElementById('send-to-back-btn'),
+        textShadowOptions: document.getElementById('text-shadow-options'),
+        textShadowColor: document.getElementById('text-shadow-color'),
+        textShadowBlurSlider: document.getElementById('text-shadow-blur-slider'),
+        textShadowBlurValue: document.getElementById('text-shadow-blur-value'),
+        textBgOptions: document.getElementById('text-bg-options'),
+        textBgColor: document.getElementById('text-bg-color'),
+        textPaddingSlider: document.getElementById('text-padding-slider'),
+        textPaddingValue: document.getElementById('text-padding-value'),
+    },
     
     // Initialize the UI
     init() {
@@ -20,9 +158,13 @@ window.UI = {
         
         this.cacheElements();
         this.setupEventListeners();
+        this.setupWatermarkControls(); // Add watermark control setup
         this.renderTemplates(); // Render templates in their own section
-        this.renderBackgroundImages(); // This will render colors and gradients
-        this.updateButtonStates();
+        
+        // Force enable export buttons after all setup is complete
+        this.forceEnableExportButtons();
+        
+        console.log('✅ UI initialized successfully');
         
         // Initialize zoom state
         this.zoomLevel = 1;
@@ -62,8 +204,8 @@ window.UI = {
         
         // Buttons
         this.elements.uploadBtn = document.getElementById('upload-btn');
-        this.elements.exportBtn = document.getElementById('export-btn');
         this.elements.randomBgBtn = document.getElementById('random-bg-btn');
+        this.elements.randomNoiseBtn = document.getElementById('random-noise-btn');
         this.elements.flipHBtn = document.getElementById('flip-h-btn');
         this.elements.flipVBtn = document.getElementById('flip-v-btn');
         
@@ -174,7 +316,39 @@ window.UI = {
         this.elements.textBgOptions = document.getElementById('text-bg-options');
         this.elements.textBgColor = document.getElementById('text-bg-color');
         this.elements.textPaddingSlider = document.getElementById('text-padding-slider');
-        this.elements.textPaddingValue = document.getElementById('text-padding-value');
+        this.elements.textPaddingValue = document.getElementById('text-padding-value'),
+        
+        // New dropdown elements
+        this.elements.actionsDropdownBtn = document.getElementById('actions-dropdown-btn');
+        this.elements.actionsDropdownMenu = document.getElementById('actions-dropdown-menu');
+        this.elements.clearAllCanvasesBtn = document.getElementById('clear-all-canvases-btn');
+        this.elements.clearAllWatermarksBtn = document.getElementById('clear-all-watermarks-btn');
+        
+        // Watermark apply to all
+        this.elements.applyWatermarkToAllBtn = document.getElementById('apply-watermark-to-all-btn');
+        
+        // Cache export button references for easier access
+        this.elements.exportBtn = document.getElementById('export-btn');
+        this.elements.exportAllBtn = document.getElementById('export-all-btn');
+        
+        // Immediately enable export buttons
+        this.forceEnableExportButtons();
+        
+        console.log('UI elements cached successfully');
+    },
+    
+    // Force enable export buttons to ensure they are always clickable
+    forceEnableExportButtons() {
+        [this.elements.exportBtn, this.elements.exportAllBtn].forEach(btn => {
+            if (btn) {
+                btn.disabled = false;
+                btn.removeAttribute('disabled');
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.classList.remove('disabled');
+            }
+        });
     },
     
     // Setup event listeners
@@ -182,6 +356,17 @@ window.UI = {
         // Button events
         this.elements.uploadBtn.addEventListener('click', () => window.App.createNewCanvas());
         this.elements.exportBtn.addEventListener('click', () => this.showExportSettingsModal());
+        console.log('✅ Export button event listener attached');
+        
+        // Export all button - find by ID since it might not be cached
+        const exportAllBtn = document.getElementById('export-all-btn');
+        if (exportAllBtn) {
+            exportAllBtn.addEventListener('click', () => window.App.exportAllImages());
+            console.log('✅ Export All button event listener attached');
+        } else {
+            console.error('❌ Export All button not found!');
+        }
+        
         this.elements.randomBgBtn.addEventListener('click', () => window.App.selectRandomBackground());
         this.elements.flipHBtn.addEventListener('click', () => window.App.toggleFlipHorizontal());
         this.elements.flipVBtn.addEventListener('click', () => window.App.toggleFlipVertical());
@@ -196,11 +381,6 @@ window.UI = {
         const applyToAllBtn = document.getElementById('apply-to-all-btn');
         if (applyToAllBtn) {
             applyToAllBtn.addEventListener('click', () => window.App.applySettingsToAll());
-        }
-        
-        const exportAllBtn = document.getElementById('export-all-btn');
-        if (exportAllBtn) {
-            exportAllBtn.addEventListener('click', () => window.App.exportAllImages());
         }
         
         // Reset button events
@@ -839,57 +1019,70 @@ window.UI = {
         
         // Watermark controls
         this.setupWatermarkControls();
+        
+        // Add text layer button
+        this.elements.addTextBtn?.addEventListener('click', () => {
+            window.App.addTextLayer();
+        });
+        
+        // Actions dropdown
+        this.elements.actionsDropdownBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleActionsDropdown();
+        });
+        
+        // Clear all canvases action
+        this.elements.clearAllCanvasesBtn?.addEventListener('click', () => {
+            this.clearAllCanvases();
+            this.hideActionsDropdown();
+        });
+        
+        // Clear all watermarks action
+        this.elements.clearAllWatermarksBtn?.addEventListener('click', () => {
+            this.clearAllWatermarks();
+            this.hideActionsDropdown();
+        });
+        
+        // Apply watermark to all
+        this.elements.applyWatermarkToAllBtn?.addEventListener('click', () => {
+            this.applyWatermarkToAll();
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-container')) {
+                this.hideActionsDropdown();
+            }
+        });
     },
     
     // Setup watermark controls
     setupWatermarkControls() {
-        const watermarkUploadArea = document.getElementById('watermark-upload-area');
-        const watermarkFileInput = document.getElementById('watermark-file-input');
-        const clearWatermarkBtn = document.getElementById('clear-watermark-btn');
-        const watermarkOpacitySlider = document.getElementById('watermark-opacity-slider');
-        const watermarkScaleSlider = document.getElementById('watermark-scale-slider');
+        const watermarkTextInput = document.getElementById('watermark-text');
+        const watermarkColorSelect = document.getElementById('watermark-color-select');
         const watermarkPositionSelect = document.getElementById('watermark-position-select');
+        const watermarkOpacitySlider = document.getElementById('watermark-opacity-slider');
+        const watermarkFontSizeSlider = document.getElementById('watermark-font-size-slider');
+        const clearWatermarkBtn = document.getElementById('clear-watermark-btn');
         const resetWatermarkOpacityBtn = document.getElementById('reset-watermark-opacity-btn');
-        const resetWatermarkScaleBtn = document.getElementById('reset-watermark-scale-btn');
+        const resetWatermarkFontSizeBtn = document.getElementById('reset-watermark-font-size-btn');
         
-        if (watermarkUploadArea) {
-            // Click to upload
-            watermarkUploadArea.addEventListener('click', () => {
-                watermarkFileInput?.click();
-            });
-            
-            // Drag and drop
-            watermarkUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                watermarkUploadArea.classList.add('dragover');
-            });
-            
-            watermarkUploadArea.addEventListener('dragleave', () => {
-                watermarkUploadArea.classList.remove('dragover');
-            });
-            
-            watermarkUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                watermarkUploadArea.classList.remove('dragover');
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    this.handleWatermarkUpload(files[0]);
-                }
+        if (watermarkTextInput) {
+            watermarkTextInput.addEventListener('input', (e) => {
+                window.App.setWatermarkText(e.target.value);
             });
         }
         
-        if (watermarkFileInput) {
-            watermarkFileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    this.handleWatermarkUpload(e.target.files[0]);
-                }
+        if (watermarkColorSelect) {
+            watermarkColorSelect.addEventListener('change', (e) => {
+                const color = e.target.value === 'white' ? '#FFFFFF' : '#000000';
+                window.App.setWatermarkColor(color);
             });
         }
         
-        if (clearWatermarkBtn) {
-            clearWatermarkBtn.addEventListener('click', () => {
-                this.clearWatermark();
+        if (watermarkPositionSelect) {
+            watermarkPositionSelect.addEventListener('change', (e) => {
+                window.App.setWatermarkPosition(e.target.value);
             });
         }
         
@@ -901,33 +1094,33 @@ window.UI = {
             });
         }
         
-        if (watermarkScaleSlider) {
-            watermarkScaleSlider.addEventListener('input', (e) => {
-                const scale = parseFloat(e.target.value);
-                document.getElementById('watermark-scale-value').textContent = `${Math.round(scale * 100)}%`;
-                window.App.setWatermarkScale(scale);
+        if (watermarkFontSizeSlider) {
+            watermarkFontSizeSlider.addEventListener('input', (e) => {
+                const fontSize = parseInt(e.target.value);
+                document.getElementById('watermark-font-size-value').textContent = `${fontSize}px`;
+                window.App.setWatermarkFontSize(fontSize);
             });
         }
         
-        if (watermarkPositionSelect) {
-            watermarkPositionSelect.addEventListener('change', (e) => {
-                window.App.setWatermarkPosition(e.target.value);
+        if (clearWatermarkBtn) {
+            clearWatermarkBtn.addEventListener('click', () => {
+                this.clearWatermark();
             });
         }
         
         if (resetWatermarkOpacityBtn) {
             resetWatermarkOpacityBtn.addEventListener('click', () => {
-                watermarkOpacitySlider.value = 0.5;
-                document.getElementById('watermark-opacity-value').textContent = '50%';
-                window.App.setWatermarkOpacity(0.5);
+                watermarkOpacitySlider.value = 0.7;
+                document.getElementById('watermark-opacity-value').textContent = '70%';
+                window.App.setWatermarkOpacity(0.7);
             });
         }
         
-        if (resetWatermarkScaleBtn) {
-            resetWatermarkScaleBtn.addEventListener('click', () => {
-                watermarkScaleSlider.value = 1;
-                document.getElementById('watermark-scale-value').textContent = '100%';
-                window.App.setWatermarkScale(1);
+        if (resetWatermarkFontSizeBtn) {
+            resetWatermarkFontSizeBtn.addEventListener('click', () => {
+                watermarkFontSizeSlider.value = 16;
+                document.getElementById('watermark-font-size-value').textContent = '16px';
+                window.App.setWatermarkFontSize(16);
             });
         }
     },
@@ -1018,15 +1211,14 @@ window.UI = {
     // Clear watermark
     clearWatermark() {
         window.App.clearWatermark();
-        this.hideWatermarkControls();
         
-        // Reset file input
-        const fileInput = document.getElementById('watermark-file-input');
-        if (fileInput) {
-            fileInput.value = '';
+        // Reset text input
+        const textInput = document.getElementById('watermark-text');
+        if (textInput) {
+            textInput.value = '';
         }
         
-        this.showSuccess('Watermark removed');
+        this.showSuccess('Watermark cleared');
     },
     
     // Setup shadow position control
@@ -1294,6 +1486,9 @@ window.UI = {
         
         // Enable/disable buttons
         this.elements.exportBtn.disabled = false; // Always allow export - supports text/background-only designs
+        
+        // Force enable both export buttons using helper function
+        this.forceEnableExportButtons();
         
         // Update export button text based on content
         const exportBtnText = this.elements.exportBtn.querySelector('span');
@@ -1621,13 +1816,18 @@ window.UI = {
             
             // Create thumbnail - either from image or from canvas state
             const img = document.createElement('img');
-            if (canvas.image) {
-                // Canvas has an image
-                const cornerRadius = canvas.settings?.cornerRadius || 8;
-                img.src = CanvasRenderer.createThumbnail(canvas.image, 200, 200, cornerRadius);
+            if (canvas.image && canvas.image instanceof HTMLImageElement && canvas.image.complete && canvas.image.naturalWidth > 0) {
+                // Canvas has a valid, loaded image - create thumbnail without corner radius
+                const thumbnailData = CanvasRenderer.createThumbnail(canvas.image, 200, 200, 0);
+                if (thumbnailData) {
+                    img.src = thumbnailData;
+                } else {
+                    // Fallback if thumbnail creation fails
+                    img.src = this.createCanvasThumbnail(canvas);
+                }
                 img.alt = 'Canvas';
             } else {
-                // Canvas without image - create a thumbnail of the background/text
+                // Canvas without image or invalid image - create a thumbnail of the background/text
                 img.src = this.createCanvasThumbnail(canvas);
                 img.alt = 'Canvas';
             }
@@ -3267,6 +3467,110 @@ window.UI = {
         if (subsectionTitle) {
             const storageKey = `subsection_${subsectionTitle.replace(/\s+/g, '_').toLowerCase()}`;
             localStorage.setItem(storageKey, isCollapsed ? 'expanded' : 'collapsed');
+        }
+    },
+    
+    // Toggle actions dropdown
+    toggleActionsDropdown() {
+        const container = document.querySelector('.dropdown-container');
+        if (container) {
+            container.classList.toggle('active');
+        }
+    },
+    
+    // Hide actions dropdown
+    hideActionsDropdown() {
+        const container = document.querySelector('.dropdown-container');
+        if (container) {
+            container.classList.remove('active');
+        }
+    },
+    
+    // Clear all canvases
+    clearAllCanvases() {
+        if (confirm('Are you sure you want to clear all canvases? This action cannot be undone.')) {
+            // Clear all canvases from the app state
+            window.App.state.canvases = [];
+            window.App.state.currentCanvasId = null;
+            window.App.state.selectedImage = null;
+            
+            // Clear gallery
+            this.renderGallery([], null);
+            
+            // Reset to initial state
+            window.App.initializeDefaultState();
+            window.App.renderPreview();
+            
+            // Update UI
+            this.updateButtonStates();
+            this.showSuccess('All canvases cleared');
+        }
+    },
+    
+    // Clear all watermarks
+    clearAllWatermarks() {
+        if (confirm('Are you sure you want to clear watermarks from all canvases?')) {
+            // Clear watermark from current state
+            window.App.state.watermarkText = '';
+            window.App.state.watermarkImage = null;
+            window.App.state.watermarkFilename = null;
+            
+            // Clear watermarks from all canvases
+            window.App.state.canvases.forEach(canvas => {
+                if (canvas.settings) {
+                    canvas.settings.watermarkText = '';
+                    canvas.settings.watermarkImage = null;
+                    canvas.settings.watermarkFilename = null;
+                }
+            });
+            
+            // Update watermark UI
+            const watermarkTextInput = document.getElementById('watermark-text');
+            if (watermarkTextInput) {
+                watermarkTextInput.value = '';
+            }
+            
+            // Re-render current canvas
+            window.App.renderPreview();
+            
+            // Save settings
+            window.App.saveSettings();
+            
+            this.showSuccess('All watermarks cleared');
+        }
+    },
+    
+    // Apply watermark to all canvases
+    applyWatermarkToAll() {
+        const currentWatermark = {
+            text: window.App.state.watermarkText || '',
+            color: window.App.state.watermarkTextColor || '#FFFFFF',
+            fontSize: window.App.state.watermarkTextSize || 16,
+            opacity: window.App.state.watermarkOpacity || 0.7,
+            position: window.App.state.watermarkPosition || 'bottom-right'
+        };
+        
+        if (!currentWatermark.text.trim()) {
+            this.showError('Please enter watermark text before applying to all canvases');
+            return;
+        }
+        
+        if (confirm(`Apply current watermark "${currentWatermark.text}" to all canvases?`)) {
+            // Apply to all canvases
+            window.App.state.canvases.forEach(canvas => {
+                if (canvas.settings) {
+                    canvas.settings.watermarkText = currentWatermark.text;
+                    canvas.settings.watermarkTextColor = currentWatermark.color;
+                    canvas.settings.watermarkTextSize = currentWatermark.fontSize;
+                    canvas.settings.watermarkOpacity = currentWatermark.opacity;
+                    canvas.settings.watermarkPosition = currentWatermark.position;
+                }
+            });
+            
+            // Save settings
+            window.App.saveSettings();
+            
+            this.showSuccess(`Watermark applied to ${window.App.state.canvases.length} canvas(es)`);
         }
     }
 };

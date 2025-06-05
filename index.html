@@ -801,6 +801,85 @@
             margin: 16px 0;
             border: none;
         }
+        
+        /* Dropdown styles */
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-btn {
+            position: relative;
+        }
+        
+        .dropdown-arrow {
+            margin-left: 8px;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+        
+        .dropdown-container.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-container.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            opacity: 0.8;
+        }
+        
+        .dropdown-item:hover i {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -863,6 +942,26 @@
                         <i class="fas fa-plus"></i>
                         <span>New Canvas</span>
                     </button>
+                    
+                    <!-- Actions Dropdown -->
+                    <div class="dropdown-container">
+                        <button id="actions-dropdown-btn" class="btn dropdown-btn">
+                            <i class="fas fa-cog"></i>
+                            <span>Actions</span>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </button>
+                        <div class="dropdown-menu" id="actions-dropdown-menu">
+                            <button class="dropdown-item" id="clear-all-canvases-btn">
+                                <i class="fas fa-trash-alt"></i>
+                                <span>Clear All Canvases</span>
+                            </button>
+                            <button class="dropdown-item" id="clear-all-watermarks-btn">
+                                <i class="fas fa-stamp"></i>
+                                <span>Clear All Watermarks</span>
+                            </button>
+                        </div>
+                    </div>
+                    
                     <button id="export-all-btn" class="btn">
                         <i class="fas fa-file-export"></i>
                         <span>Export All</span>
@@ -1527,7 +1626,7 @@
                             <!-- Watermark Section -->
                             <div class="settings-section">
                                 <div class="section-header">
-                                    <h5>Watermark</h5>
+                                    <h5>Text Watermark</h5>
                                     <div class="header-buttons">
                                         <button id="clear-watermark-btn" class="btn small-btn danger-btn">
                                             <i class="fas fa-times"></i>
@@ -1537,59 +1636,56 @@
                                 </div>
                                 <div class="section-content">
                                     <div class="form-group">
-                                        <label>Upload Watermark</label>
-                                        <div class="upload-watermark-area" id="watermark-upload-area">
-                                            <i class="fas fa-image"></i>
-                                            <p>Click or drag to upload watermark image</p>
-                                            <small>PNG recommended for transparency</small>
-                                        </div>
-                                        <input type="file" id="watermark-file-input" accept="image/*" style="display: none;">
+                                        <label for="watermark-text">Watermark Text</label>
+                                        <input type="text" id="watermark-text" class="select-control" placeholder="Enter watermark text" maxlength="50">
+                                        <small class="form-help">Add your watermark text (e.g., your name, website, or logo text)</small>
                                     </div>
                                     
-                                    <div id="watermark-preview" class="watermark-preview hidden">
-                                        <img id="watermark-preview-img" alt="Watermark preview">
-                                        <div class="watermark-info">
-                                            <span id="watermark-filename">No file selected</span>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="watermark-position-select">Position</label>
+                                        <select id="watermark-position-select" class="select-control">
+                                            <option value="top-left">Top Left</option>
+                                            <option value="top-right">Top Right</option>
+                                            <option value="bottom-left">Bottom Left</option>
+                                            <option value="bottom-right" selected>Bottom Right</option>
+                                        </select>
                                     </div>
                                     
-                                    <div id="watermark-controls" class="watermark-controls hidden">
-                                        <div class="adjustment-row">
-                                            <label>Opacity</label>
-                                            <span class="value-display" id="watermark-opacity-value">50%</span>
-                                        </div>
-                                        <div class="slider-container">
-                                            <input type="range" id="watermark-opacity-slider" min="0" max="1" value="0.5" step="0.01">
-                                            <button id="reset-watermark-opacity-btn" class="reset-btn">
-                                                <i class="fas fa-undo"></i>
-                                            </button>
-                                        </div>
-                                        
-                                        <div class="adjustment-row">
-                                            <label>Size</label>
-                                            <span class="value-display" id="watermark-scale-value">100%</span>
-                                        </div>
-                                        <div class="slider-container">
-                                            <input type="range" id="watermark-scale-slider" min="0.1" max="2" value="1" step="0.1">
-                                            <button id="reset-watermark-scale-btn" class="reset-btn">
-                                                <i class="fas fa-undo"></i>
-                                            </button>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label>Position</label>
-                                            <select id="watermark-position-select" class="select-control">
-                                                <option value="top-left">Top Left</option>
-                                                <option value="top-right">Top Right</option>
-                                                <option value="bottom-left">Bottom Left</option>
-                                                <option value="bottom-right" selected>Bottom Right</option>
-                                                <option value="center">Center</option>
-                                            </select>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="watermark-color-select">Text Color</label>
+                                        <select id="watermark-color-select" class="select-control">
+                                            <option value="white" selected>White</option>
+                                            <option value="black">Black</option>
+                                        </select>
                                     </div>
                                     
-                                    <div class="watermark-help">
-                                        <small><i class="fas fa-info-circle"></i> Use PNG images with transparency for best results. Watermarks are applied over your design.</small>
+                                    <div class="adjustment-row">
+                                        <label>Opacity</label>
+                                        <span class="value-display" id="watermark-opacity-value">70%</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="watermark-opacity-slider" min="0" max="1" value="0.7" step="0.01">
+                                        <button id="reset-watermark-opacity-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Font Size</label>
+                                        <span class="value-display" id="watermark-font-size-value">16px</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="watermark-font-size-slider" min="10" max="48" value="16" step="1">
+                                        <button id="reset-watermark-font-size-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="button-row">
+                                        <button id="apply-watermark-to-all-btn" class="btn success-btn">
+                                            <i class="fas fa-sync"></i>
+                                            <span>Apply to All</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
