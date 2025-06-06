@@ -1980,6 +1980,12 @@ window.Auth = {
             return;
         }
 
+        // Skip global stats update for dev users
+        if (level === 'dev') {
+            console.log('📊 Skipping global stats update for dev user');
+            return;
+        }
+
         try {
             console.log(`🔄 Updating global stats: action=${action}, level=${level}`);
             
@@ -2007,6 +2013,12 @@ window.Auth = {
     // Manual update of global statistics (fallback)
     async manualUpdateGlobalStats(action, level) {
         if (action !== 'new_user') return;
+        
+        // Skip global stats update for dev users
+        if (level === 'dev') {
+            console.log('📊 Skipping global stats update for dev user');
+            return;
+        }
         
         try {
             // Get current global stats
@@ -2164,7 +2176,7 @@ window.Auth = {
         try {
             console.log('📊 Recalculating global statistics...');
 
-            // Get all profiles with counts
+            // Get all profiles with counts, excluding dev users from global stats
             const { data: allProfiles, error: profilesError } = await this.supabase
                 .from('profiles')
                 .select('user_level, export_count, canvas_count, upload_count');
@@ -2174,17 +2186,22 @@ window.Auth = {
                 return;
             }
 
-            // Calculate totals
+            // Filter out dev users for global statistics
+            const nonDevProfiles = allProfiles.filter(p => p.user_level !== 'dev');
+
+            // Calculate totals excluding dev users
             const stats = {
-                total_users: allProfiles.length,
-                standard_users: allProfiles.filter(p => p.user_level === 'standard').length,
-                beta_users: allProfiles.filter(p => p.user_level === 'beta').length,
-                total_exports: allProfiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
-                total_canvases: allProfiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
-                total_uploads: allProfiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
+                total_users: nonDevProfiles.length,
+                standard_users: nonDevProfiles.filter(p => p.user_level === 'standard').length,
+                beta_users: nonDevProfiles.filter(p => p.user_level === 'beta').length,
+                total_exports: nonDevProfiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
+                total_canvases: nonDevProfiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
+                total_uploads: nonDevProfiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
             };
 
-            console.log('📊 Calculated stats:', stats);
+            console.log('📊 Calculated stats (excluding dev users):', stats);
+            console.log('📊 Total profiles found:', allProfiles.length);
+            console.log('📊 Dev users excluded:', allProfiles.length - nonDevProfiles.length);
 
             // Update global stats table
             const { error: updateError } = await this.supabase
@@ -2205,16 +2222,21 @@ window.Auth = {
 
     // Calculate stats from profiles when global table not available
     calculateStatsFromProfiles(profiles) {
+        // Filter out dev users for global statistics
+        const nonDevProfiles = profiles.filter(p => p.user_level !== 'dev');
+        
         const stats = {
-            total_users: profiles.length,
-            standard_users: profiles.filter(p => p.user_level === 'standard').length,
-            beta_users: profiles.filter(p => p.user_level === 'beta').length,
-            total_exports: profiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
-            total_canvases: profiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
-            total_uploads: profiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
+            total_users: nonDevProfiles.length,
+            standard_users: nonDevProfiles.filter(p => p.user_level === 'standard').length,
+            beta_users: nonDevProfiles.filter(p => p.user_level === 'beta').length,
+            total_exports: nonDevProfiles.reduce((sum, p) => sum + (p.export_count || 0), 0),
+            total_canvases: nonDevProfiles.reduce((sum, p) => sum + (p.canvas_count || 0), 0),
+            total_uploads: nonDevProfiles.reduce((sum, p) => sum + (p.upload_count || 0), 0)
         };
         
-        console.log('📊 Calculated stats from profiles:', stats);
+        console.log('📊 Calculated stats from profiles (excluding dev users):', stats);
+        console.log('📊 Total profiles:', profiles.length);
+        console.log('📊 Dev users excluded:', profiles.length - nonDevProfiles.length);
         return stats;
     },
 
@@ -2300,10 +2322,10 @@ window.Auth = {
             console.log('📊 Starting manual upload count update...');
             console.log('📊 Current user:', this.currentUser?.id);
             
-            // Get current profile
+            // Get current profile with user_level
             const { data: profile, error: fetchError } = await this.supabase
                 .from('profiles')
-                .select('upload_count')
+                .select('upload_count, user_level')
                 .eq('id', this.currentUser.id)
                 .single();
 
@@ -2333,9 +2355,13 @@ window.Auth = {
 
             console.log('✅ Upload count updated manually to:', newUploadCount);
             
-            // Update global stats
-            console.log('📊 Updating global upload count...');
-            await this.updateGlobalUploadCount();
+            // Update global stats only if user is not dev
+            if (profile.user_level !== 'dev') {
+                console.log('📊 Updating global upload count (non-dev user)...');
+                await this.updateGlobalUploadCount();
+            } else {
+                console.log('📊 Skipping global upload count update (dev user)');
+            }
             
             // Refresh analytics if open
             this.refreshAnalyticsIfOpen();
@@ -2427,10 +2453,10 @@ window.Auth = {
     // Manual canvas count update (fallback)
     async manualUpdateCanvasCount() {
         try {
-            // Get current profile
+            // Get current profile with user_level
             const { data: profile, error: fetchError } = await this.supabase
                 .from('profiles')
-                .select('canvas_count')
+                .select('canvas_count, user_level')
                 .eq('id', this.currentUser.id)
                 .single();
 
@@ -2454,8 +2480,13 @@ window.Auth = {
 
             console.log('✅ Canvas count updated manually to:', newCanvasCount);
             
-            // Update global stats
-            await this.updateGlobalCanvasCount();
+            // Update global stats only if user is not dev
+            if (profile.user_level !== 'dev') {
+                console.log('📊 Updating global canvas count (non-dev user)...');
+                await this.updateGlobalCanvasCount();
+            } else {
+                console.log('📊 Skipping global canvas count update (dev user)');
+            }
             
             // Refresh analytics if open
             this.refreshAnalyticsIfOpen();

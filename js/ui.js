@@ -585,7 +585,7 @@ window.UI = {
                 // Throttle the expensive text layer update
                 clearTimeout(textColorTimeout);
                 textColorTimeout = setTimeout(() => {
-                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { color });
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { color });
                 }, 16); // ~60fps throttle
             });
             
@@ -696,7 +696,7 @@ window.UI = {
         }
         
         // Text shadow toggle - now always enabled, just for visual consistency
-        if (this.elements.textShadowOptions) {
+                if (this.elements.textShadowOptions) {
             // Remove the event listener since it's always enabled
             // The toggle will be checked and disabled in showTextEditor
         }
@@ -713,7 +713,7 @@ window.UI = {
                 // Throttle the expensive update
                 clearTimeout(shadowColorTimeout);
                 shadowColorTimeout = setTimeout(() => {
-                    window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadowColor });
+                window.App.updateTextLayer(window.App.state.selectedTextLayerId, { shadowColor });
                 }, 16); // ~60fps throttle
             });
             
@@ -777,8 +777,8 @@ window.UI = {
                 clearTimeout(bgColorTimeout);
                 window.App.updateTextLayer(window.App.state.selectedTextLayerId, { backgroundColor: e.target.value });
             });
-        }
-        
+                }
+                
         // Text background opacity slider
         const textBgOpacitySlider = document.getElementById('text-bg-opacity-slider');
         const textBgOpacityValue = document.getElementById('text-bg-opacity-value');
@@ -1908,8 +1908,8 @@ window.UI = {
                 
                 ctx.save();
                 ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
                 ctx.fillStyle = layer.color || '#ffffff';
                 
                 // Position text layers in thumbnail
@@ -1982,6 +1982,9 @@ window.UI = {
             'linkedin': 'fab fa-linkedin',
             'pinterest': 'fab fa-pinterest',
             'youtube': 'fab fa-youtube',
+            'tiktok': 'fab fa-tiktok',
+            'snapchat': 'fab fa-snapchat',
+            'substack': 'fas fa-bookmark',
             'ios': 'fab fa-apple',
             'android': 'fab fa-android',
             'windows': 'fab fa-windows',
@@ -2878,9 +2881,9 @@ window.UI = {
                     textLayer.position = { x: coords.x, y: coords.y };
                     scheduleRender();
                     
-                    clearTimeout(dragUpdateTimeout);
-                    dragUpdateTimeout = setTimeout(() => {
-                        window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
+                clearTimeout(dragUpdateTimeout);
+                dragUpdateTimeout = setTimeout(() => {
+                    window.App.updateTextLayerPosition(currentTextLayerId, coords.x, coords.y);
                     }, 150);
                 }
                 
@@ -3060,41 +3063,41 @@ window.UI = {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 // Set the text content
-                if (this.elements.textContent) {
-                    this.elements.textContent.value = textLayer.text || '';
-                }
-                
+        if (this.elements.textContent) {
+            this.elements.textContent.value = textLayer.text || '';
+        }
+        
                 // Set font size
-                if (this.elements.fontSizeSlider) {
-                    this.elements.fontSizeSlider.value = textLayer.fontSize || 36;
+        if (this.elements.fontSizeSlider) {
+            this.elements.fontSizeSlider.value = textLayer.fontSize || 36;
                     const fontSizeValue = document.getElementById('font-size-value');
                     if (fontSizeValue) {
                         fontSizeValue.textContent = `${textLayer.fontSize || 36}px`;
                     }
-                }
-                
+        }
+        
                 // Set font family
-                if (this.elements.fontFamilySelect) {
+        if (this.elements.fontFamilySelect) {
                     this.elements.fontFamilySelect.value = textLayer.fontFamily || "'Inter', sans-serif";
-                }
-                
+        }
+        
                 // Set text color
-                if (this.elements.textColorInput) {
-                    this.elements.textColorInput.value = textLayer.color || '#FFFFFF';
-                }
-                
+        if (this.elements.textColorInput) {
+            this.elements.textColorInput.value = textLayer.color || '#FFFFFF';
+        }
+        
                 // Set text opacity
-                if (this.elements.textOpacitySlider) {
-                    this.elements.textOpacitySlider.value = textLayer.opacity !== undefined ? textLayer.opacity : 1;
+        if (this.elements.textOpacitySlider) {
+            this.elements.textOpacitySlider.value = textLayer.opacity !== undefined ? textLayer.opacity : 1;
                     const opacityValue = document.getElementById('text-opacity-value');
                     if (opacityValue) {
                         opacityValue.textContent = `${Math.round((textLayer.opacity || 1) * 100)}%`;
                     }
-                }
-                
-                // Set alignment buttons
-                this.updateAlignmentButtons(textLayer.align || 'center');
-                
+        }
+        
+        // Set alignment buttons
+        this.updateAlignmentButtons(textLayer.align || 'center');
+        
                 // Set style buttons (bold, italic, underline)
                 const boldBtn = document.getElementById('bold-btn');
                 const italicBtn = document.getElementById('italic-btn');
@@ -3102,14 +3105,14 @@ window.UI = {
                 
                 if (boldBtn) {
                     boldBtn.classList.toggle('active', textLayer.bold || false);
-                }
+        }
                 if (italicBtn) {
                     italicBtn.classList.toggle('active', textLayer.italic || false);
-                }
+        }
                 if (underlineBtn) {
                     underlineBtn.classList.toggle('active', textLayer.underline || false);
-                }
-                
+        }
+        
                 // Set shadow settings - always enabled now, options always visible
                 const shadowOptions = document.getElementById('text-shadow-options');
                 if (shadowOptions) {
@@ -3126,13 +3129,13 @@ window.UI = {
                 
                 if (shadowColorInput) {
                     shadowColorInput.value = textLayer.shadowColor || '#000000';
-                }
+            }
                 if (shadowBlurSlider) {
                     shadowBlurSlider.value = textLayer.shadowBlur || 3;
                     if (shadowBlurValue) {
                         shadowBlurValue.textContent = `${textLayer.shadowBlur || 3}px`;
-                    }
-                }
+            }
+        }
                 if (shadowOpacitySlider) {
                     const opacity = textLayer.shadowOpacity !== undefined ? textLayer.shadowOpacity : 0;
                     shadowOpacitySlider.value = opacity;
@@ -3159,7 +3162,7 @@ window.UI = {
                 
                 if (bgColorInput) {
                     bgColorInput.value = textLayer.backgroundColor || '#333333';
-                }
+            }
                 if (paddingSlider) {
                     paddingSlider.value = textLayer.padding || 10;
                 }
@@ -3573,4 +3576,4 @@ window.UI = {
             this.showSuccess(`Watermark applied to ${window.App.state.canvases.length} canvas(es)`);
         }
     }
-};
+}; 

@@ -34,25 +34,25 @@ window.Config = {
                     platforms: ['instagram', 'facebook', 'linkedin', 'pinterest']
                 },
                 { 
-                    id: 'tall', 
+                    id: 'story-vertical', 
                     name: '1080×1920', 
                     width: 1080, 
                     height: 1920, 
-                    platforms: ['instagram', 'facebook', 'linkedin', 'pinterest']
+                    platforms: ['instagram', 'facebook', 'snapchat', 'tiktok']
                 },
                 { 
                     id: 'linkedin-post', 
-                    name: '1200×627 (LinkedIn)', 
+                    name: '1200×627', 
                     width: 1200, 
                     height: 627, 
                     platforms: ['linkedin']
                 },
                 { 
                     id: 'substack', 
-                    name: '1200×800 (Substack)', 
+                    name: '1200×800', 
                     width: 1200, 
                     height: 800, 
-                    platforms: []
+                    platforms: ['substack']
                 }
             ]
         }
@@ -1388,7 +1388,7 @@ window.Config = {
             id: 'warm-canvas',
             name: 'Warm Canvas',
             category: 'warm',
-            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdoIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjA5M2ZiIi8+PHN0b3Agb2Zmc2V0PSIwLjI1IiBzdG9wLWNvbG9yPSIjZjU1NzZjIi8+PHN0b3Agb2Zmc2V0PSIwLjciIiBzdG9wLWNvbG9yPSIjNGZhY2ZlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDBmMmZlIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZ2gpIi8+PC9zdmc+',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmMDkzZmIiLz48c3RvcCBvZmZzZXQ9IjAuMzMiIHN0b3AtY29sb3I9IiNmNTU3NmMiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiM0ZmFjZmUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMGYyZmUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==',
             settings: {
                 backgroundGradientId: 'golden-hour',
                 noiseOverlayId: 'canvas-light',
@@ -1401,6 +1401,196 @@ window.Config = {
                 shadowOffsetX: 0,
                 shadowOffsetY: 8,
                 shadowColor: '#FFCC4D'
+            }
+        },
+        {
+            id: 'arctic-breeze',
+            name: 'Arctic Breeze',
+            category: 'minimal',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImFiIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjdmOWZjIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZDRlNmYxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYTZiOGQxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjYWIpIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'arctic-mist',
+                noiseOverlayId: 'paper-smooth',
+                noiseOpacity: 0.12,
+                noiseBlendMode: 'multiply',
+                cornerRadius: 6,
+                padding: 45,
+                shadowOpacity: 0.08,
+                shadowRadius: 25,
+                shadowOffsetX: 0,
+                shadowOffsetY: 12,
+                shadowColor: '#a6b8d1'
+            }
+        },
+        {
+            id: 'electric-storm',
+            name: 'Electric Storm',
+            category: 'colorful',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImVzIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+PHN0b3Agb2Zmc2V0PSIwLjI1IiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+PHN0b3Agb2Zmc2V0PSIwLjUiIHN0b3AtY29sb3I9IiNmMDkzZmIiLz48c3RvcCBvZmZzZXQ9IjAuNzUiIHN0b3AtY29sb3I9IiNmNTU3NmMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0ZmFjZmUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNlcykiLz48L3N2Zz4=',
+            settings: {
+                backgroundGradientId: 'electric-dreams',
+                noiseOverlayId: 'static-medium',
+                noiseOpacity: 0.18,
+                noiseBlendMode: 'screen',
+                cornerRadius: 22,
+                padding: 28,
+                shadowOpacity: 0.35,
+                shadowRadius: 32,
+                shadowOffsetX: 0,
+                shadowOffsetY: 14,
+                shadowColor: '#667eea'
+            }
+        },
+        {
+            id: 'emerald-depths',
+            name: 'Emerald Depths',
+            category: 'luxury',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImVkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjBmZmYwIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjOThmYjk4Ii8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjMDBmZjdmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDBmYTlhIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZWQpIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'emerald-luxury',
+                noiseOverlayId: 'marble-light',
+                noiseOpacity: 0.3,
+                noiseBlendMode: 'multiply',
+                cornerRadius: 18,
+                padding: 42,
+                shadowOpacity: 0.22,
+                shadowRadius: 28,
+                shadowOffsetX: 0,
+                shadowOffsetY: 10,
+                shadowColor: '#00fa9a'
+            }
+        },
+        {
+            id: 'holographic-dream',
+            name: 'Holographic Dream',
+            category: 'retro',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImhkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjBmOGZmIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZGRhMGRkIi8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjZTZlNmZhIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZDNkM2QzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjdGQpIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'diamond-sparkle',
+                noiseOverlayId: 'static-light',
+                noiseOpacity: 0.2,
+                noiseBlendMode: 'screen',
+                cornerRadius: 15,
+                padding: 35,
+                shadowOpacity: 0.4,
+                shadowRadius: 22,
+                shadowOffsetX: 0,
+                shadowOffsetY: 8,
+                shadowColor: '#dda0dd'
+            }
+        },
+        {
+            id: 'volcanic-power',
+            name: 'Volcanic Power',
+            category: 'dark',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9InZwIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMmY0ZjRmIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjOGI0NTEzIi8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjYTA1MjJkIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjY2Q4NTNmIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjdnApIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'volcanic-earth',
+                noiseOverlayId: 'canvas-heavy',
+                noiseOpacity: 0.45,
+                noiseBlendMode: 'overlay',
+                cornerRadius: 20,
+                padding: 30,
+                shadowOpacity: 0.5,
+                shadowRadius: 40,
+                shadowOffsetX: 0,
+                shadowOffsetY: 16,
+                shadowColor: '#8b4513'
+            }
+        },
+        {
+            id: 'crystal-prism',
+            name: 'Crystal Prism',
+            category: 'cosmic',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImNwIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmYwMDgwIi8+PHN0b3Agb2Zmc2V0PSIwLjE2IiBzdG9wLWNvbG9yPSIjZmY4YzAwIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZmZkNzAwIi8+PHN0b3Agb2Zmc2V0PSIwLjUiIHN0b3AtY29sb3I9IiMwMGZmMDAiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiMwMDgwZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4MDAwZmYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNjcCkiLz48L3N2Zz4=',
+            settings: {
+                backgroundGradientId: 'prismatic-burst',
+                noiseOverlayId: 'perlin-subtle',
+                noiseOpacity: 0.15,
+                noiseBlendMode: 'overlay',
+                cornerRadius: 25,
+                padding: 35,
+                shadowOpacity: 0.3,
+                shadowRadius: 30,
+                shadowOffsetX: 0,
+                shadowOffsetY: 12,
+                shadowColor: '#ff0080'
+            }
+        },
+        {
+            id: 'twilight-serenity',
+            name: 'Twilight Serenity',
+            category: 'soft',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9InRzIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZTBhYWZmIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjYzc3ZGZmIi8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjYTY2M2NjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTYwYmFkIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjdHMpIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'synthpop',
+                noiseOverlayId: 'fabric-fine',
+                noiseOpacity: 0.2,
+                noiseBlendMode: 'soft-light',
+                cornerRadius: 16,
+                padding: 50,
+                shadowOpacity: 0.18,
+                shadowRadius: 20,
+                shadowOffsetX: 0,
+                shadowOffsetY: 6,
+                shadowColor: '#c77dff'
+            }
+        },
+        {
+            id: 'industrial-chrome',
+            name: 'Industrial Chrome',
+            category: 'industrial',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImljIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjVmNWY1Ii8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZGNkY2RjIi8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjYzBjMGMwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjODA4MDgwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjaWMpIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'titanium-finish',
+                noiseOverlayId: 'metal-brushed',
+                noiseOpacity: 0.4,
+                noiseBlendMode: 'overlay',
+                cornerRadius: 2,
+                padding: 15,
+                shadowOpacity: 0.35,
+                shadowRadius: 12,
+                shadowOffsetX: 3,
+                shadowOffsetY: 3,
+                shadowColor: '#808080'
+            }
+        },
+        {
+            id: 'aurora-magic',
+            name: 'Aurora Magic',
+            category: 'cosmic',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImFtIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDBmZjg3Ii8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjNjBlZmZmIi8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjYThmZjc4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzhmZmQ2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjYW0pIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'aurora-swirl',
+                noiseOverlayId: 'perlin-medium',
+                noiseOpacity: 0.22,
+                noiseBlendMode: 'screen',
+                cornerRadius: 28,
+                padding: 38,
+                shadowOpacity: 0.25,
+                shadowRadius: 35,
+                shadowOffsetX: 0,
+                shadowOffsetY: 15,
+                shadowColor: '#00ff87'
+            }
+        },
+        {
+            id: 'golden-luxury',
+            name: 'Golden Luxury',
+            category: 'luxury',
+            thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmOGRjIi8+PHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZmZkNzAwIi8+PHN0b3Agb2Zmc2V0PSIwLjY2IiBzdG9wLWNvbG9yPSIjZGFhNTIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYjg4NjBiIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZ2wpIi8+PC9zdmc+',
+            settings: {
+                backgroundGradientId: 'golden-silk',
+                noiseOverlayId: 'fabric-coarse',
+                noiseOpacity: 0.25,
+                noiseBlendMode: 'multiply',
+                cornerRadius: 14,
+                padding: 45,
+                shadowOpacity: 0.3,
+                shadowRadius: 26,
+                shadowOffsetX: 0,
+                shadowOffsetY: 10,
+                shadowColor: '#daa520'
             }
         },
         {
@@ -1710,6 +1900,27 @@ window.Config = {
             scale: 2
         },
         {
+            id: 'metal-brushed',
+            name: 'Brushed Metal',
+            type: 'metal',
+            intensity: 0.3,
+            scale: 0.8
+        },
+        {
+            id: 'marble-light',
+            name: 'Light Marble',
+            type: 'marble',
+            intensity: 0.25,
+            scale: 1.2
+        },
+        {
+            id: 'galaxy-stars',
+            name: 'Galaxy Stars',
+            type: 'static',
+            intensity: 0.4,
+            scale: 0.5
+        },
+        {
             id: 'hexagon-pattern',
             name: 'Hexagon Pattern',
             type: 'hexagon',
@@ -1729,13 +1940,6 @@ window.Config = {
             type: 'waves',
             intensity: 0.3,
             scale: 2.5
-        },
-        {
-            id: 'marble-light',
-            name: 'Light Marble',
-            type: 'marble',
-            intensity: 0.2,
-            scale: 1.2
         },
         {
             id: 'marble-heavy',
@@ -1764,13 +1968,6 @@ window.Config = {
             type: 'wood',
             intensity: 0.22,
             scale: 1.2
-        },
-        {
-            id: 'metal-brushed',
-            name: 'Brushed Metal',
-            type: 'metal',
-            intensity: 0.25,
-            scale: 0.8
         },
         {
             id: 'leather-fine',
@@ -1836,111 +2033,81 @@ window.Config = {
             scale: 1.0
         },
         {
-            id: 'galaxy-stars',
-            name: 'Galaxy Stars',
-            type: 'galaxy',
-            intensity: 0.18,
-            scale: 2.2
-        },
-        {
-            id: 'diamond-plate',
-            name: 'Diamond Plate',
-            type: 'diamond',
-            intensity: 0.25,
-            scale: 1.3
-        },
-        {
-            id: 'chain-link',
-            name: 'Chain Link',
-            type: 'chain',
-            intensity: 0.22,
-            scale: 1.1
-        },
-        
-        // New Swirl and Visual Patterns
-        {
-            id: 'spiral-vortex',
-            name: 'Spiral Vortex',
-            type: 'spiral',
-            intensity: 0.25,
+            id: 'tropical-waters',
+            name: 'Tropical Waters',
+            type: 'tropical',
+            intensity: 0.16,
             scale: 1.8
         },
         {
-            id: 'fluid-swirl',
-            name: 'Fluid Swirl',
-            type: 'fluid',
-            intensity: 0.2,
-            scale: 2.0
-        },
-        {
-            id: 'energy-waves',
-            name: 'Energy Waves',
-            type: 'energy',
+            id: 'prairie-sunrise',
+            name: 'Prairie Sunrise',
+            type: 'prairie',
             intensity: 0.18,
             scale: 1.5
         },
         {
-            id: 'aurora-flow',
-            name: 'Aurora Flow',
-            type: 'aurora',
-            intensity: 0.22,
-            scale: 2.2
-        },
-        {
-            id: 'plasma-field',
-            name: 'Plasma Field',
-            type: 'plasma',
-            intensity: 0.2,
-            scale: 1.6
-        },
-        {
-            id: 'interference-pattern',
-            name: 'Interference Pattern',
-            type: 'interference',
-            intensity: 0.15,
-            scale: 1.2
-        },
-        {
-            id: 'organic-cells',
-            name: 'Organic Cells',
-            type: 'cells',
-            intensity: 0.2,
+            id: 'bamboo-grove',
+            name: 'Bamboo Grove',
+            type: 'bamboo',
+            intensity: 0.16,
             scale: 1.4
         },
         {
-            id: 'turbulent-flow',
-            name: 'Turbulent Flow',
-            type: 'turbulence',
-            intensity: 0.25,
-            scale: 1.8
-        },
-        {
-            id: 'cosmic-web',
-            name: 'Cosmic Web',
-            type: 'web',
+            id: 'canyon-rocks',
+            name: 'Canyon Rocks',
+            type: 'canyon',
             intensity: 0.18,
-            scale: 2.5
+            scale: 1.2
         },
         {
-            id: 'fiber-optic',
-            name: 'Fiber Optic',
-            type: 'fiber',
-            intensity: 0.2,
-            scale: 1.3
-        },
-        {
-            id: 'ripple-effect',
-            name: 'Ripple Effect',
-            type: 'ripples',
+            id: 'moss-stone',
+            name: 'Moss Stone',
+            type: 'moss',
             intensity: 0.16,
-            scale: 2.0
+            scale: 1.0
         },
         {
-            id: 'neural-network',
-            name: 'Neural Network',
-            type: 'neural',
-            intensity: 0.19,
-            scale: 1.7
+            id: 'river-pebbles',
+            name: 'River Pebbles',
+            type: 'river',
+            intensity: 0.16,
+            scale: 1.2
+        },
+        {
+            id: 'wildflower-meadow',
+            name: 'Wildflower Meadow',
+            type: 'meadow',
+            intensity: 0.16,
+            scale: 1.4
+        },
+        {
+            id: 'coral-reef',
+            name: 'Coral Reef',
+            type: 'reef',
+            intensity: 0.18,
+            scale: 1.2
+        },
+        {
+            id: 'redwood-bark',
+            name: 'Redwood Bark',
+            type: 'bark',
+            intensity: 0.18,
+            scale: 1.2
+        },
+        {
+            id: 'alpine-snow',
+            name: 'Alpine Snow',
+            type: 'snow',
+            intensity: 0.16,
+            scale: 1.0
+        },
+        {
+            id: 'volcanic-earth',
+            name: 'Volcanic Earth',
+            type: 'earth',
+            intensity: 0.18,
+            scale: 1.2
         }
     ],
     
