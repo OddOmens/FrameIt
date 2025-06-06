@@ -124,7 +124,6 @@ body {
 }
 
 .btn * {
-    pointer-events: none;
     user-select: none;
 }
 
@@ -166,6 +165,19 @@ body {
     background-color: #3b92ff !important;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(59, 146, 255, 0.3);
+}
+
+/* Ensure export buttons are always clickable */
+#export-btn,
+#export-all-btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+#export-btn:disabled,
+#export-all-btn:disabled {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
 }
 
 .danger-btn {

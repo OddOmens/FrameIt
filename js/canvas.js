@@ -125,28 +125,41 @@ window.CanvasRenderer = {
             .filter(layer => (layer.zIndex !== undefined ? layer.zIndex < 5 : false))
             .forEach(layer => this.drawTextOverlay(layer));
         
-        // Draw image if available
-        if (image) {
-            this.drawImage(
-                image,
-                cornerRadiusVal,
-                paddingVal,
-                shadowOpacityVal,
-                shadowRadiusVal,
-                shadowOffsetXVal,
-                shadowOffsetYVal,
-                shadowColor,
-                rotationVal,
-                isFlippedHorizontally,
-                isFlippedVertically
+        // Draw images if available
+        const images = options.images || (image ? [image] : []);
+        const currentLayout = options.currentLayout || 'single';
+        
+        if (images.length > 0) {
+            // Use individual image settings if available, fallback to global settings
+            const imageSettings = options.imageSettings || images.map(() => ({
+                cornerRadius: cornerRadiusVal,
+                padding: 20,
+                rotation: rotationVal,
+                flipH: isFlippedHorizontally,
+                flipV: isFlippedVertically,
+                shadowOpacity: shadowOpacityVal,
+                shadowColor: shadowColor,
+                shadowRadius: shadowRadiusVal,
+                shadowOffsetX: shadowOffsetXVal,
+                shadowOffsetY: shadowOffsetYVal,
+                scale: 1.2,
+                maskEnabled: true
+            }));
+            
+            this.drawMultipleImages(
+                images,
+                currentLayout,
+                imageSettings,
+                paddingVal, // Global padding
+                options.selectedImageIndex || 0
             );
             
-            // Draw text layers that should appear in front of the image (z-index >= 5)
+            // Draw text layers that should appear in front of the images (z-index >= 5)
             sortedTextLayers
                 .filter(layer => (layer.zIndex !== undefined ? layer.zIndex >= 5 : true))
                 .forEach(layer => this.drawTextOverlay(layer));
         } else {
-            // No image - draw all text layers with default z-index behavior
+            // No images - draw all text layers with default z-index behavior
             sortedTextLayers.forEach(layer => this.drawTextOverlay(layer));
         }
         
@@ -177,12 +190,12 @@ window.CanvasRenderer = {
             }
             
             if (watermarkData) {
-                this.drawWatermark(
+            this.drawWatermark(
                     watermarkData,
-                    watermarkOpacity,
-                    watermarkScale,
-                    watermarkPosition
-                );
+                watermarkOpacity,
+                watermarkScale,
+                watermarkPosition
+            );
             }
         }
         
@@ -635,7 +648,431 @@ window.CanvasRenderer = {
         };
     },
     
-    // Draw the image with transformations
+    // Draw multiple images using layout with individual settings
+    drawMultipleImages(images, layoutId, imageSettings, globalPadding, selectedIndex) {
+        // Get layout configuration
+        const layout = Config.multiImageLayouts?.find(l => l.id === layoutId) || Config.multiImageLayouts?.[0];
+        if (!layout) {
+            console.error('Layout not found:', layoutId);
+            return;
+        }
+        
+        const { width: canvasWidth, height: canvasHeight } = this.canvas;
+        const padding = Math.max(0, Number(globalPadding) || 0);
+        
+        // Calculate available drawing area after global padding
+        const availableWidth = canvasWidth - (padding * 2);
+        const availableHeight = canvasHeight - (padding * 2);
+        const offsetX = padding;
+        const offsetY = padding;
+        
+        // Draw each image in its position
+        layout.positions.forEach((position, index) => {
+            const image = images[index];
+            if (!image) return; // Skip empty slots
+            
+            // Get individual settings for this image slot
+            const settings = imageSettings && imageSettings[index] ? imageSettings[index] : {
+                cornerRadius: 25,
+                padding: 20,
+                rotation: 0,
+                flipH: false,
+                flipV: false,
+                shadowOpacity: 0.15,
+                shadowColor: '#000000',
+                shadowRadius: 8,
+                shadowOffsetX: 0,
+                shadowOffsetY: 4,
+                scale: 1.2,
+                maskEnabled: true
+            };
+            
+            // Calculate position and size within the available area
+            let imageX = offsetX + (position.x * availableWidth);
+            let imageY = offsetY + (position.y * availableHeight);
+            let imageWidth = position.width * availableWidth;
+            let imageHeight = position.height * availableHeight;
+            
+            // Add some gap between images (1% of canvas size)
+            const gap = Math.min(canvasWidth, canvasHeight) * 0.01;
+            const adjustedX = imageX + (position.x > 0 ? gap / 2 : 0);
+            const adjustedY = imageY + (position.y > 0 ? gap / 2 : 0);
+            const adjustedWidth = imageWidth - (position.x > 0 || position.width < 1 ? gap : gap / 2);
+            const adjustedHeight = imageHeight - (position.y > 0 || position.height < 1 ? gap : gap / 2);
+            
+            // Apply individual padding
+            const slotPadding = Math.max(0, Number(settings.padding) || 0);
+            const finalX = adjustedX + slotPadding;
+            const finalY = adjustedY + slotPadding;
+            const finalWidth = Math.max(10, adjustedWidth - (slotPadding * 2));
+            const finalHeight = Math.max(10, adjustedHeight - (slotPadding * 2));
+            
+            // Draw selection highlight for selected image
+            if (index === selectedIndex) {
+                this.ctx.save();
+                this.ctx.strokeStyle = '#43A047';
+                this.ctx.lineWidth = 3;
+                this.ctx.setLineDash([5, 5]);
+                this.ctx.strokeRect(finalX - 2, finalY - 2, finalWidth + 4, finalHeight + 4);
+                this.ctx.restore();
+            }
+            
+            // Draw the image in this slot with individual settings and smart scaling
+            this.drawImageInRectWithSmartScaling(
+                image,
+                finalX,
+                finalY,
+                finalWidth,
+                finalHeight,
+                settings.cornerRadius,
+                settings.shadowOpacity,
+                settings.shadowRadius,
+                settings.shadowOffsetX,
+                settings.shadowOffsetY,
+                settings.shadowColor,
+                settings.rotation,
+                settings.flipH,
+                settings.flipV,
+                settings.scale,
+                settings.maskEnabled,
+                settings.panX || 0,
+                settings.panY || 0
+            );
+        });
+    },
+
+    // Draw image with smart scaling and masking (new method for individual slots)
+    drawImageInRectWithSmartScaling(image, x, y, width, height, cornerRadius, shadowOpacity, shadowRadius, shadowOffsetX, shadowOffsetY, shadowColor, rotation, flipH, flipV, scale = 1.2, maskEnabled = true, panX = 0, panY = 0) {
+        // Ensure cornerRadius is a number
+        cornerRadius = Number(cornerRadius) || 0;
+        scale = Number(scale) || 1.0;
+        
+        // Calculate the image aspect ratio
+        const imageAspect = image.width / image.height;
+        const rectAspect = width / height;
+        
+        // Smart scaling - scale the image to fill the slot while maintaining aspect ratio
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (maskEnabled) {
+            // Scale to fill the entire slot (may crop image)
+            if (imageAspect > rectAspect) {
+                // Image is wider - scale to fill height, crop width
+                drawHeight = height * scale;
+                drawWidth = drawHeight * imageAspect;
+                drawX = x + (width - drawWidth) / 2;
+                drawY = y + (height - drawHeight) / 2;
+            } else {
+                // Image is taller - scale to fill width, crop height
+                drawWidth = width * scale;
+                drawHeight = drawWidth / imageAspect;
+                drawX = x + (width - drawWidth) / 2;
+                drawY = y + (height - drawHeight) / 2;
+            }
+        } else {
+            // Scale to fit within the slot (no cropping)
+            if (imageAspect > rectAspect) {
+                // Image is wider than rect - fit to width
+                drawWidth = width * scale;
+                drawHeight = drawWidth / imageAspect;
+                drawX = x + (width - drawWidth) / 2;
+                drawY = y + (height - drawHeight) / 2;
+            } else {
+                // Image is taller than rect - fit to height
+                drawHeight = height * scale;
+                drawWidth = drawHeight * imageAspect;
+                drawX = x + (width - drawWidth) / 2;
+                drawY = y + (height - drawHeight) / 2;
+            }
+        }
+        
+        // Apply pan offsets (-1 to 1 range)
+        // Pan offsets move the image within the available overflow area
+        const maxPanX = (drawWidth - width) / 2;
+        const maxPanY = (drawHeight - height) / 2;
+        drawX += panX * maxPanX;
+        drawY += panY * maxPanY;
+        
+        // Get the center point for transformations
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+        
+        // Create mask canvas for clipping if masking is enabled
+        let maskCanvas = null;
+        let maskCtx = null;
+        
+        if (maskEnabled) {
+            maskCanvas = document.createElement('canvas');
+            maskCanvas.width = width;
+            maskCanvas.height = height;
+            maskCtx = maskCanvas.getContext('2d');
+            
+            // Create clipping mask with rounded corners
+            if (cornerRadius > 0) {
+                const maxRadius = Math.min(width, height) / 2;
+                const effectiveRadius = Math.min(cornerRadius, maxRadius);
+                
+                maskCtx.beginPath();
+                maskCtx.moveTo(effectiveRadius, 0);
+                maskCtx.lineTo(width - effectiveRadius, 0);
+                maskCtx.arc(width - effectiveRadius, effectiveRadius, effectiveRadius, -Math.PI / 2, 0, false);
+                maskCtx.lineTo(width, height - effectiveRadius);
+                maskCtx.arc(width - effectiveRadius, height - effectiveRadius, effectiveRadius, 0, Math.PI / 2, false);
+                maskCtx.lineTo(effectiveRadius, height);
+                maskCtx.arc(effectiveRadius, height - effectiveRadius, effectiveRadius, Math.PI / 2, Math.PI, false);
+                maskCtx.lineTo(0, effectiveRadius);
+                maskCtx.arc(effectiveRadius, effectiveRadius, effectiveRadius, Math.PI, 3 * Math.PI / 2, false);
+                maskCtx.closePath();
+                maskCtx.clip();
+            }
+            
+            // Draw the scaled image onto the mask canvas
+            maskCtx.drawImage(image, drawX - x, drawY - y, drawWidth, drawHeight);
+        }
+        
+        // Create shadow if enabled
+        if (shadowOpacity > 0) {
+            const shadowCanvas = document.createElement('canvas');
+            shadowCanvas.width = this.canvas.width;
+            shadowCanvas.height = this.canvas.height;
+            const shadowCtx = shadowCanvas.getContext('2d');
+            
+            // Apply transformations to shadow canvas
+            shadowCtx.save();
+            shadowCtx.translate(centerX, centerY);
+            shadowCtx.rotate((rotation * Math.PI) / 180);
+            if (flipH) shadowCtx.scale(-1, 1);
+            if (flipV) shadowCtx.scale(1, -1);
+            shadowCtx.translate(-centerX, -centerY);
+            
+            // Get shadow color with opacity
+            let shadowColorWithOpacity;
+            if (shadowColor) {
+                if (shadowColor.startsWith('#')) {
+                    const rgb = this.hexToRgb(shadowColor);
+                    shadowColorWithOpacity = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${shadowOpacity})`;
+                } else if (shadowColor.startsWith('rgba')) {
+                    shadowColorWithOpacity = shadowColor.replace(/,([^,]*)$/, `,${shadowOpacity})`);
+                } else if (shadowColor.startsWith('rgb')) {
+                    shadowColorWithOpacity = shadowColor.replace(')', `, ${shadowOpacity})`);
+                } else {
+                    shadowColorWithOpacity = `rgba(0, 0, 0, ${shadowOpacity})`;
+                }
+            } else {
+                shadowColorWithOpacity = `rgba(0, 0, 0, ${shadowOpacity})`;
+            }
+            
+            // Apply shadow settings
+            shadowCtx.shadowColor = shadowColorWithOpacity;
+            shadowCtx.shadowBlur = shadowRadius;
+            shadowCtx.shadowOffsetX = shadowOffsetX;
+            shadowCtx.shadowOffsetY = shadowOffsetY;
+            
+            // Draw shadow using the appropriate source
+            if (maskEnabled && maskCanvas) {
+                shadowCtx.drawImage(maskCanvas, x, y);
+            } else {
+                // Create a temporary rounded canvas for shadow
+                const roundedCanvas = document.createElement('canvas');
+                roundedCanvas.width = width;
+                roundedCanvas.height = height;
+                const roundedCtx = roundedCanvas.getContext('2d');
+                
+                if (cornerRadius > 0) {
+                    const maxRadius = Math.min(width, height) / 2;
+                    const effectiveRadius = Math.min(cornerRadius, maxRadius);
+                    
+                    roundedCtx.beginPath();
+                    roundedCtx.moveTo(effectiveRadius, 0);
+                    roundedCtx.lineTo(width - effectiveRadius, 0);
+                    roundedCtx.arc(width - effectiveRadius, effectiveRadius, effectiveRadius, -Math.PI / 2, 0, false);
+                    roundedCtx.lineTo(width, height - effectiveRadius);
+                    roundedCtx.arc(width - effectiveRadius, height - effectiveRadius, effectiveRadius, 0, Math.PI / 2, false);
+                    roundedCtx.lineTo(effectiveRadius, height);
+                    roundedCtx.arc(effectiveRadius, height - effectiveRadius, effectiveRadius, Math.PI / 2, Math.PI, false);
+                    roundedCtx.lineTo(0, effectiveRadius);
+                    roundedCtx.arc(effectiveRadius, effectiveRadius, effectiveRadius, Math.PI, 3 * Math.PI / 2, false);
+                    roundedCtx.closePath();
+                    roundedCtx.clip();
+                }
+                
+                roundedCtx.drawImage(image, drawX - x, drawY - y, drawWidth, drawHeight);
+                shadowCtx.drawImage(roundedCanvas, x, y);
+            }
+            
+            shadowCtx.restore();
+            
+            // Draw the shadow canvas first
+            this.ctx.drawImage(shadowCanvas, 0, 0);
+        }
+        
+        // Save context for actual image transformations
+        this.ctx.save();
+        
+        // Apply transformations
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate((rotation * Math.PI) / 180);
+        if (flipH) this.ctx.scale(-1, 1);
+        if (flipV) this.ctx.scale(1, -1);
+        this.ctx.translate(-centerX, -centerY);
+        
+        // Draw the actual image (masked or unmasked)
+        if (maskEnabled && maskCanvas) {
+            this.ctx.drawImage(maskCanvas, x, y);
+        } else {
+            // Draw with clipping for rounded corners
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            
+            if (cornerRadius > 0) {
+                const maxRadius = Math.min(width, height) / 2;
+                const effectiveRadius = Math.min(cornerRadius, maxRadius);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(effectiveRadius, 0);
+                this.ctx.lineTo(width - effectiveRadius, 0);
+                this.ctx.arc(width - effectiveRadius, effectiveRadius, effectiveRadius, -Math.PI / 2, 0, false);
+                this.ctx.lineTo(width, height - effectiveRadius);
+                this.ctx.arc(width - effectiveRadius, height - effectiveRadius, effectiveRadius, 0, Math.PI / 2, false);
+                this.ctx.lineTo(effectiveRadius, height);
+                this.ctx.arc(effectiveRadius, height - effectiveRadius, effectiveRadius, Math.PI / 2, Math.PI, false);
+                this.ctx.lineTo(0, effectiveRadius);
+                this.ctx.arc(effectiveRadius, effectiveRadius, effectiveRadius, Math.PI, 3 * Math.PI / 2, false);
+                this.ctx.closePath();
+                this.ctx.clip();
+            }
+            
+            this.ctx.drawImage(image, drawX - x, drawY - y, drawWidth, drawHeight);
+            this.ctx.restore();
+        }
+        
+        // Restore context
+        this.ctx.restore();
+    },
+    
+    // Draw image within specific rectangle
+    drawImageInRect(image, x, y, width, height, cornerRadius, shadowOpacity, shadowRadius, shadowOffsetX, shadowOffsetY, shadowColor, rotation, flipH, flipV) {
+        // Ensure cornerRadius is a number
+        cornerRadius = Number(cornerRadius) || 0;
+        
+        // Calculate the image aspect ratio
+        const imageAspect = image.width / image.height;
+        const rectAspect = width / height;
+        
+        // Calculate actual draw dimensions (fit image within rect maintaining aspect ratio)
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (imageAspect > rectAspect) {
+            // Image is wider than rect - fit to width
+            drawWidth = width;
+            drawHeight = width / imageAspect;
+            drawX = x;
+            drawY = y + (height - drawHeight) / 2;
+        } else {
+            // Image is taller than rect - fit to height
+            drawHeight = height;
+            drawWidth = height * imageAspect;
+            drawX = x + (width - drawWidth) / 2;
+            drawY = y;
+        }
+        
+        // Get the center point for transformations
+        const centerX = drawX + drawWidth / 2;
+        const centerY = drawY + drawHeight / 2;
+        
+        // Create rounded version of the image on an offscreen canvas
+        const roundedCanvas = document.createElement('canvas');
+        roundedCanvas.width = drawWidth;
+        roundedCanvas.height = drawHeight;
+        const roundedCtx = roundedCanvas.getContext('2d');
+        
+        // Create the rounded rectangle path
+        if (cornerRadius > 0) {
+            const maxRadius = Math.min(drawWidth, drawHeight) / 2;
+            const effectiveRadius = Math.min(cornerRadius, maxRadius);
+            
+            roundedCtx.beginPath();
+            roundedCtx.moveTo(effectiveRadius, 0);
+            roundedCtx.lineTo(drawWidth - effectiveRadius, 0);
+            roundedCtx.arc(drawWidth - effectiveRadius, effectiveRadius, effectiveRadius, -Math.PI / 2, 0, false);
+            roundedCtx.lineTo(drawWidth, drawHeight - effectiveRadius);
+            roundedCtx.arc(drawWidth - effectiveRadius, drawHeight - effectiveRadius, effectiveRadius, 0, Math.PI / 2, false);
+            roundedCtx.lineTo(effectiveRadius, drawHeight);
+            roundedCtx.arc(effectiveRadius, drawHeight - effectiveRadius, effectiveRadius, Math.PI / 2, Math.PI, false);
+            roundedCtx.lineTo(0, effectiveRadius);
+            roundedCtx.arc(effectiveRadius, effectiveRadius, effectiveRadius, Math.PI, 3 * Math.PI / 2, false);
+            roundedCtx.closePath();
+            roundedCtx.clip();
+        }
+        
+        // Clear and draw the image
+        roundedCtx.clearRect(0, 0, drawWidth, drawHeight);
+        roundedCtx.drawImage(image, 0, 0, drawWidth, drawHeight);
+        
+        // Create shadow if enabled
+        if (shadowOpacity > 0) {
+            const shadowCanvas = document.createElement('canvas');
+            shadowCanvas.width = this.canvas.width;
+            shadowCanvas.height = this.canvas.height;
+            const shadowCtx = shadowCanvas.getContext('2d');
+            
+            // Apply transformations to shadow canvas
+            shadowCtx.save();
+            shadowCtx.translate(centerX, centerY);
+            shadowCtx.rotate((rotation * Math.PI) / 180);
+            if (flipH) shadowCtx.scale(-1, 1);
+            if (flipV) shadowCtx.scale(1, -1);
+            shadowCtx.translate(-centerX, -centerY);
+            
+            // Get shadow color with opacity
+            let shadowColorWithOpacity;
+            if (shadowColor) {
+                if (shadowColor.startsWith('#')) {
+                    const rgb = this.hexToRgb(shadowColor);
+                    shadowColorWithOpacity = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${shadowOpacity})`;
+                } else if (shadowColor.startsWith('rgba')) {
+                    shadowColorWithOpacity = shadowColor.replace(/,([^,]*)$/, `,${shadowOpacity})`);
+                } else if (shadowColor.startsWith('rgb')) {
+                    shadowColorWithOpacity = shadowColor.replace(')', `, ${shadowOpacity})`);
+                } else {
+                    shadowColorWithOpacity = `rgba(0, 0, 0, ${shadowOpacity})`;
+                }
+            } else {
+                shadowColorWithOpacity = `rgba(0, 0, 0, ${shadowOpacity})`;
+            }
+            
+            // Apply shadow settings
+            shadowCtx.shadowColor = shadowColorWithOpacity;
+            shadowCtx.shadowBlur = shadowRadius;
+            shadowCtx.shadowOffsetX = shadowOffsetX;
+            shadowCtx.shadowOffsetY = shadowOffsetY;
+            
+            // Draw shadow
+            shadowCtx.drawImage(roundedCanvas, drawX, drawY);
+            shadowCtx.restore();
+            
+            // Draw the shadow canvas first
+            this.ctx.drawImage(shadowCanvas, 0, 0);
+        }
+        
+        // Save context for actual image transformations
+        this.ctx.save();
+        
+        // Apply transformations
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate((rotation * Math.PI) / 180);
+        if (flipH) this.ctx.scale(-1, 1);
+        if (flipV) this.ctx.scale(1, -1);
+        this.ctx.translate(-centerX, -centerY);
+        
+        // Draw the actual image
+        this.ctx.drawImage(roundedCanvas, drawX, drawY);
+        
+        // Restore context
+        this.ctx.restore();
+    },
+    
+    // Draw the image with transformations (legacy single image method)
     drawImage(image, cornerRadius, padding, shadowOpacity, shadowRadius, shadowOffsetX, shadowOffsetY, shadowColor, rotation, flipH, flipV) {
         const { width: canvasWidth, height: canvasHeight } = this.canvas;
         
@@ -1070,9 +1507,9 @@ window.CanvasRenderer = {
             // Apply corner radius if specified
             if (cornerRadius > 0) {
                 // Create clipping path for rounded corners
-                thumbCtx.beginPath();
+            thumbCtx.beginPath();
                 thumbCtx.roundRect(0, 0, thumbWidth, thumbHeight, cornerRadius);
-                thumbCtx.clip();
+            thumbCtx.clip();
             }
             
             // Clear the canvas before drawing

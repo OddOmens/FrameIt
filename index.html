@@ -880,6 +880,289 @@
         .dropdown-item:hover i {
             opacity: 1;
         }
+        
+        /* Layout Grid Styles */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .layout-item {
+            position: relative;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .layout-item:hover {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .layout-item.selected {
+            border-color: var(--accent-color);
+            background: rgba(67, 160, 71, 0.1);
+        }
+        
+        .layout-item img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 6px;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        
+        .layout-item:hover img,
+        .layout-item.selected img {
+            opacity: 1;
+        }
+        
+        .layout-item .layout-name {
+            font-size: 11px;
+            color: #fff;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+        
+        /* Image Slots Styles */
+        .image-slots-container {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+        
+        .slots-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            margin: 0 0 12px 0;
+        }
+        
+        .image-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+        }
+        
+        .image-slot {
+            position: relative;
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.02);
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-slot:hover {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .image-slot.selected {
+            border-color: var(--accent-color);
+            border-style: solid;
+            background: rgba(67, 160, 71, 0.1);
+        }
+        
+        .image-slot.filled {
+            border-style: solid;
+            border-color: #666;
+            padding: 4px;
+        }
+        
+        .image-slot.filled:hover {
+            border-color: var(--accent-color);
+        }
+        
+        .image-slot.filled.selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.3);
+        }
+        
+        .slot-preview {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        
+        .slot-label {
+            font-size: 11px;
+            color: #aaa;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .image-slot.filled .slot-label {
+            color: #fff;
+        }
+        
+        .slot-empty-icon {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        
+        .image-slot:hover .slot-empty-icon {
+            color: var(--accent-color);
+        }
+        
+        .slot-actions {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .image-slot.filled:hover .slot-actions {
+            opacity: 1;
+        }
+        
+        .slot-action {
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            padding: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slot-action:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+        
+        .slot-action.remove:hover {
+            background: rgba(244, 67, 54, 0.8);
+        }
+        
+        .slot-action.replace:hover {
+            background: rgba(33, 150, 243, 0.8);
+        }
+        
+        .slot-action.duplicate:hover {
+            background: rgba(76, 175, 80, 0.8);
+        }
+        
+        /* Drag and drop feedback */
+        .image-slot.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            border-color: var(--accent-color);
+        }
+        
+        .image-slot.drag-over {
+            border-color: var(--accent-color);
+            background: rgba(67, 160, 71, 0.2);
+            transform: scale(1.05);
+        }
+        
+        /* Context menu styles */
+        .slot-context-menu {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .context-menu-item {
+            transition: background-color 0.2s ease;
+        }
+        
+        /* Duplicate modal styles */
+        .duplicate-slot-modal {
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .duplicate-option:hover {
+            background: rgba(67, 160, 71, 0.8) !important;
+            transform: scale(1.05);
+        }
+        
+        .cancel-duplicate:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: #888 !important;
+        }
+
+        /* Checkbox styles */
+        .checkbox-row {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #e0e0e0;
+            user-select: none;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            background-color: #2a2a2a;
+            border: 1px solid #555;
+            border-radius: 3px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-container:hover .checkmark {
+            border-color: #43A047;
+            background-color: #333;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked + .checkmark {
+            background-color: #43A047;
+            border-color: #43A047;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -962,13 +1245,13 @@
                         </div>
                     </div>
                     
+                    <button id="export-btn" class="btn primary-btn" disabled>
+                        <i class="fas fa-download"></i>
+                        <span>Export</span>
+                    </button>
                     <button id="export-all-btn" class="btn">
                         <i class="fas fa-file-export"></i>
                         <span>Export All</span>
-                    </button>
-                    <button id="export-btn" class="btn primary-btn" disabled>
-                        <i class="fas fa-download"></i>
-                        <span>Export Mockup</span>
                     </button>
                 </div>
             </div>
@@ -1048,6 +1331,28 @@
                             
                             <div class="divider"></div>
                             
+                            <!-- Multi-Image Layout Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>Layout</h5>
+                                </div>
+                                <div class="section-content">
+                                    <div class="layout-grid" id="layout-grid">
+                                        <!-- Layout templates will be populated dynamically -->
+                                    </div>
+                                    
+                                    <!-- Image Slots -->
+                                    <div id="image-slots-container" class="image-slots-container">
+                                        <h6 class="slots-title">Image Slots</h6>
+                                        <div id="image-slots" class="image-slots">
+                                            <!-- Image slots will be populated dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
                             <!-- Image Manipulation Section -->
                             <div class="settings-section">
                                 <div class="section-header">
@@ -1083,6 +1388,47 @@
                                     <div class="slider-container">
                                         <input type="range" id="rotation-slider" min="0" max="360" value="0" step="1">
                                         <button id="reset-rotation-btn" class="reset-btn" disabled>
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Image Scale</label>
+                                        <span class="value-display" id="image-scale-value">120%</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="image-scale-slider" min="0.5" max="2.0" value="1.2" step="0.1">
+                                        <button id="reset-image-scale-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="checkbox-row">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="mask-enabled-toggle" checked>
+                                            <span class="checkmark"></span>
+                                            Smart Fill & Crop
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Pan Horizontal</label>
+                                        <span class="value-display" id="pan-x-value">0%</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="pan-x-slider" min="-1" max="1" value="0" step="0.01">
+                                        <button id="reset-pan-x-btn" class="reset-btn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Pan Vertical</label>
+                                        <span class="value-display" id="pan-y-value">0%</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" id="pan-y-slider" min="-1" max="1" value="0" step="0.01">
+                                        <button id="reset-pan-y-btn" class="reset-btn">
                                             <i class="fas fa-undo"></i>
                                         </button>
                                     </div>
@@ -2185,12 +2531,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-            <div class="user-settings-actions">
-                <button id="close-settings-btn" class="btn">
-                    <i class="fas fa-times"></i>
-                    Close
-                </button>
             </div>
         </div>
     </div>

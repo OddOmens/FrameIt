@@ -160,6 +160,7 @@ window.UI = {
         this.setupEventListeners();
         this.setupWatermarkControls(); // Add watermark control setup
         this.renderTemplates(); // Render templates in their own section
+        this.renderLayouts(); // Render layout options
         
         // Force enable export buttons after all setup is complete
         this.forceEnableExportButtons();
@@ -349,23 +350,93 @@ window.UI = {
                 btn.classList.remove('disabled');
             }
         });
+        
+        // Also ensure both buttons by ID for redundancy
+        const exportBtn = document.getElementById('export-btn');
+        const exportAllBtn = document.getElementById('export-all-btn');
+        
+        [exportBtn, exportAllBtn].forEach(btn => {
+            if (btn) {
+                btn.disabled = false;
+                btn.removeAttribute('disabled');
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.classList.remove('disabled');
+                
+                // Clear any inline styles that might interfere
+                btn.style.removeProperty('pointer-events');
+                btn.style.pointerEvents = 'auto';
+            }
+        });
+        
+        console.log('✅ Export buttons force-enabled with full properties');
+    },
+
+    // Setup export buttons with robust event handling
+    setupExportButtons() {
+        // Primary export button
+        const exportBtn = document.getElementById('export-btn');
+        if (exportBtn) {
+            // Remove any existing listeners to prevent duplicates
+            exportBtn.replaceWith(exportBtn.cloneNode(true));
+            const newExportBtn = document.getElementById('export-btn');
+            
+            // Add event listener
+            newExportBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔥 Export button clicked');
+                this.showExportSettingsModal();
+            });
+            
+            // Ensure it's enabled and clickable
+            newExportBtn.disabled = false;
+            newExportBtn.style.pointerEvents = 'auto';
+            newExportBtn.style.cursor = 'pointer';
+            
+            console.log('✅ Export button setup complete');
+        } else {
+            console.error('❌ Export button not found in DOM');
+        }
+
+        // Export all button
+        const exportAllBtn = document.getElementById('export-all-btn');
+        if (exportAllBtn) {
+            // Remove any existing listeners to prevent duplicates
+            exportAllBtn.replaceWith(exportAllBtn.cloneNode(true));
+            const newExportAllBtn = document.getElementById('export-all-btn');
+            
+            // Add event listener
+            newExportAllBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔥 Export All button clicked');
+                window.App.exportAllImages();
+            });
+            
+            // Ensure it's enabled and clickable
+            newExportAllBtn.disabled = false;
+            newExportAllBtn.style.pointerEvents = 'auto';
+            newExportAllBtn.style.cursor = 'pointer';
+            
+            console.log('✅ Export All button setup complete');
+        } else {
+            console.error('❌ Export All button not found in DOM');
+        }
+
+        // Update cached references to the new buttons
+        this.elements.exportBtn = document.getElementById('export-btn');
+        this.elements.exportAllBtn = document.getElementById('export-all-btn');
     },
     
     // Setup event listeners
     setupEventListeners() {
         // Button events
         this.elements.uploadBtn.addEventListener('click', () => window.App.createNewCanvas());
-        this.elements.exportBtn.addEventListener('click', () => this.showExportSettingsModal());
-        console.log('✅ Export button event listener attached');
         
-        // Export all button - find by ID since it might not be cached
-        const exportAllBtn = document.getElementById('export-all-btn');
-        if (exportAllBtn) {
-            exportAllBtn.addEventListener('click', () => window.App.exportAllImages());
-            console.log('✅ Export All button event listener attached');
-        } else {
-            console.error('❌ Export All button not found!');
-        }
+        // Setup export buttons with robust error handling
+        this.setupExportButtons();
         
         this.elements.randomBgBtn.addEventListener('click', () => window.App.selectRandomBackground());
         this.elements.flipHBtn.addEventListener('click', () => window.App.toggleFlipHorizontal());
@@ -393,6 +464,41 @@ window.UI = {
         this.elements.resetShadowOffsetYBtn.addEventListener('click', () => window.App.resetShadowOffsetY());
         this.elements.resetShadowColorBtn.addEventListener('click', () => window.App.resetShadowColor());
         this.elements.resetRotationBtn.addEventListener('click', () => window.App.resetRotation());
+        
+        // Image scale controls
+        const imageScaleSlider = document.getElementById('image-scale-slider');
+        const resetImageScaleBtn = document.getElementById('reset-image-scale-btn');
+        if (imageScaleSlider) {
+            imageScaleSlider.addEventListener('input', (e) => window.App.setImageScale(e.target.value));
+        }
+        if (resetImageScaleBtn) {
+            resetImageScaleBtn.addEventListener('click', () => window.App.resetImageScale());
+        }
+        
+        // Mask enabled toggle
+        const maskEnabledToggle = document.getElementById('mask-enabled-toggle');
+        if (maskEnabledToggle) {
+            maskEnabledToggle.addEventListener('change', (e) => window.App.setMaskEnabled(e.target.checked));
+        }
+        
+        // Pan controls
+        const panXSlider = document.getElementById('pan-x-slider');
+        const panYSlider = document.getElementById('pan-y-slider');
+        const resetPanXBtn = document.getElementById('reset-pan-x-btn');
+        const resetPanYBtn = document.getElementById('reset-pan-y-btn');
+        
+        if (panXSlider) {
+            panXSlider.addEventListener('input', (e) => window.App.setPanX(parseFloat(e.target.value)));
+        }
+        if (panYSlider) {
+            panYSlider.addEventListener('input', (e) => window.App.setPanY(parseFloat(e.target.value)));
+        }
+        if (resetPanXBtn) {
+            resetPanXBtn.addEventListener('click', () => window.App.resetPanX());
+        }
+        if (resetPanYBtn) {
+            resetPanYBtn.addEventListener('click', () => window.App.resetPanY());
+        }
         
         // Slider events
         this.elements.bgBlurSlider.addEventListener('input', (e) => window.App.setBackgroundBlur(e.target.value));
@@ -450,8 +556,36 @@ window.UI = {
                     }
                 }
                 
-                // Now proceed with the normal file handling
+                // Check if this is a targeted slot upload
+                const targetSlot = e.target.dataset.targetSlot;
+                const replaceMode = e.target.dataset.replaceMode;
+                
+                if (targetSlot !== undefined && e.target.files.length === 1) {
+                    // Load the image and add/replace it in the specific slot
+                    const file = e.target.files[0];
+                    try {
+                        const image = await Utils.loadImageFromFile(file);
+                        const slotIndex = parseInt(targetSlot);
+                        
+                        if (replaceMode === 'true') {
+                            window.App.replaceImageInSlot(image, slotIndex);
+                            UI.showNotification(`Image replaced in slot ${slotIndex + 1}`, 'success', 2000);
+                        } else {
+                            window.App.addImageToSlot(image, slotIndex);
+                            UI.showNotification(`Image added to slot ${slotIndex + 1}`, 'success', 2000);
+                        }
+                    } catch (error) {
+                        console.error('Failed to load image for slot:', error);
+                        UI.showError('Failed to load image. Please try another file.');
+                    }
+                    // Clear the markers
+                    delete e.target.dataset.targetSlot;
+                    delete e.target.dataset.replaceMode;
+                } else {
+                    // Normal multi-file handling
                 window.App.handleFileSelect(e.target.files);
+                }
+                
                 // Reset the file input value to allow uploading the same file again
                 e.target.value = '';
             }
@@ -1493,7 +1627,7 @@ window.UI = {
         // Update export button text based on content
         const exportBtnText = this.elements.exportBtn.querySelector('span');
         if (exportBtnText) {
-            exportBtnText.textContent = appState.selectedImage ? 'Export Mockup' : 'Export Design';
+            exportBtnText.textContent = appState.selectedImage ? 'Export' : 'Export Design';
         }
         
         // Update reset buttons
@@ -1680,6 +1814,436 @@ window.UI = {
             templateItem.appendChild(nameOverlay);
             container.appendChild(templateItem);
         });
+    },
+    
+    // Render layout options
+    renderLayouts() {
+        const container = document.getElementById('layout-grid');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        Config.multiImageLayouts.forEach(layout => {
+            const layoutItem = document.createElement('div');
+            layoutItem.className = 'layout-item';
+            layoutItem.dataset.layoutId = layout.id;
+            
+            // Create image element with thumbnail
+            const img = document.createElement('img');
+            img.src = layout.thumbnail;
+            img.alt = layout.name;
+            img.loading = 'lazy';
+            
+            // Create name label
+            const nameLabel = document.createElement('div');
+            nameLabel.className = 'layout-name';
+            nameLabel.textContent = layout.name;
+            
+            // Add click handler
+            layoutItem.addEventListener('click', () => {
+                window.App.setLayout(layout.id);
+                // Force recalculation after layout change
+                setTimeout(() => this.recalculateCollapsibleSections(), 100);
+            });
+            
+            layoutItem.appendChild(img);
+            layoutItem.appendChild(nameLabel);
+            container.appendChild(layoutItem);
+        });
+    },
+    
+    // Update layout selection UI
+    updateLayoutSelection(selectedLayoutId) {
+        const layoutItems = document.querySelectorAll('.layout-item');
+        layoutItems.forEach(item => {
+            if (item.dataset.layoutId === selectedLayoutId) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    },
+    
+    // Render image slots with enhanced functionality
+    updateImageSlots(images, selectedIndex) {
+        const container = document.getElementById('image-slots');
+        if (!container) return;
+        
+        const slotsContainer = document.getElementById('image-slots-container');
+        if (!slotsContainer) return;
+        
+        // Show/hide slots container based on layout
+        const currentLayout = window.App.getCurrentLayout();
+        const wasVisible = slotsContainer.style.display !== 'none';
+        
+        if (currentLayout.maxImages <= 1) {
+            slotsContainer.style.display = 'none';
+            // If we just hid the slots, recalculate section height
+            if (wasVisible) {
+                setTimeout(() => this.recalculateCollapsibleSections(), 50);
+            }
+            return;
+        } else {
+            slotsContainer.style.display = 'block';
+            // If we just showed the slots, we'll recalculate after adding content
+        }
+        
+        container.innerHTML = '';
+        
+        for (let i = 0; i < images.length; i++) {
+            const image = images[i];
+            const slotElement = document.createElement('div');
+            slotElement.className = 'image-slot';
+            slotElement.dataset.slotIndex = i;
+            
+            if (image) {
+                slotElement.classList.add('filled');
+                
+                // Make slots draggable for reordering
+                slotElement.draggable = true;
+                slotElement.addEventListener('dragstart', (e) => this.handleSlotDragStart(e, i));
+                
+                // Create preview thumbnail
+                const preview = document.createElement('img');
+                preview.className = 'slot-preview';
+                preview.src = CanvasRenderer.createThumbnail(image, 100, 60);
+                preview.alt = `Image ${i + 1}`;
+                slotElement.appendChild(preview);
+                
+                // Create slot actions
+                const actions = document.createElement('div');
+                actions.className = 'slot-actions';
+                
+                // Replace button
+                const replaceBtn = document.createElement('button');
+                replaceBtn.className = 'slot-action replace';
+                replaceBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                replaceBtn.title = 'Replace image';
+                replaceBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.replaceImageInSlot(i);
+                });
+                actions.appendChild(replaceBtn);
+                
+                // Duplicate button
+                const duplicateBtn = document.createElement('button');
+                duplicateBtn.className = 'slot-action duplicate';
+                duplicateBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                duplicateBtn.title = 'Duplicate to empty slot';
+                duplicateBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showDuplicateSlotOptions(i);
+                });
+                actions.appendChild(duplicateBtn);
+                
+                // Remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'slot-action remove';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.title = 'Remove image';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.App.removeImageFromSlot(i);
+                });
+                actions.appendChild(removeBtn);
+                
+                slotElement.appendChild(actions);
+                
+                // Right-click context menu
+                slotElement.addEventListener('contextmenu', (e) => this.showSlotContextMenu(e, i, true));
+            } else {
+                // Empty slot
+                const emptyIcon = document.createElement('i');
+                emptyIcon.className = 'fas fa-plus slot-empty-icon';
+                slotElement.appendChild(emptyIcon);
+                
+                // Right-click context menu for empty slots
+                slotElement.addEventListener('contextmenu', (e) => this.showSlotContextMenu(e, i, false));
+            }
+            
+            // Make all slots drop targets
+            slotElement.addEventListener('dragover', (e) => this.handleSlotDragOver(e));
+            slotElement.addEventListener('drop', (e) => this.handleSlotDrop(e, i));
+            slotElement.addEventListener('dragleave', (e) => this.handleSlotDragLeave(e));
+            
+            // Create slot label
+            const label = document.createElement('div');
+            label.className = 'slot-label';
+            label.textContent = `Slot ${i + 1}`;
+            slotElement.appendChild(label);
+            
+            // Mark as selected
+            if (i === selectedIndex) {
+                slotElement.classList.add('selected');
+            }
+            
+            // Add click handler for slot selection
+            slotElement.addEventListener('click', () => {
+                if (image) {
+                    // Select this slot
+                    window.App.selectImageSlot(i);
+                } else {
+                    // Open file dialog for empty slot
+                    this.addImageToSlot(i);
+                }
+            });
+            
+            container.appendChild(slotElement);
+        }
+        
+        // Recalculate section height after adding all slots
+        setTimeout(() => this.recalculateCollapsibleSections(), 50);
+    },
+    
+    // Handle drag start for image slots
+    handleSlotDragStart(e, slotIndex) {
+        e.dataTransfer.setData('text/plain', slotIndex);
+        e.dataTransfer.effectAllowed = 'move';
+        
+        // Add dragging class for visual feedback
+        e.target.classList.add('dragging');
+        
+        console.log('Started dragging slot:', slotIndex);
+    },
+    
+    // Handle drag over for image slots
+    handleSlotDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        // Add visual feedback
+        const slot = e.target.closest('.image-slot');
+        if (slot && !slot.classList.contains('dragging')) {
+            slot.classList.add('drag-over');
+        }
+    },
+    
+    // Handle drag leave for image slots
+    handleSlotDragLeave(e) {
+        // Remove visual feedback
+        const slot = e.target.closest('.image-slot');
+        if (slot) {
+            slot.classList.remove('drag-over');
+        }
+    },
+    
+    // Handle drop for image slots
+    handleSlotDrop(e, targetIndex) {
+        e.preventDefault();
+        
+        // Remove all drag-related classes
+        document.querySelectorAll('.image-slot').forEach(slot => {
+            slot.classList.remove('dragging', 'drag-over');
+        });
+        
+        const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'));
+        
+        if (sourceIndex !== targetIndex) {
+            window.App.moveImageSlot(sourceIndex, targetIndex);
+            this.showNotification(`Moved image from slot ${sourceIndex + 1} to slot ${targetIndex + 1}`, 'success', 2000);
+        }
+        
+        console.log('Dropped slot', sourceIndex, 'on slot', targetIndex);
+    },
+    
+    // Show context menu for image slots
+    showSlotContextMenu(e, slotIndex, hasFilled) {
+        e.preventDefault();
+        
+        // Remove any existing context menu
+        const existingMenu = document.querySelector('.slot-context-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+        
+        const menu = document.createElement('div');
+        menu.className = 'slot-context-menu';
+        menu.style.position = 'fixed';
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+        menu.style.zIndex = '10000';
+        menu.style.background = '#1a1a1a';
+        menu.style.border = '1px solid #333';
+        menu.style.borderRadius = '8px';
+        menu.style.padding = '8px 0';
+        menu.style.minWidth = '160px';
+        
+        const menuItems = [];
+        
+        if (hasFilled) {
+            menuItems.push(
+                { icon: 'fa-eye', text: 'Select Image', action: () => window.App.selectImageSlot(slotIndex) },
+                { icon: 'fa-sync-alt', text: 'Replace Image', action: () => this.replaceImageInSlot(slotIndex) },
+                { icon: 'fa-copy', text: 'Duplicate Image', action: () => this.showDuplicateSlotOptions(slotIndex) },
+                { icon: 'fa-times', text: 'Remove Image', action: () => window.App.removeImageFromSlot(slotIndex) }
+            );
+        } else {
+            menuItems.push(
+                { icon: 'fa-plus', text: 'Add Image', action: () => this.addImageToSlot(slotIndex) }
+            );
+        }
+        
+        menuItems.forEach(item => {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'context-menu-item';
+            menuItem.style.cssText = `
+                padding: 8px 16px;
+                cursor: pointer;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 14px;
+                transition: background-color 0.2s;
+            `;
+            menuItem.innerHTML = `<i class="fas ${item.icon}" style="width: 16px;"></i> ${item.text}`;
+            menuItem.onmouseenter = () => menuItem.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            menuItem.onmouseleave = () => menuItem.style.backgroundColor = 'transparent';
+            menuItem.onclick = () => {
+                item.action();
+                menu.remove();
+            };
+            menu.appendChild(menuItem);
+        });
+        
+        document.body.appendChild(menu);
+        
+        // Remove menu on click outside
+        setTimeout(() => {
+            document.addEventListener('click', function closeMenu() {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+            });
+        }, 100);
+    },
+    
+    // Helper functions for context menu actions
+    addImageToSlot(slotIndex) {
+        const fileInput = document.getElementById('file-input');
+        fileInput.dataset.targetSlot = slotIndex;
+        fileInput.click();
+    },
+    
+    replaceImageInSlot(slotIndex) {
+        const fileInput = document.getElementById('file-input');
+        fileInput.dataset.targetSlot = slotIndex;
+        fileInput.dataset.replaceMode = 'true';
+        fileInput.click();
+    },
+    
+    // Recalculate collapsible section heights
+    recalculateCollapsibleSections() {
+        // Find all expanded settings sections and recalculate their max-height
+        const sections = document.querySelectorAll('.settings-section:not(.collapsed)');
+        sections.forEach(section => {
+            const content = section.querySelector('.section-content');
+            if (content) {
+                // Temporarily remove max-height to measure actual content height
+                content.style.maxHeight = 'none';
+                const actualHeight = content.scrollHeight;
+                
+                // Set max-height to the actual content height with some padding
+                content.style.maxHeight = (actualHeight + 20) + 'px';
+                
+                // After a brief delay, set it back to the default high value for smooth transitions
+                setTimeout(() => {
+                    content.style.maxHeight = '2000px';
+                }, 50);
+            }
+        });
+        
+        console.log('✅ Recalculated collapsible section heights');
+    },
+    
+    // Show duplicate options modal
+    showDuplicateSlotOptions(sourceIndex) {
+        const images = window.App.state.images;
+        const emptySlots = images.map((img, index) => ({ index, isEmpty: !img }))
+                                  .filter(slot => slot.isEmpty && slot.index !== sourceIndex);
+        
+        if (emptySlots.length === 0) {
+            this.showNotification('No empty slots available for duplication', 'warning', 3000);
+            return;
+        }
+        
+        // Create a simple selection dialog
+        const modal = document.createElement('div');
+        modal.className = 'duplicate-slot-modal';
+        modal.innerHTML = `
+            <div class="duplicate-modal-content" style="
+                background: #1a1a1a;
+                border: 1px solid #333;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 400px;
+                text-align: center;
+            ">
+                <h4 style="color: #fff; margin: 0 0 16px 0;">Duplicate to which slot?</h4>
+                <div class="duplicate-options" style="
+                    display: flex;
+                    gap: 12px;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    margin-bottom: 16px;
+                ">
+                    ${emptySlots.map(slot => 
+                        `<button class="duplicate-option" data-target="${slot.index}" style="
+                            background: var(--accent-color);
+                            border: none;
+                            border-radius: 8px;
+                            color: #fff;
+                            padding: 12px 16px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            transition: all 0.2s ease;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-plus"></i>
+                            Slot ${slot.index + 1}
+                        </button>`
+                    ).join('')}
+                </div>
+                <button class="cancel-duplicate" style="
+                    background: transparent;
+                    border: 1px solid #666;
+                    border-radius: 8px;
+                    color: #fff;
+                    padding: 8px 16px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: all 0.2s ease;
+                ">Cancel</button>
+            </div>
+        `;
+        
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+        
+        // Add event listeners
+        modal.addEventListener('click', (e) => {
+            if (e.target.classList.contains('duplicate-option')) {
+                const targetIndex = parseInt(e.target.dataset.target);
+                window.App.duplicateImageToSlot(sourceIndex, targetIndex);
+                this.showNotification(`Image duplicated to slot ${targetIndex + 1}`, 'success', 2000);
+                modal.remove();
+            } else if (e.target.classList.contains('cancel-duplicate') || e.target === modal) {
+                modal.remove();
+            }
+        });
+        
+        document.body.appendChild(modal);
     },
     
     // Populate noise overlay dropdown
@@ -2544,20 +3108,39 @@ window.UI = {
         
         // Mouse events for desktop
         canvasWrapper.addEventListener('mousedown', (e) => {
-            // Allow dragging with any mouse button
-            // Left button (0), middle button (1), or when zoomed in
+            // Check if we're in multi-image mode and over an image
+            const canvas = document.getElementById('preview-canvas');
+            if (canvas && this.isMultiImageMode()) {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
+                
+                const imageSlot = this.getImageSlotAtPosition(x, y);
+                if (imageSlot !== -1) {
+                    // Start image panning instead of canvas panning
+                    this.startImagePanning(e.clientX, e.clientY, imageSlot);
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+            // Default canvas panning behavior
             this.startDragging(e.clientX, e.clientY);
             e.preventDefault();
         });
         
         document.addEventListener('mousemove', (e) => {
-            if (this.isDragging) {
+            if (this.isPanningImage) {
+                this.doImagePan(e.clientX, e.clientY);
+                e.preventDefault();
+            } else if (this.isDragging) {
                 this.doDrag(e.clientX, e.clientY);
                 e.preventDefault();
             }
         });
         
         document.addEventListener('mouseup', () => {
+            this.stopImagePanning();
             this.stopDragging();
         });
         
@@ -2627,6 +3210,103 @@ window.UI = {
         if (canvasWrapper) {
             canvasWrapper.style.cursor = 'grab';
         }
+    },
+
+    // Check if we're in multi-image mode
+    isMultiImageMode() {
+        return window.App?.state?.currentLayout !== 'single' && 
+               window.App?.state?.images && 
+               window.App.state.images.length > 0;
+    },
+
+    // Get image slot at canvas position
+    getImageSlotAtPosition(normalizedX, normalizedY) {
+        if (!window.App?.state?.currentLayout) return -1;
+        
+        const layout = Config.multiImageLayouts?.find(l => l.id === window.App.state.currentLayout);
+        if (!layout || !layout.slots) return -1;
+        
+        for (let i = 0; i < layout.slots.length; i++) {
+            const slot = layout.slots[i];
+            if (!window.App.state.images[i]) continue; // Skip empty slots
+            
+            // Check if position is within this slot
+            if (normalizedX >= slot.x && normalizedX <= slot.x + slot.width &&
+                normalizedY >= slot.y && normalizedY <= slot.y + slot.height) {
+                return i;
+            }
+        }
+        
+        return -1;
+    },
+
+    // Start image panning
+    startImagePanning(x, y, slotIndex) {
+        this.isPanningImage = true;
+        this.panningSlotIndex = slotIndex;
+        this.lastPanX = x;
+        this.lastPanY = y;
+        
+        // Select the slot being panned
+        window.App.selectImageSlot(slotIndex);
+        
+        const canvasWrapper = document.querySelector('.canvas-wrapper');
+        if (canvasWrapper) {
+            canvasWrapper.style.cursor = 'move';
+        }
+        
+        console.log('🖱️ Started panning image in slot', slotIndex);
+    },
+
+    // Perform image panning
+    doImagePan(x, y) {
+        if (!this.isPanningImage || this.panningSlotIndex === undefined) return;
+        
+        const dx = x - this.lastPanX;
+        const dy = y - this.lastPanY;
+        
+        // Convert pixel movement to normalized pan offsets
+        const canvas = document.getElementById('preview-canvas');
+        if (!canvas) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const normalizedDx = dx / rect.width;
+        const normalizedDy = dy / rect.height;
+        
+        // Get current pan values
+        const settings = window.App.state.imageSettings?.[this.panningSlotIndex];
+        if (!settings) return;
+        
+        // Update pan with sensitivity adjustment
+        const sensitivity = 2.0; // Adjust this to make panning more/less sensitive
+        const newPanX = Math.max(-1, Math.min(1, settings.panX + normalizedDx * sensitivity));
+        const newPanY = Math.max(-1, Math.min(1, settings.panY + normalizedDy * sensitivity));
+        
+        // Update the pan values
+        window.App.updateIndividualImageSetting('panX', newPanX);
+        window.App.updateIndividualImageSetting('panY', newPanY);
+        
+        // Update last positions
+        this.lastPanX = x;
+        this.lastPanY = y;
+        
+        // Re-render the preview
+        window.App.renderPreview();
+    },
+
+    // Stop image panning
+    stopImagePanning() {
+        if (!this.isPanningImage) return;
+        
+        this.isPanningImage = false;
+        this.panningSlotIndex = undefined;
+        
+        const canvasWrapper = document.querySelector('.canvas-wrapper');
+        if (canvasWrapper) {
+            canvasWrapper.style.cursor = 'grab';
+        }
+        
+        console.log('🖱️ Stopped image panning');
     },
     
     // Setup text layers dragging functionality

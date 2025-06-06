@@ -6,6 +6,10 @@ window.App = {
     // Application state
     state: {
         selectedImage: null,
+        images: [], // Array of image objects for multi-image support
+        selectedImageIndex: 0, // Currently selected image for manipulation
+        currentLayout: 'single', // Current multi-image layout
+        imageSettings: [], // Individual settings for each image slot
         backgroundColor: '#FFFFFF',
         backgroundGradientId: null,
         backgroundImageId: null,
@@ -64,6 +68,420 @@ window.App = {
         watermarkColor: '#000000'
     },
     
+    // Multi-image layout management
+    setLayout(layoutId) {
+        console.log('🎯 Setting layout:', layoutId);
+        this.saveStateForUndo();
+        
+        const layout = Config.multiImageLayouts.find(l => l.id === layoutId);
+        if (!layout) {
+            console.error('Layout not found:', layoutId);
+            return;
+        }
+        
+        this.state.currentLayout = layoutId;
+        
+        // Trim or pad images array to match layout requirements
+        if (this.state.images.length > layout.maxImages) {
+            // Too many images, keep only the first ones
+            this.state.images = this.state.images.slice(0, layout.maxImages);
+        } else if (this.state.images.length < layout.maxImages) {
+            // Not enough images, add empty slots
+            while (this.state.images.length < layout.maxImages) {
+                this.state.images.push(null);
+            }
+        }
+        
+        // Reinitialize image settings for the new layout
+        this.initializeImageSettings();
+        
+        // Update the selected image for backward compatibility
+        this.state.selectedImage = this.state.images[0];
+        
+        // Re-render
+        this.renderPreview();
+        
+        // Update UI
+        UI.updateLayoutSelection(layoutId);
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        
+        // Force recalculation of collapsible section heights after DOM updates
+        setTimeout(() => {
+            UI.recalculateCollapsibleSections();
+        }, 50);
+        
+        UI.showNotification(`Layout changed to ${layout.name}`, 'success', 2000);
+    },
+    
+    // Add image to specific slot
+    addImageToSlot(image, slotIndex) {
+        console.log('🖼️ Adding image to slot:', slotIndex);
+        
+        if (slotIndex < 0 || slotIndex >= this.state.images.length) {
+            console.error('Invalid slot index:', slotIndex);
+            return;
+        }
+        
+        this.saveStateForUndo();
+        this.state.images[slotIndex] = image;
+        
+        // Update selected image for backward compatibility
+        this.state.selectedImage = this.state.images[0];
+        this.state.selectedImageIndex = slotIndex;
+        
+        this.renderPreview();
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+    },
+    
+    // Remove image from slot
+    removeImageFromSlot(slotIndex) {
+        console.log('🗑️ Removing image from slot:', slotIndex);
+        
+        if (slotIndex < 0 || slotIndex >= this.state.images.length) {
+            console.error('Invalid slot index:', slotIndex);
+            return;
+        }
+        
+        this.saveStateForUndo();
+        this.state.images[slotIndex] = null;
+        
+        // Update selected image for backward compatibility
+        if (slotIndex === this.state.selectedImageIndex) {
+            // Find the first non-null image
+            const firstImageIndex = this.state.images.findIndex(img => img !== null);
+            if (firstImageIndex !== -1) {
+                this.state.selectedImage = this.state.images[firstImageIndex];
+                this.state.selectedImageIndex = firstImageIndex;
+            } else {
+                this.state.selectedImage = null;
+                this.state.selectedImageIndex = 0;
+            }
+        }
+        
+        this.renderPreview();
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+    },
+    
+    // Select image slot for editing
+    selectImageSlot(slotIndex) {
+        console.log('👆 Selecting image slot:', slotIndex);
+        
+        if (slotIndex < 0 || slotIndex >= this.state.images.length) {
+            console.error('Invalid slot index:', slotIndex);
+            return;
+        }
+        
+        this.state.selectedImageIndex = slotIndex;
+        this.state.selectedImage = this.state.images[slotIndex];
+        
+        // Apply individual image settings to UI controls
+        this.applyIndividualImageSettingsToUI(slotIndex);
+        
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        
+        // Show which image is selected
+        if (this.state.selectedImage) {
+            UI.showNotification(`Selected image ${slotIndex + 1}`, 'info', 1500);
+        }
+        
+        this.renderPreview();
+    },
+
+    // Apply individual image settings to UI controls
+    applyIndividualImageSettingsToUI(slotIndex) {
+        if (!this.state.imageSettings || !this.state.imageSettings[slotIndex]) return;
+        
+        const settings = this.state.imageSettings[slotIndex];
+        
+        // Update corner radius
+        const cornerRadiusSlider = document.getElementById('corner-radius-slider');
+        const cornerRadiusValue = document.getElementById('corner-radius-value');
+        if (cornerRadiusSlider && cornerRadiusValue) {
+            cornerRadiusSlider.value = settings.cornerRadius;
+            cornerRadiusValue.textContent = `${settings.cornerRadius}px`;
+        }
+        
+        // Update padding
+        const paddingSlider = document.getElementById('padding-slider');
+        const paddingValue = document.getElementById('padding-value');
+        if (paddingSlider && paddingValue) {
+            paddingSlider.value = settings.padding;
+            paddingValue.textContent = `${settings.padding}px`;
+        }
+        
+        // Update rotation
+        const rotationSlider = document.getElementById('rotation-slider');
+        const rotationValue = document.getElementById('rotation-value');
+        if (rotationSlider && rotationValue) {
+            rotationSlider.value = settings.rotation;
+            rotationValue.textContent = `${settings.rotation}°`;
+        }
+        
+        // Update shadow opacity
+        const shadowOpacitySlider = document.getElementById('shadow-opacity-slider');
+        const shadowOpacityValue = document.getElementById('shadow-opacity-value');
+        if (shadowOpacitySlider && shadowOpacityValue) {
+            shadowOpacitySlider.value = settings.shadowOpacity;
+            shadowOpacityValue.textContent = `${Math.round(settings.shadowOpacity * 100)}%`;
+        }
+        
+        // Update shadow radius
+        const shadowRadiusSlider = document.getElementById('shadow-radius-slider');
+        const shadowRadiusValue = document.getElementById('shadow-radius-value');
+        if (shadowRadiusSlider && shadowRadiusValue) {
+            shadowRadiusSlider.value = settings.shadowRadius;
+            shadowRadiusValue.textContent = `${settings.shadowRadius}px`;
+        }
+        
+        // Update shadow offset X
+        const shadowOffsetXSlider = document.getElementById('shadow-offset-x-slider');
+        const shadowOffsetXValue = document.getElementById('shadow-offset-x-value');
+        if (shadowOffsetXSlider && shadowOffsetXValue) {
+            shadowOffsetXSlider.value = settings.shadowOffsetX;
+            shadowOffsetXValue.textContent = `${settings.shadowOffsetX}px`;
+        }
+        
+        // Update shadow offset Y
+        const shadowOffsetYSlider = document.getElementById('shadow-offset-y-slider');
+        const shadowOffsetYValue = document.getElementById('shadow-offset-y-value');
+        if (shadowOffsetYSlider && shadowOffsetYValue) {
+            shadowOffsetYSlider.value = settings.shadowOffsetY;
+            shadowOffsetYValue.textContent = `${settings.shadowOffsetY}px`;
+        }
+        
+        // Update shadow color
+        const shadowColorInput = document.getElementById('shadow-color-input');
+        const shadowColorValue = document.getElementById('shadow-color-value');
+        if (shadowColorInput && shadowColorValue) {
+            shadowColorInput.value = settings.shadowColor;
+            shadowColorValue.textContent = settings.shadowColor;
+        }
+        
+        // Update image scale
+        const imageScaleSlider = document.getElementById('image-scale-slider');
+        const imageScaleValue = document.getElementById('image-scale-value');
+        if (imageScaleSlider && imageScaleValue) {
+            imageScaleSlider.value = settings.scale;
+            imageScaleValue.textContent = `${Math.round(settings.scale * 100)}%`;
+        }
+        
+        // Update mask enabled toggle
+        const maskEnabledToggle = document.getElementById('mask-enabled-toggle');
+        if (maskEnabledToggle) {
+            maskEnabledToggle.checked = settings.maskEnabled;
+        }
+
+        // Update pan controls
+        const panXSlider = document.getElementById('pan-x-slider');
+        const panYSlider = document.getElementById('pan-y-slider');
+        const panXValue = document.getElementById('pan-x-value');
+        const panYValue = document.getElementById('pan-y-value');
+        
+        if (panXSlider && panXValue) {
+            panXSlider.value = settings.panX || 0;
+            panXValue.textContent = `${Math.round((settings.panX || 0) * 100)}%`;
+        }
+        
+        if (panYSlider && panYValue) {
+            panYSlider.value = settings.panY || 0;
+            panYValue.textContent = `${Math.round((settings.panY || 0) * 100)}%`;
+        }
+        
+        // Update the shadow position handle if it exists
+        if (settings.shadowOffsetX !== undefined && settings.shadowOffsetY !== undefined) {
+            // Convert offset values (-50 to 50) to percentages (0 to 1)
+            const xPercent = (settings.shadowOffsetX + 50) / 100;
+            const yPercent = (settings.shadowOffsetY + 50) / 100;
+            UI.updateShadowHandlePosition(xPercent, yPercent);
+        }
+        
+        console.log('🎨 Applied individual settings for slot', slotIndex, settings);
+    },
+
+    // Update individual image setting
+    updateIndividualImageSetting(property, value) {
+        if (!this.state.imageSettings || this.state.selectedImageIndex < 0 || 
+            this.state.selectedImageIndex >= this.state.imageSettings.length) {
+            return;
+        }
+        
+        this.saveStateForUndo();
+        this.state.imageSettings[this.state.selectedImageIndex][property] = value;
+        this.renderPreview();
+        console.log('🎯 Updated', property, 'for slot', this.state.selectedImageIndex, 'to', value);
+    },
+    
+    // Replace image in specific slot
+    replaceImageInSlot(image, slotIndex) {
+        console.log('🔄 Replacing image in slot:', slotIndex);
+        this.saveStateForUndo();
+        
+        const layout = this.getCurrentLayout();
+        if (slotIndex < 0 || slotIndex >= layout.maxImages) {
+            console.error('Invalid slot index:', slotIndex);
+            return;
+        }
+        
+        // Replace image in the specified slot
+        this.state.images[slotIndex] = image;
+        
+        // If this is the first image, also update selectedImage for compatibility
+        if (slotIndex === 0) {
+            this.state.selectedImage = image;
+        }
+        
+        // Keep the slot selected
+        this.state.selectedImageIndex = slotIndex;
+        
+        // Update UI and render
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        this.renderPreview();
+        this.saveSettings();
+        
+        console.log('✅ Image replaced in slot successfully');
+    },
+    
+    // Move image between slots
+    moveImageSlot(fromIndex, toIndex) {
+        console.log('🔄 Moving image from slot', fromIndex, 'to slot', toIndex);
+        this.saveStateForUndo();
+        
+        const layout = this.getCurrentLayout();
+        if (fromIndex < 0 || fromIndex >= layout.maxImages || toIndex < 0 || toIndex >= layout.maxImages) {
+            console.error('Invalid slot indices:', fromIndex, toIndex);
+            return;
+        }
+        
+        // Swap images
+        const tempImage = this.state.images[fromIndex];
+        this.state.images[fromIndex] = this.state.images[toIndex];
+        this.state.images[toIndex] = tempImage;
+        
+        // Update selectedImage if first slot is involved
+        if (fromIndex === 0 || toIndex === 0) {
+            this.state.selectedImage = this.state.images[0];
+        }
+        
+        // Update selected index if needed
+        if (this.state.selectedImageIndex === fromIndex) {
+            this.state.selectedImageIndex = toIndex;
+        } else if (this.state.selectedImageIndex === toIndex) {
+            this.state.selectedImageIndex = fromIndex;
+        }
+        
+        // Update UI and render
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        this.renderPreview();
+        this.saveSettings();
+        
+        console.log('✅ Image moved successfully');
+    },
+    
+    // Duplicate image to another slot
+    duplicateImageToSlot(fromIndex, toIndex) {
+        console.log('📋 Duplicating image from slot', fromIndex, 'to slot', toIndex);
+        this.saveStateForUndo();
+        
+        const layout = this.getCurrentLayout();
+        if (fromIndex < 0 || fromIndex >= layout.maxImages || toIndex < 0 || toIndex >= layout.maxImages) {
+            console.error('Invalid slot indices:', fromIndex, toIndex);
+            return;
+        }
+        
+        const sourceImage = this.state.images[fromIndex];
+        if (!sourceImage) {
+            console.error('No image in source slot:', fromIndex);
+            return;
+        }
+        
+        // Copy image to target slot
+        this.state.images[toIndex] = sourceImage;
+        
+        // Update selectedImage if first slot is involved
+        if (toIndex === 0) {
+            this.state.selectedImage = sourceImage;
+        }
+        
+        // Select the target slot
+        this.state.selectedImageIndex = toIndex;
+        
+        // Update UI and render
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        this.renderPreview();
+        this.saveSettings();
+        
+        console.log('✅ Image duplicated successfully');
+    },
+    
+    // Get current layout configuration
+    getCurrentLayout() {
+        return Config.multiImageLayouts.find(l => l.id === this.state.currentLayout) || Config.multiImageLayouts[0];
+    },
+
+    // Check if we're in a multi-image layout mode
+    isMultiImageLayout() {
+        return this.state.currentLayout !== 'single' && this.state.imageSettings && this.state.imageSettings.length > 0;
+    },
+    
+    // Initialize multi-image system
+    initializeMultiImageSystem() {
+        // Set up initial layout (single image by default)
+        const defaultLayout = Config.multiImageLayouts[0]; // 'single'
+        this.state.currentLayout = defaultLayout.id;
+        
+        // Initialize images array with empty slots
+        this.state.images = new Array(defaultLayout.maxImages).fill(null);
+        
+        // Initialize individual image settings
+        this.initializeImageSettings();
+        
+        // If there's a selected image, put it in the first slot
+        if (this.state.selectedImage) {
+            this.state.images[0] = this.state.selectedImage;
+        }
+        
+        // Update UI
+        UI.updateLayoutSelection(this.state.currentLayout);
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        
+        // Force recalculation of collapsible section height
+        UI.recalculateCollapsibleSections();
+        
+        console.log('✅ Multi-image system initialized');
+    },
+
+    // Initialize individual image settings for each slot
+    initializeImageSettings() {
+        const layout = Config.multiImageLayouts.find(l => l.id === this.state.currentLayout);
+        if (!layout) return;
+        
+        // Preserve existing settings if they exist
+        const existingSettings = this.state.imageSettings || [];
+        this.state.imageSettings = [];
+        
+        for (let i = 0; i < layout.maxImages; i++) {
+            const existing = existingSettings[i] || {};
+            this.state.imageSettings.push({
+                cornerRadius: existing.cornerRadius ?? 25,
+                padding: existing.padding ?? 20,
+                rotation: existing.rotation ?? 0,
+                flipH: existing.flipH ?? false,
+                flipV: existing.flipV ?? false,
+                shadowOpacity: existing.shadowOpacity ?? 0.15,
+                shadowColor: existing.shadowColor ?? '#000000',
+                shadowRadius: existing.shadowRadius ?? 8,
+                shadowOffsetX: existing.shadowOffsetX ?? 0,
+                shadowOffsetY: existing.shadowOffsetY ?? 4,
+                scale: existing.scale ?? 1.2,
+                maskEnabled: existing.maskEnabled ?? true,
+                panX: existing.panX ?? 0,  // Pan offset X (-1 to 1, where 0 is centered)
+                panY: existing.panY ?? 0   // Pan offset Y (-1 to 1, where 0 is centered)
+            });
+        }
+        
+        console.log('🎨 Individual image settings initialized for', layout.maxImages, 'slots');
+    },
+    
     // Initialize the application
     async init() {
         console.log('Initializing FrameIt App...');
@@ -89,6 +507,9 @@ window.App = {
         if (dropZone) {
             dropZone.style.display = 'none';
         }
+        
+        // Initialize multi-image system
+        this.initializeMultiImageSystem();
         
         // Initialize with background and render initial preview
         this.renderPreview();
@@ -394,10 +815,65 @@ window.App = {
                 // Special case: if uploading multiple images, ALL should get random backgrounds
                 const isMultiUpload = images.length > 1;
                 
-                // Set the first image as the selected image for current canvas
-                this.state.selectedImage = images[0];
+                // Handle multi-image logic
+                if (images.length === 1) {
+                    // Single image - add to first available slot or replace selected
+                    const currentLayout = this.getCurrentLayout();
+                    
+                    // Initialize images array if needed
+                    if (this.state.images.length === 0) {
+                        this.state.images = new Array(currentLayout.maxImages).fill(null);
+                    }
+                    
+                    // Find first empty slot or use selected slot
+                    let targetSlot = this.state.selectedImageIndex;
+                    if (this.state.images[targetSlot] !== null) {
+                        // Current slot is occupied, find first empty slot
+                        const emptySlot = this.state.images.findIndex(img => img === null);
+                        if (emptySlot !== -1) {
+                            targetSlot = emptySlot;
+                        }
+                        // If no empty slot, replace current selection
+                    }
+                    
+                    this.state.images[targetSlot] = images[0];
+                    this.state.selectedImageIndex = targetSlot;
+                    this.state.selectedImage = images[0];
+                    
+                            } else {
+                    // Multiple images - determine best layout and distribute
+                    let bestLayout = this.getCurrentLayout();
+                    
+                    // If current layout can't accommodate all images, find the best one
+                    if (images.length > bestLayout.maxImages) {
+                        const possibleLayouts = Config.multiImageLayouts.filter(layout => 
+                            layout.maxImages >= images.length
+                        );
+                        if (possibleLayouts.length > 0) {
+                            bestLayout = possibleLayouts[0]; // Use first suitable layout
+                            this.state.currentLayout = bestLayout.id;
+                        }
+                    }
+                    
+                    // Initialize or resize images array
+                    this.state.images = new Array(bestLayout.maxImages).fill(null);
+                    
+                    // Add images to slots (up to layout limit)
+                    const imagesToAdd = images.slice(0, bestLayout.maxImages);
+                    imagesToAdd.forEach((image, index) => {
+                        this.state.images[index] = image;
+                    });
+                    
+                    this.state.selectedImageIndex = 0;
+                    this.state.selectedImage = this.state.images[0];
+                    
+                    // Notify about layout change if needed
+                    if (bestLayout.id !== this.getCurrentLayout().id) {
+                        UI.showNotification(`Switched to ${bestLayout.name} layout for ${images.length} images`, 'info', 3000);
+                    }
+                }
                 
-                // Apply canvas size from image
+                // Apply canvas size from first image
                 this.updateCanvasSize();
                 
                 // Apply random background/noise for:
@@ -599,6 +1075,9 @@ window.App = {
         
         // Load canvas data - deep copy to prevent reference issues
         this.state.selectedImage = canvas.image;
+        this.state.images = canvas.images ? [...canvas.images] : (canvas.image ? [canvas.image] : []);
+        this.state.currentLayout = canvas.currentLayout || 'single';
+        this.state.selectedImageIndex = canvas.selectedImageIndex || 0;
         this.state.textLayers = canvas.textLayers ? JSON.parse(JSON.stringify(canvas.textLayers)) : [];
         
         // Apply canvas settings
@@ -661,7 +1140,11 @@ window.App = {
             watermarkPosition: this.state.watermarkPosition,
             watermarkText: this.state.watermarkText,
             watermarkFontSize: this.state.watermarkFontSize,
-            watermarkColor: this.state.watermarkColor
+            watermarkColor: this.state.watermarkColor,
+            // Multi-image layout data
+            currentLayout: this.state.currentLayout,
+            images: this.state.images,
+            selectedImageIndex: this.state.selectedImageIndex
         };
     },
     
@@ -819,6 +1302,21 @@ window.App = {
         this.state.watermarkText = settings.watermarkText || '';
         this.state.watermarkFontSize = settings.watermarkFontSize || 16;
         this.state.watermarkColor = settings.watermarkColor || '#000000';
+        
+        // Apply multi-image layout data
+        if (settings.currentLayout) {
+            this.state.currentLayout = settings.currentLayout;
+        }
+        if (settings.images) {
+            this.state.images = settings.images;
+        }
+        if (settings.selectedImageIndex !== undefined) {
+            this.state.selectedImageIndex = settings.selectedImageIndex;
+        }
+        
+        // Update multi-image UI
+        UI.updateLayoutSelection(this.state.currentLayout);
+        UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
     },
     
     // Add to history without persisting to localStorage
@@ -997,7 +1495,7 @@ window.App = {
         
         // Update UI
         UI.renderTextLayers(this.state.textLayers, this.state.selectedTextLayerId);
-        UI.showTextEditor(textLayer);
+            UI.showTextEditor(textLayer);
         
         // Render preview with the new text layer
         this.renderPreview();
@@ -1337,6 +1835,9 @@ window.App = {
             id: this.state.currentCanvasId,
             date: new Date().toISOString(),
             image: this.state.selectedImage,
+            images: [...this.state.images], // Include multi-image data
+            currentLayout: this.state.currentLayout,
+            selectedImageIndex: this.state.selectedImageIndex,
             settings: this.getCurrentSettings(),
             textLayers: [...this.state.textLayers],
             isCurrentCanvas: true
@@ -1374,6 +1875,9 @@ window.App = {
         
         // Reset to default state
         this.state.selectedImage = null;
+        this.state.images = [null]; // Initialize with single empty slot
+        this.state.currentLayout = 'single';
+        this.state.selectedImageIndex = 0;
         this.state.textLayers = [];
         this.state.selectedTextLayerId = null;
         this.state.currentCanvasId = newCanvasId;
@@ -1925,28 +2429,52 @@ window.App = {
     // Set corner radius
     setCornerRadius(value) {
         this.saveStateForUndo();
+        
+        // Update individual image setting if multi-image layout
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('cornerRadius', Number(value));
+        } else {
+            // Fallback to global setting for single image
         this.state.cornerRadius = Number(value);
-        document.getElementById('corner-radius-value').textContent = `${value}px`;
         this.renderPreview();
         this.saveSettings();
+        }
+        
+        document.getElementById('corner-radius-value').textContent = `${value}px`;
     },
 
     // Set padding
     setPadding(value) {
         this.saveStateForUndo();
+        
+        // Update individual image setting if multi-image layout
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('padding', Number(value));
+        } else {
+            // Fallback to global setting for single image
         this.state.padding = Number(value);
-        document.getElementById('padding-value').textContent = `${value}px`;
         this.renderPreview();
         this.saveSettings();
+        }
+        
+        document.getElementById('padding-value').textContent = `${value}px`;
     },
 
     // Set shadow opacity
     setShadowOpacity(value) {
         this.saveStateForUndo();
+        
+        // Update individual image setting if multi-image layout
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('shadowOpacity', Number(value));
+        } else {
+            // Fallback to global setting for single image
         this.state.shadowOpacity = Number(value);
-        document.getElementById('shadow-opacity-value').textContent = `${Math.round(value * 100)}%`;
         this.renderPreview();
         this.saveSettings();
+        }
+        
+        document.getElementById('shadow-opacity-value').textContent = `${Math.round(value * 100)}%`;
     },
 
     // Set shadow radius
@@ -1995,10 +2523,94 @@ window.App = {
     // Set rotation
     setRotation(value) {
         this.saveStateForUndo();
+        
+        // Update individual image setting if multi-image layout
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('rotation', Number(value));
+        } else {
+            // Fallback to global setting for single image
         this.state.rotation = Number(value);
-        document.getElementById('rotation-value').textContent = `${value}°`;
         this.renderPreview();
         this.saveSettings();
+        }
+        
+        document.getElementById('rotation-value').textContent = `${value}°`;
+    },
+
+    // Set image scale
+    setImageScale(value) {
+        this.saveStateForUndo();
+        
+        // Update individual image setting if multi-image layout
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('scale', Number(value));
+        } else {
+            // For single image, just render without saving to state
+            this.renderPreview();
+        }
+        
+        document.getElementById('image-scale-value').textContent = `${Math.round(value * 100)}%`;
+    },
+
+    // Reset image scale to default
+    resetImageScale() {
+        this.saveStateForUndo();
+        
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('scale', 1.2);
+        }
+        
+        document.getElementById('image-scale-slider').value = 1.2;
+        document.getElementById('image-scale-value').textContent = '120%';
+    },
+
+    // Set mask enabled state
+    setMaskEnabled(enabled) {
+        this.saveStateForUndo();
+        
+        // Update individual image setting if multi-image layout
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('maskEnabled', enabled);
+        } else {
+            // For single image, just render without saving to state
+            this.renderPreview();
+        }
+    },
+
+    // Set horizontal pan offset
+    setPanX(value) {
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('panX', value);
+            
+            // Update UI display
+            document.getElementById('pan-x-value').textContent = `${Math.round(value * 100)}%`;
+        }
+        
+        this.renderPreview();
+    },
+
+    // Set vertical pan offset
+    setPanY(value) {
+        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
+            this.updateIndividualImageSetting('panY', value);
+            
+            // Update UI display
+            document.getElementById('pan-y-value').textContent = `${Math.round(value * 100)}%`;
+        }
+        
+        this.renderPreview();
+    },
+
+    // Reset horizontal pan to center
+    resetPanX() {
+        this.setPanX(0);
+        document.getElementById('pan-x-slider').value = 0;
+    },
+
+    // Reset vertical pan to center
+    resetPanY() {
+        this.setPanY(0);
+        document.getElementById('pan-y-slider').value = 0;
     },
 
     // Reset shadow offset Y to default
@@ -2035,39 +2647,43 @@ window.App = {
         // Use requestAnimationFrame for smooth rendering
         requestAnimationFrame(() => {
             try {
-                // Get the selected image if any
-                const image = this.state.selectedImage;
-                
-                // Get background gradient if selected
-                let backgroundGradient = null;
-                if (this.state.backgroundGradientId) {
-                    const allGradients = Config.getAllGradients();
-                    backgroundGradient = allGradients.find(g => g.id === this.state.backgroundGradientId);
-                }
-                
-                // Get noise overlay if selected
-                let noiseOverlay = null;
-                if (this.state.noiseOverlayId) {
-                    noiseOverlay = Config.noiseOverlayTypes.find(n => n.id === this.state.noiseOverlayId);
-                }
-                
-                // Call the canvas renderer
-                CanvasRenderer.renderMockup({
-                    image: image,
-                    backgroundColor: this.state.backgroundColor,
-                    backgroundGradient: backgroundGradient,
-                    backgroundImage: this.state.backgroundImage, 
-                    backgroundBlurRadius: this.state.backgroundBlurRadius,
-                    backgroundTwirlAmount: this.state.backgroundTwirlAmount,
-                    backgroundSaturation: this.state.backgroundSaturation,
-                    backgroundHueRotation: this.state.backgroundHueRotation,
-                    backgroundContrast: this.state.backgroundContrast,
-                    backgroundBrightness: this.state.backgroundBrightness,
-                    backgroundWaveAmount: this.state.backgroundWaveAmount,
-                    backgroundRippleAmount: this.state.backgroundRippleAmount,
-                    backgroundZoomAmount: this.state.backgroundZoomAmount,
-                    backgroundShakeAmount: this.state.backgroundShakeAmount,
-                    backgroundLensAmount: this.state.backgroundLensAmount,
+        // Get the selected image if any
+        const image = this.state.selectedImage;
+        
+        // Get background gradient if selected
+        let backgroundGradient = null;
+        if (this.state.backgroundGradientId) {
+            const allGradients = Config.getAllGradients();
+            backgroundGradient = allGradients.find(g => g.id === this.state.backgroundGradientId);
+        }
+        
+        // Get noise overlay if selected
+        let noiseOverlay = null;
+        if (this.state.noiseOverlayId) {
+            noiseOverlay = Config.noiseOverlayTypes.find(n => n.id === this.state.noiseOverlayId);
+        }
+        
+        // Call the canvas renderer
+        CanvasRenderer.renderMockup({
+            image: image,
+                    images: this.state.images,
+                    imageSettings: this.state.imageSettings,
+                    currentLayout: this.state.currentLayout,
+                    selectedImageIndex: this.state.selectedImageIndex,
+            backgroundColor: this.state.backgroundColor,
+            backgroundGradient: backgroundGradient,
+            backgroundImage: this.state.backgroundImage,
+            backgroundBlurRadius: this.state.backgroundBlurRadius,
+            backgroundTwirlAmount: this.state.backgroundTwirlAmount,
+            backgroundSaturation: this.state.backgroundSaturation,
+            backgroundHueRotation: this.state.backgroundHueRotation,
+            backgroundContrast: this.state.backgroundContrast,
+            backgroundBrightness: this.state.backgroundBrightness,
+            backgroundWaveAmount: this.state.backgroundWaveAmount,
+            backgroundRippleAmount: this.state.backgroundRippleAmount,
+            backgroundZoomAmount: this.state.backgroundZoomAmount,
+            backgroundShakeAmount: this.state.backgroundShakeAmount,
+            backgroundLensAmount: this.state.backgroundLensAmount,
                     noiseOverlay: noiseOverlay ? {
                         ...noiseOverlay,
                         intensity: this.state.noiseOverlayIntensity,
@@ -2076,19 +2692,19 @@ window.App = {
                         scale: this.state.noiseScale,
                         invert: this.state.noiseInvert
                     } : null,
-                    cornerRadius: this.state.cornerRadius,
-                    padding: this.state.padding,
-                    shadowOpacity: this.state.shadowOpacity,
-                    shadowRadius: this.state.shadowRadius,
-                    shadowOffsetX: this.state.shadowOffsetX,
-                    shadowOffsetY: this.state.shadowOffsetY,
-                    shadowColor: this.state.shadowColor,
-                    rotation: this.state.rotation,
-                    isFlippedHorizontally: this.state.isFlippedHorizontally,
-                    isFlippedVertically: this.state.isFlippedVertically,
-                    watermarkImage: this.state.watermarkImage,
-                    watermarkOpacity: this.state.watermarkOpacity,
-                    watermarkScale: this.state.watermarkScale,
+            cornerRadius: this.state.cornerRadius,
+            padding: this.state.padding,
+            shadowOpacity: this.state.shadowOpacity,
+            shadowRadius: this.state.shadowRadius,
+            shadowOffsetX: this.state.shadowOffsetX,
+            shadowOffsetY: this.state.shadowOffsetY,
+            shadowColor: this.state.shadowColor,
+            rotation: this.state.rotation,
+            isFlippedHorizontally: this.state.isFlippedHorizontally,
+            isFlippedVertically: this.state.isFlippedVertically,
+            watermarkImage: this.state.watermarkImage,
+            watermarkOpacity: this.state.watermarkOpacity,
+            watermarkScale: this.state.watermarkScale,
                     watermarkPosition: this.state.watermarkPosition,
                     watermarkType: 'text',
                     watermarkText: this.state.watermarkText,

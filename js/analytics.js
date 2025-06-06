@@ -336,13 +336,13 @@ window.Analytics = {
                     console.warn('⚠️ Upload count function not available, using manual update');
                     return await this.manualUpdateUploadCount();
                 } else {
-                    console.error('📊 Upload tracking error details:', {
-                        message: error.message,
-                        details: error.details,
-                        hint: error.hint,
-                        code: error.code
-                    });
-                    throw error;
+                console.error('📊 Upload tracking error details:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
+                throw error;
                 }
             }
 
@@ -406,8 +406,8 @@ window.Analytics = {
                     console.warn('⚠️ Canvas count function not available, using manual update');
                     return await this.manualUpdateCanvasCount();
                 } else {
-                    console.error('📊 Canvas tracking error:', error);
-                    throw error;
+                console.error('📊 Canvas tracking error:', error);
+                throw error;
                 }
             }
 
@@ -595,8 +595,8 @@ window.Analytics = {
                     console.warn('⚠️ Export count function not available, using manual update');
                     return await this.manualUpdateExportCount();
                 } else {
-                    console.error('📊 Export tracking error:', error);
-                    throw error;
+                console.error('📊 Export tracking error:', error);
+                throw error;
                 }
             }
 

@@ -1113,7 +1113,7 @@ window.Auth = {
                     });
                 } else {
                     // Regular flow for subsequent opens
-                    this.loadGlobalAnalytics();
+                this.loadGlobalAnalytics();
                 }
             } else {
                 console.log('📊 Non-dev user');
@@ -1283,7 +1283,7 @@ window.Auth = {
         const inputs = document.querySelectorAll('#user-settings-modal input');
         inputs.forEach(input => {
             // Don't clear the email display element (it's a span, not input anyway)
-            input.value = '';
+                input.value = '';
         });
         
         // Clear error/success messages

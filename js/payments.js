@@ -204,7 +204,7 @@ const PaymentManager = {
             exportBtn.classList.add('primary-btn');
             exportBtn.onclick = () => this.showUpgradePrompt();
         } else {
-            exportBtn.innerHTML = '<i class="fas fa-download"></i> Export Mockup';
+            exportBtn.innerHTML = '<i class="fas fa-download"></i> Export';
             exportBtn.classList.remove('primary-btn');
             exportBtn.onclick = null; // Reset to original handler
         }

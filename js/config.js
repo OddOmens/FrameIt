@@ -153,6 +153,95 @@ window.Config = {
         '#B31966'                                    // Deep Pink
     ],
     
+    // Multi-image layout templates
+    multiImageLayouts: [
+        {
+            id: 'single',
+            name: 'Single Image',
+            maxImages: 1,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="%23ddd" stroke="%23999" stroke-width="2" rx="8"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 1, height: 1 }
+            ]
+        },
+        {
+            id: 'side-by-side',
+            name: 'Side by Side',
+            maxImages: 2,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="5" y="15" width="40" height="70" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="55" y="15" width="40" height="70" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 0.48, height: 1 },
+                { x: 0.52, y: 0, width: 0.48, height: 1 }
+            ]
+        },
+        {
+            id: 'top-bottom',
+            name: 'Top & Bottom',
+            maxImages: 2,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="5" width="70" height="40" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="15" y="55" width="70" height="40" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 1, height: 0.48 },
+                { x: 0, y: 0.52, width: 1, height: 0.48 }
+            ]
+        },
+        {
+            id: 'main-with-sidebar',
+            name: 'Main + Sidebar',
+            maxImages: 2,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="5" y="10" width="60" height="80" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="72" y="10" width="23" height="80" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 0.68, height: 1 },
+                { x: 0.72, y: 0, width: 0.28, height: 1 }
+            ]
+        },
+        {
+            id: 'three-column',
+            name: 'Three Columns',
+            maxImages: 3,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="2" y="15" width="28" height="70" fill="%23ddd" stroke="%23999" stroke-width="1.5" rx="3"/><rect x="36" y="15" width="28" height="70" fill="%23ddd" stroke="%23999" stroke-width="1.5" rx="3"/><rect x="70" y="15" width="28" height="70" fill="%23ddd" stroke="%23999" stroke-width="1.5" rx="3"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 0.32, height: 1 },
+                { x: 0.34, y: 0, width: 0.32, height: 1 },
+                { x: 0.68, y: 0, width: 0.32, height: 1 }
+            ]
+        },
+        {
+            id: 'grid-2x2',
+            name: '2×2 Grid',
+            maxImages: 4,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="5" y="5" width="40" height="40" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="55" y="5" width="40" height="40" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="5" y="55" width="40" height="40" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="55" y="55" width="40" height="40" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 0.48, height: 0.48 },
+                { x: 0.52, y: 0, width: 0.48, height: 0.48 },
+                { x: 0, y: 0.52, width: 0.48, height: 0.48 },
+                { x: 0.52, y: 0.52, width: 0.48, height: 0.48 }
+            ]
+        },
+        {
+            id: 'hero-with-thumbs',
+            name: 'Hero + Thumbnails',
+            maxImages: 4,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="60" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="5" y="72" width="27" height="23" fill="%23ddd" stroke="%23999" stroke-width="1.5" rx="2"/><rect x="37" y="72" width="27" height="23" fill="%23ddd" stroke="%23999" stroke-width="1.5" rx="2"/><rect x="69" y="72" width="27" height="23" fill="%23ddd" stroke="%23999" stroke-width="1.5" rx="2"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 1, height: 0.65 },
+                { x: 0, y: 0.72, width: 0.32, height: 0.28 },
+                { x: 0.34, y: 0.72, width: 0.32, height: 0.28 },
+                { x: 0.68, y: 0.72, width: 0.32, height: 0.28 }
+            ]
+        },
+        {
+            id: 'l-shape',
+            name: 'L-Shape',
+            maxImages: 3,
+            thumbnail: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="5" y="5" width="60" height="60" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="72" y="5" width="23" height="28" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/><rect x="72" y="40" width="23" height="25" fill="%23ddd" stroke="%23999" stroke-width="2" rx="4"/></svg>',
+            positions: [
+                { x: 0, y: 0, width: 0.68, height: 0.68 },
+                { x: 0.72, y: 0, width: 0.28, height: 0.32 },
+                { x: 0.72, y: 0.36, width: 0.28, height: 0.32 }
+            ]
+        }
+    ],
+
     // Gradient presets - organized as separate sections
     lightToDarkGradients: [
         // Light Gradients First
