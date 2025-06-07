@@ -198,6 +198,84 @@ window.Auth = {
             gateLoginBtn.addEventListener('click', () => this.showAuthModal('login'));
         }
         
+        // New landing page navigation buttons
+        const heroSignupBtn = document.getElementById('hero-signup-btn');
+        const heroLoginBtn = document.getElementById('hero-login-btn');
+        const footerSignupBtn = document.getElementById('footer-signup-btn');
+        const footerLoginBtn = document.getElementById('footer-login-btn');
+        
+        if (heroSignupBtn) {
+            heroSignupBtn.addEventListener('click', () => this.showLandingSignupModal());
+        }
+        if (heroLoginBtn) {
+            heroLoginBtn.addEventListener('click', () => this.showLandingLoginModal());
+        }
+        if (footerSignupBtn) {
+            footerSignupBtn.addEventListener('click', () => this.showLandingSignupModal());
+        }
+        if (footerLoginBtn) {
+            footerLoginBtn.addEventListener('click', () => this.showLandingLoginModal());
+        }
+        
+        // Landing auth modal close button
+        const landingAuthCloseBtn = document.getElementById('landing-auth-close-btn');
+        const landingAuthModal = document.getElementById('landing-auth-modal');
+        
+        if (landingAuthCloseBtn) {
+            landingAuthCloseBtn.addEventListener('click', () => this.closeLandingAuthModal());
+        }
+        
+        // Close modal when clicking outside of it
+        if (landingAuthModal) {
+            landingAuthModal.addEventListener('click', (e) => {
+                if (e.target === landingAuthModal) {
+                    this.closeLandingAuthModal();
+                }
+            });
+        }
+        
+        // Landing auth modal form switching
+        const showLandingSignupFromLogin = document.getElementById('show-landing-signup');
+        const showLandingLoginFromSignup = document.getElementById('show-landing-login');
+        
+        if (showLandingSignupFromLogin) {
+            showLandingSignupFromLogin.addEventListener('click', () => {
+                const loginForm = document.getElementById('landing-login-form');
+                const signupForm = document.getElementById('landing-signup-form');
+                if (loginForm && signupForm) {
+                    loginForm.classList.add('hidden');
+                    signupForm.classList.remove('hidden');
+                    this.clearLandingSignupForm();
+                }
+            });
+        }
+        if (showLandingLoginFromSignup) {
+            showLandingLoginFromSignup.addEventListener('click', () => {
+                const loginForm = document.getElementById('landing-login-form');
+                const signupForm = document.getElementById('landing-signup-form');
+                if (loginForm && signupForm) {
+                    loginForm.classList.remove('hidden');
+                    signupForm.classList.add('hidden');
+                    this.clearLandingLoginForm();
+                }
+            });
+        }
+        
+        // Landing auth modal form submissions
+        const landingLoginSubmit = document.getElementById('landing-login-submit');
+        const landingSignupSubmit = document.getElementById('landing-signup-submit');
+        const landingForgotBtn = document.getElementById('landing-forgot-password-btn');
+        
+        if (landingLoginSubmit) {
+            landingLoginSubmit.closest('form').addEventListener('submit', (e) => this.handleLandingLogin(e));
+        }
+        if (landingSignupSubmit) {
+            landingSignupSubmit.closest('form').addEventListener('submit', (e) => this.handleLandingSignup(e));
+        }
+        if (landingForgotBtn) {
+            landingForgotBtn.addEventListener('click', () => this.handleLandingForgotPassword());
+        }
+        
         // Account button - shows login modal when not logged in, user settings when logged in
         if (accountBtn) {
             console.log('✅ Setting up account button listener');
@@ -389,6 +467,47 @@ window.Auth = {
             });
         }
         
+        // Footer navigation links
+        const privacyLink = document.getElementById('privacy-link');
+        const termsLink = document.getElementById('terms-link');
+        const privacyBackBtn = document.getElementById('privacy-back-btn');
+        const termsBackBtn = document.getElementById('terms-back-btn');
+        const termsPrivacyLink = document.getElementById('terms-privacy-link');
+        
+        if (privacyLink) {
+            privacyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showPrivacyPage();
+            });
+        }
+        
+        if (termsLink) {
+            termsLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showTermsPage();
+            });
+        }
+        
+        if (privacyBackBtn) {
+            privacyBackBtn.addEventListener('click', () => {
+                this.hidePrivacyPage();
+            });
+        }
+        
+        if (termsBackBtn) {
+            termsBackBtn.addEventListener('click', () => {
+                this.hideTermsPage();
+            });
+        }
+        
+        if (termsPrivacyLink) {
+            termsPrivacyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.hideTermsPage();
+                this.showPrivacyPage();
+            });
+        }
+        
         console.log('✅ Authentication event listeners setup complete');
     },
     
@@ -476,16 +595,35 @@ window.Auth = {
     
     // Show the authentication gate
     showAuthGate() {
-        const authGate = document.getElementById('auth-gate');
+        this.showMainLanding();
+    },
+    
+    // Show main landing page
+    showMainLanding() {
+        console.log('🔍 showMainLanding called');
+        const mainLanding = document.getElementById('main-landing');
         const appContainer = document.querySelector('.app-container');
         const accountBtn = document.getElementById('account-btn');
         const logoutBtn = document.getElementById('logout-btn');
         
-        if (authGate) {
-            authGate.style.display = 'flex';
+        console.log('🔍 Elements found:', { 
+            mainLanding: !!mainLanding, 
+            appContainer: !!appContainer 
+        });
+        
+        if (mainLanding) {
+            console.log('✅ Showing main landing');
+            mainLanding.classList.remove('hidden');
+            mainLanding.style.display = 'block';
+        } else {
+            console.error('❌ Main landing element not found!');
         }
+        
         if (appContainer) {
+            console.log('✅ Hiding main app');
             appContainer.style.display = 'none';
+        } else {
+            console.error('❌ Main app element not found!');
         }
         
         // Reset account button to show "Account" when logged out
@@ -500,11 +638,59 @@ window.Auth = {
         if (logoutBtn) {
             logoutBtn.style.display = 'none';
         }
+        
+        // Close any open modal
+        this.closeLandingAuthModal();
+    },
+    
+    // Show landing auth modal with login form
+    showLandingLoginModal() {
+        console.log('🔍 showLandingLoginModal called');
+        const modal = document.getElementById('landing-auth-modal');
+        const loginForm = document.getElementById('landing-login-form');
+        const signupForm = document.getElementById('landing-signup-form');
+        
+        if (modal && loginForm && signupForm) {
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
+            modal.classList.add('visible');
+            this.clearLandingLoginForm();
+        } else {
+            console.error('❌ Landing auth modal elements not found!');
+        }
+    },
+
+    // Show landing auth modal with signup form
+    showLandingSignupModal() {
+        console.log('🔍 showLandingSignupModal called');
+        const modal = document.getElementById('landing-auth-modal');
+        const loginForm = document.getElementById('landing-login-form');
+        const signupForm = document.getElementById('landing-signup-form');
+        
+        if (modal && loginForm && signupForm) {
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            modal.classList.add('visible');
+            this.clearLandingSignupForm();
+        } else {
+            console.error('❌ Landing auth modal elements not found!');
+        }
+    },
+
+    // Close landing auth modal
+    closeLandingAuthModal() {
+        console.log('🔍 closeLandingAuthModal called');
+        const modal = document.getElementById('landing-auth-modal');
+        if (modal) {
+            modal.classList.remove('visible');
+            this.clearLandingLoginForm();
+            this.clearLandingSignupForm();
+        }
     },
     
     // Show the main application
     showMainApp() {
-        const authGate = document.getElementById('auth-gate');
+        const mainLanding = document.getElementById('main-landing');
         const appContainer = document.querySelector('.app-container');
         const authButtons = document.getElementById('auth-buttons');
         const userMenu = document.getElementById('user-menu');
@@ -512,9 +698,12 @@ window.Auth = {
         const accountBtn = document.getElementById('account-btn');
         const logoutBtn = document.getElementById('logout-btn');
         
-        if (authGate) {
-            authGate.style.display = 'none';
+        // Hide landing page
+        if (mainLanding) {
+            mainLanding.classList.add('hidden');
+            mainLanding.style.display = 'none';
         }
+        
         if (appContainer) {
             appContainer.style.display = 'flex';
         }
@@ -536,6 +725,7 @@ window.Auth = {
         }
         
         this.hideAuthModal();
+        this.closeLandingAuthModal();
     },
     
     // Show authentication modal
@@ -1679,6 +1869,202 @@ window.Auth = {
         if (landingSignupSuccess) landingSignupSuccess.classList.add('hidden');
     },
     
+    // Clear login page form
+    clearLoginPageForm() {
+        const loginPageEmail = document.getElementById('login-page-email');
+        const loginPagePassword = document.getElementById('login-page-password');
+        const loginPageError = document.getElementById('login-page-error');
+        
+        if (loginPageEmail) loginPageEmail.value = '';
+        if (loginPagePassword) loginPagePassword.value = '';
+        if (loginPageError) loginPageError.classList.add('hidden');
+    },
+    
+    // Clear signup page form
+    clearSignupPageForm() {
+        const signupPageEmail = document.getElementById('signup-page-email');
+        const signupPagePassword = document.getElementById('signup-page-password');
+        const signupPageConfirmPassword = document.getElementById('signup-page-confirm-password');
+        const signupPageError = document.getElementById('signup-page-error');
+        const signupPageSuccess = document.getElementById('signup-page-success');
+        
+        if (signupPageEmail) signupPageEmail.value = '';
+        if (signupPagePassword) signupPagePassword.value = '';
+        if (signupPageConfirmPassword) signupPageConfirmPassword.value = '';
+        if (signupPageError) signupPageError.classList.add('hidden');
+        if (signupPageSuccess) signupPageSuccess.classList.add('hidden');
+    },
+
+    // Clear landing login form
+    clearLandingLoginForm() {
+        const landingLoginEmail = document.getElementById('landing-login-email');
+        const landingLoginPassword = document.getElementById('landing-login-password');
+        const landingLoginError = document.getElementById('landing-login-error');
+        
+        if (landingLoginEmail) landingLoginEmail.value = '';
+        if (landingLoginPassword) landingLoginPassword.value = '';
+        if (landingLoginError) landingLoginError.classList.add('hidden');
+    },
+
+    // Clear landing signup form
+    clearLandingSignupForm() {
+        const landingSignupEmail = document.getElementById('landing-signup-email');
+        const landingSignupPassword = document.getElementById('landing-signup-password');
+        const landingSignupConfirmPassword = document.getElementById('landing-signup-confirm-password');
+        const landingSignupError = document.getElementById('landing-signup-error');
+        const landingSignupSuccess = document.getElementById('landing-signup-success');
+        
+        if (landingSignupEmail) landingSignupEmail.value = '';
+        if (landingSignupPassword) landingSignupPassword.value = '';
+        if (landingSignupConfirmPassword) landingSignupConfirmPassword.value = '';
+        if (landingSignupError) landingSignupError.classList.add('hidden');
+        if (landingSignupSuccess) landingSignupSuccess.classList.add('hidden');
+    },
+    
+    // Handle login page form submission
+    async handleLoginPageSubmit(e) {
+        e.preventDefault();
+        console.log('🔐 Login page form submitted');
+        
+        const email = document.getElementById('login-page-email').value;
+        const password = document.getElementById('login-page-password').value;
+        const submitBtn = document.getElementById('login-page-submit');
+        
+        console.log('🔍 Login attempt with:', { email, password: password ? '***' : 'empty', submitBtn: !!submitBtn });
+        
+        if (!email || !password) {
+            console.log('❌ Missing email or password');
+            this.showError('login-page-error', 'Please fill in all fields');
+            return;
+        }
+        
+        if (!this.supabase) {
+            console.log('❌ Supabase not initialized');
+            this.showError('login-page-error', 'Authentication service not available');
+            return;
+        }
+
+        this.setLoading(submitBtn, true);
+        this.hideError('login-page-error');
+        console.log('🔄 Starting authentication request...');
+
+        try {
+            console.log('🔐 Attempting login with:', email);
+            
+            const { data, error } = await this.supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            console.log('📡 Supabase response:', { data: !!data, error: error?.message || 'none' });
+            
+            if (error) {
+                throw error;
+            }
+            
+            console.log('✅ Login successful');
+            this.currentUser = data.user;
+            
+            // Clear form
+            this.clearLoginPageForm();
+            
+        } catch (error) {
+            console.error('❌ Login error:', error);
+            let errorMessage = 'Login failed. Please try again.';
+            
+            if (error.message.includes('Invalid login credentials')) {
+                errorMessage = 'Invalid email or password. Please check your credentials.';
+            } else if (error.message.includes('Email not confirmed')) {
+                errorMessage = 'Please check your email and click the confirmation link before logging in.';
+            } else if (error.message.includes('Too many requests')) {
+                errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+            }
+            
+            this.showError('login-page-error', errorMessage);
+        } finally {
+            console.log('🔄 Setting loading to false');
+            this.setLoading(submitBtn, false);
+        }
+    },
+    
+    // Handle signup page form submission
+    async handleSignupPageSubmit(e) {
+        e.preventDefault();
+        console.log('📝 Signup page form submitted');
+        
+        const email = document.getElementById('signup-page-email').value;
+        const password = document.getElementById('signup-page-password').value;
+        const confirmPassword = document.getElementById('signup-page-confirm-password').value;
+        const submitBtn = document.getElementById('signup-page-submit');
+        
+        // Validate passwords match
+        if (password !== confirmPassword) {
+            this.showError('signup-page-error', 'Passwords do not match.');
+            return;
+        }
+        
+        // Validate password length
+        if (password.length < 6) {
+            this.showError('signup-page-error', 'Password must be at least 6 characters long.');
+            return;
+        }
+        
+        if (!this.supabase) {
+            this.showError('signup-page-error', 'Authentication service not available');
+            return;
+        }
+        
+        this.setLoading(submitBtn, true);
+        this.hideError('signup-page-error');
+        const successElement = document.getElementById('signup-page-success');
+        if (successElement) successElement.classList.add('hidden');
+        
+        try {
+            console.log('📝 Attempting signup with:', email);
+            
+            const { data, error } = await this.supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    emailRedirectTo: window.location.origin
+                }
+            });
+            
+            console.log('📡 Signup response:', { data: !!data, error: error?.message || 'none' });
+            
+            if (error) {
+                throw error;
+            }
+            
+            // Show success message
+            if (successElement) {
+                successElement.classList.remove('hidden');
+                successElement.textContent = 'Account created successfully! Please check your email to verify your account.';
+            }
+            
+            console.log('✅ Signup successful! Check email for confirmation.');
+            
+            // Clear form
+            this.clearSignupPageForm();
+            
+        } catch (error) {
+            console.error('❌ Signup error:', error);
+            let errorMessage = 'Signup failed. Please try again.';
+            
+            if (error.message.includes('User already registered')) {
+                errorMessage = 'An account with this email already exists. Please login instead.';
+            } else if (error.message.includes('Invalid email')) {
+                errorMessage = 'Please enter a valid email address.';
+            } else if (error.message.includes('Password')) {
+                errorMessage = 'Password must be at least 6 characters long.';
+            }
+            
+            this.showError('signup-page-error', errorMessage);
+        } finally {
+            this.setLoading(submitBtn, false);
+        }
+    },
+    
     // Handle landing page login
     async handleLandingLogin(e) {
         e.preventDefault();
@@ -2526,5 +2912,42 @@ window.Auth = {
         } catch (error) {
             console.warn('Error updating global canvas count:', error);
         }
+    },
+
+    // Navigation functions for footer links
+    showPrivacyPage() {
+        console.log('📜 Showing Privacy Policy page');
+        document.getElementById('main-landing').style.display = 'none';
+        document.getElementById('privacy-page').classList.remove('hidden');
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+    },
+
+    showTermsPage() {
+        console.log('📜 Showing Terms of Service page');
+        document.getElementById('main-landing').style.display = 'none';
+        document.getElementById('terms-page').classList.remove('hidden');
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+    },
+
+    hidePrivacyPage() {
+        console.log('📜 Hiding Privacy Policy page');
+        document.getElementById('privacy-page').classList.add('hidden');
+        document.getElementById('main-landing').style.display = 'block';
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+    },
+
+    hideTermsPage() {
+        console.log('📜 Hiding Terms of Service page');
+        document.getElementById('terms-page').classList.add('hidden');
+        document.getElementById('main-landing').style.display = 'block';
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
     },
 }; 
