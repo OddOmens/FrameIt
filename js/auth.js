@@ -3,7 +3,7 @@
  * Handles user registration, login, logout, and session management using Supabase
  */
 
-console.log('🔍 Auth.js file loaded successfully');
+console.log('🔍 Auth.js file loaded successfully - FIXED VERSION: ' + new Date().toISOString());
 
 window.Auth = {
     supabase: null,
@@ -11,11 +11,33 @@ window.Auth = {
     currentSession: null,
     testMode: false, // Set to true to bypass auth for testing
     hasRunSyncCheck: false, // Flag to prevent repeated sync checks
+    isRedirecting: false, // Flag to prevent infinite redirects
+    isLoggingIn: false, // Flag to prevent multiple login attempts
     
     // Initialize authentication
     async init() {
-        // Check for test mode (remove this in production)
+        console.log('🚀 Auth.init() method called');
+        
+        // Check for URL-based login (for testing)
         const urlParams = new URLSearchParams(window.location.search);
+        const urlEmail = urlParams.get('email');
+        const urlPassword = urlParams.get('password');
+        
+        if (urlEmail && urlPassword) {
+            console.log('🔗 URL-based login detected for:', urlEmail);
+            console.log('🔗 Decoded email:', decodeURIComponent(urlEmail));
+            console.log('🔗 Password provided:', !!urlPassword);
+            console.log('🔗 Current URL:', window.location.href);
+            
+            // Store URL credentials for processing after Supabase init
+            this.urlLogin = {
+                email: decodeURIComponent(urlEmail),
+                password: urlPassword
+            };
+            console.log('🔗 Stored URL login credentials for processing after Supabase init');
+        }
+        
+        // Check for test mode (remove this in production)
         if (urlParams.get('test') === 'true' || urlParams.get('demo') === 'true' || this.testMode) {
             console.log('🧪 Running in test mode - bypassing authentication');
             this.currentUser = { email: 'test@frameit.com', id: 'test-user' };
@@ -72,6 +94,13 @@ window.Auth = {
             } else {
                 console.log('No active session, showing auth gate');
                 this.showAuthGate();
+                
+                // Process URL login if credentials were provided
+                if (this.urlLogin) {
+                    console.log('🔗 Processing stored URL login credentials...');
+                    this.performUrlLogin(this.urlLogin.email, this.urlLogin.password);
+                    this.urlLogin = null; // Clear after use
+                }
             }
             
             this.setupEventListeners();
@@ -85,6 +114,66 @@ window.Auth = {
         // console.log('Auth initialized - Please configure Supabase credentials');
         // this.setupEventListeners();
         // this.checkAuthState();
+    },
+    
+    // Handle URL-based login for testing
+    async performUrlLogin(email, password) {
+        try {
+            console.log('🔗 Attempting URL-based login for:', email);
+            console.log('🔗 Supabase initialized:', !!this.supabase);
+            
+            if (!this.supabase) {
+                console.error('❌ Supabase not initialized for URL login');
+                alert('Authentication system not ready. Please try again in a moment.');
+                return;
+            }
+            
+            // Show loading feedback
+            const authLoadingOverlay = document.getElementById('auth-loading-overlay');
+            if (authLoadingOverlay) {
+                const loadingContent = authLoadingOverlay.querySelector('.auth-loading-content p');
+                if (loadingContent) {
+                    loadingContent.textContent = 'Logging in...';
+                }
+            }
+            
+            console.log('🚀 Starting URL login with Supabase...');
+            const { data, error } = await this.supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+            
+            if (error) {
+                console.error('❌ URL login error:', error);
+                
+                // Hide loading overlay
+                if (authLoadingOverlay) {
+                    authLoadingOverlay.classList.add('hidden');
+                }
+                
+                // Show user-friendly error
+                this.showNotification('Login failed: ' + error.message, 'error');
+                return;
+            }
+            
+            console.log('✅ URL login successful for:', data.user?.email);
+            
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Success will be handled by the auth state change listener
+            
+        } catch (error) {
+            console.error('❌ URL login failed:', error);
+            
+            // Hide loading overlay
+            const authLoadingOverlay = document.getElementById('auth-loading-overlay');
+            if (authLoadingOverlay) {
+                authLoadingOverlay.classList.add('hidden');
+            }
+            
+            this.showNotification('Login failed: ' + error.message, 'error');
+        }
     },
     
     // Handle auth callback (email confirmations, etc.)
@@ -149,24 +238,56 @@ window.Auth = {
     setupEventListeners() {
         console.log('Setting up authentication event listeners...');
         
-        // Debug: Check if buttons exist
-        const loginBtn = document.getElementById('login-btn');
-        const signupBtn = document.getElementById('signup-btn');
-        const accountBtn = document.getElementById('account-btn');
-        const showLandingSignup = document.getElementById('show-landing-signup');
-        const showLandingLogin = document.getElementById('show-landing-login');
-        const landingLoginForm = document.getElementById('landing-login-form-element');
-        const landingSignupForm = document.getElementById('landing-signup-form-element');
+        // New modal structure elements
+        const loginFormElement = document.getElementById('signin-form-element');
+        const signupFormElement = document.getElementById('signup-form-element');
+        const forgotPasswordBtn = document.getElementById('forgot-password');
         
-        console.log('🔍 Button availability check:', {
-            loginBtn: !!loginBtn,
-            signupBtn: !!signupBtn,
-            accountBtn: !!accountBtn,
-            showLandingSignup: !!showLandingSignup,
-            showLandingLogin: !!showLandingLogin,
-            landingLoginForm: !!landingLoginForm,
-            landingSignupForm: !!landingSignupForm
+        console.log('🔍 Form availability check:', {
+            loginFormElement: !!loginFormElement,
+            signupFormElement: !!signupFormElement,
+            forgotPasswordBtn: !!forgotPasswordBtn
         });
+        
+        // Debug: Check if the modal exists
+        const authModalEl = document.getElementById('auth-modal');
+        const signinFormEl = document.getElementById('signin-form');
+        const signupFormEl = document.getElementById('signup-form');
+        
+        console.log('🔍 Modal structure check:', {
+            authModal: !!authModalEl,
+            signinForm: !!signinFormEl,
+            signupForm: !!signupFormEl
+        });
+        
+        // Form submissions
+        if (loginFormElement) {
+            loginFormElement.addEventListener('submit', (e) => this.handleLogin(e));
+            console.log('✅ Signin form event listener attached');
+        } else {
+            console.warn('⚠️ Signin form element not found, will retry later');
+        }
+        if (signupFormElement) {
+            signupFormElement.addEventListener('submit', (e) => this.handleSignup(e));
+            console.log('✅ Signup form event listener attached');
+        }
+        if (forgotPasswordBtn) {
+            forgotPasswordBtn.addEventListener('click', () => this.handleForgotPassword());
+        }
+        
+        // Retry mechanism for missing form elements
+        if (!loginFormElement) {
+            console.log('🔄 Setting up retry for signin form...');
+            setTimeout(() => {
+                const retryLoginForm = document.getElementById('signin-form-element');
+                if (retryLoginForm) {
+                    retryLoginForm.addEventListener('submit', (e) => this.handleLogin(e));
+                    console.log('✅ Signin form event listener attached (retry)');
+                } else {
+                    console.warn('⚠️ Signin form still not found after retry');
+                }
+            }, 1000);
+        }
         
         // Modal close buttons
         const authCloseBtn = document.getElementById('auth-close-btn');
@@ -198,85 +319,8 @@ window.Auth = {
             gateLoginBtn.addEventListener('click', () => this.showAuthModal('login'));
         }
         
-        // New landing page navigation buttons
-        const heroSignupBtn = document.getElementById('hero-signup-btn');
-        const heroLoginBtn = document.getElementById('hero-login-btn');
-        const footerSignupBtn = document.getElementById('footer-signup-btn');
-        const footerLoginBtn = document.getElementById('footer-login-btn');
-        
-        if (heroSignupBtn) {
-            heroSignupBtn.addEventListener('click', () => this.showLandingSignupModal());
-        }
-        if (heroLoginBtn) {
-            heroLoginBtn.addEventListener('click', () => this.showLandingLoginModal());
-        }
-        if (footerSignupBtn) {
-            footerSignupBtn.addEventListener('click', () => this.showLandingSignupModal());
-        }
-        if (footerLoginBtn) {
-            footerLoginBtn.addEventListener('click', () => this.showLandingLoginModal());
-        }
-        
-        // Landing auth modal close button
-        const landingAuthCloseBtn = document.getElementById('landing-auth-close-btn');
-        const landingAuthModal = document.getElementById('landing-auth-modal');
-        
-        if (landingAuthCloseBtn) {
-            landingAuthCloseBtn.addEventListener('click', () => this.closeLandingAuthModal());
-        }
-        
-        // Close modal when clicking outside of it
-        if (landingAuthModal) {
-            landingAuthModal.addEventListener('click', (e) => {
-                if (e.target === landingAuthModal) {
-                    this.closeLandingAuthModal();
-                }
-            });
-        }
-        
-        // Landing auth modal form switching
-        const showLandingSignupFromLogin = document.getElementById('show-landing-signup');
-        const showLandingLoginFromSignup = document.getElementById('show-landing-login');
-        
-        if (showLandingSignupFromLogin) {
-            showLandingSignupFromLogin.addEventListener('click', () => {
-                const loginForm = document.getElementById('landing-login-form');
-                const signupForm = document.getElementById('landing-signup-form');
-                if (loginForm && signupForm) {
-                    loginForm.classList.add('hidden');
-                    signupForm.classList.remove('hidden');
-                    this.clearLandingSignupForm();
-                }
-            });
-        }
-        if (showLandingLoginFromSignup) {
-            showLandingLoginFromSignup.addEventListener('click', () => {
-                const loginForm = document.getElementById('landing-login-form');
-                const signupForm = document.getElementById('landing-signup-form');
-                if (loginForm && signupForm) {
-                    loginForm.classList.remove('hidden');
-                    signupForm.classList.add('hidden');
-                    this.clearLandingLoginForm();
-                }
-            });
-        }
-        
-        // Landing auth modal form submissions
-        const landingLoginSubmit = document.getElementById('landing-login-submit');
-        const landingSignupSubmit = document.getElementById('landing-signup-submit');
-        const landingForgotBtn = document.getElementById('landing-forgot-password-btn');
-        
-        if (landingLoginSubmit) {
-            landingLoginSubmit.closest('form').addEventListener('submit', (e) => this.handleLandingLogin(e));
-        }
-        if (landingSignupSubmit) {
-            landingSignupSubmit.closest('form').addEventListener('submit', (e) => this.handleLandingSignup(e));
-        }
-        if (landingForgotBtn) {
-            landingForgotBtn.addEventListener('click', () => this.handleLandingForgotPassword());
-        }
-        
         // Account button - shows login modal when not logged in, user settings when logged in
+        const accountBtn = document.getElementById('account-btn');
         if (accountBtn) {
             console.log('✅ Setting up account button listener');
             accountBtn.addEventListener('click', () => {
@@ -292,6 +336,8 @@ window.Auth = {
         }
         
         // Toolbar auth buttons (legacy)
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
         if (loginBtn) {
             console.log('✅ Setting up login button listener');
             loginBtn.addEventListener('click', () => {
@@ -313,6 +359,8 @@ window.Auth = {
         }
         
         // Landing page form switching
+        const showLandingSignup = document.getElementById('show-landing-signup');
+        const showLandingLogin = document.getElementById('show-landing-login');
         if (showLandingSignup) {
             console.log('✅ Setting up landing signup switch listener');
             showLandingSignup.addEventListener('click', () => {
@@ -344,46 +392,9 @@ window.Auth = {
             showLogin.addEventListener('click', () => this.switchAuthForm('login'));
         }
         
-        // Form submissions - Modal forms
-        const loginForm = document.getElementById('login-form-element');
-        const signupForm = document.getElementById('signup-form-element');
-        const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+        // Form submissions - Modal forms (handled above in new structure)
         
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => this.handleLogin(e));
-        }
-        if (signupForm) {
-            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
-        }
-        if (forgotPasswordBtn) {
-            forgotPasswordBtn.addEventListener('click', () => this.handleForgotPassword());
-        }
-        
-        // Form submissions - Landing page forms
-        if (landingLoginForm) {
-            console.log('✅ Setting up landing login form listener');
-            landingLoginForm.addEventListener('submit', (e) => {
-                console.log('🔐 Landing login form submitted');
-                this.handleLandingLogin(e);
-            });
-        } else {
-            console.warn('⚠️ Landing login form not found');
-        }
-        
-        if (landingSignupForm) {
-            console.log('✅ Setting up landing signup form listener');
-            landingSignupForm.addEventListener('submit', (e) => {
-                console.log('📝 Landing signup form submitted');
-                this.handleLandingSignup(e);
-            });
-        } else {
-            console.warn('⚠️ Landing signup form not found');
-        }
-        
-        const landingForgotPasswordBtn = document.getElementById('landing-forgot-password-btn');
-        if (landingForgotPasswordBtn) {
-            landingForgotPasswordBtn.addEventListener('click', () => this.handleLandingForgotPassword());
-        }
+        // Landing page forms are no longer used - all auth is handled through the modal
         
         // User menu
         const userMenuBtn = document.getElementById('user-menu-btn');
@@ -467,47 +478,6 @@ window.Auth = {
             });
         }
         
-        // Footer navigation links
-        const privacyLink = document.getElementById('privacy-link');
-        const termsLink = document.getElementById('terms-link');
-        const privacyBackBtn = document.getElementById('privacy-back-btn');
-        const termsBackBtn = document.getElementById('terms-back-btn');
-        const termsPrivacyLink = document.getElementById('terms-privacy-link');
-        
-        if (privacyLink) {
-            privacyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showPrivacyPage();
-            });
-        }
-        
-        if (termsLink) {
-            termsLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showTermsPage();
-            });
-        }
-        
-        if (privacyBackBtn) {
-            privacyBackBtn.addEventListener('click', () => {
-                this.hidePrivacyPage();
-            });
-        }
-        
-        if (termsBackBtn) {
-            termsBackBtn.addEventListener('click', () => {
-                this.hideTermsPage();
-            });
-        }
-        
-        if (termsPrivacyLink) {
-            termsPrivacyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.hideTermsPage();
-                this.showPrivacyPage();
-            });
-        }
-        
         console.log('✅ Authentication event listeners setup complete');
     },
     
@@ -515,7 +485,14 @@ window.Auth = {
     handleAuthStateChange(event, session) {
         console.log('🔍 Auth state change:', event, session?.user?.email || 'No user');
         
+        // Prevent handling state changes if we're already redirecting
+        if (this.isRedirecting) {
+            console.log('🔄 Already redirecting, skipping state change handling');
+            return;
+        }
+        
         if (event === 'SIGNED_IN' && session) {
+            console.log('✅ User signed in successfully:', session.user.email);
             this.currentUser = session.user;
             this.currentSession = session; // Store the full session with access token
             
@@ -523,10 +500,15 @@ window.Auth = {
             this.ensureCurrentUserProfile();
             
             this.hideAuthModal(); // Hide modal immediately when signed in
+            
+            // Show main app (this will handle the redirect flag internally)
+            console.log('🔄 Redirecting to main app...');
             this.showMainApp();
         } else if (event === 'SIGNED_OUT') {
             this.currentUser = null;
             this.currentSession = null; // Clear session
+            
+            // Show auth gate (this will handle the redirect flag internally)
             this.showAuthGate();
         }
     },
@@ -595,38 +577,44 @@ window.Auth = {
     
     // Show the authentication gate
     showAuthGate() {
-        this.showMainLanding();
-    },
-    
-    // Show main landing page
-    showMainLanding() {
-        console.log('🔍 showMainLanding called');
-        const mainLanding = document.getElementById('main-landing');
+        const heroSection = document.querySelector('.hero');
         const appContainer = document.querySelector('.app-container');
-        const accountBtn = document.getElementById('account-btn');
-        const logoutBtn = document.getElementById('logout-btn');
         
-        console.log('🔍 Elements found:', { 
-            mainLanding: !!mainLanding, 
-            appContainer: !!appContainer 
-        });
-        
-        if (mainLanding) {
-            console.log('✅ Showing main landing');
-            mainLanding.classList.remove('hidden');
-            mainLanding.style.display = 'block';
-        } else {
-            console.error('❌ Main landing element not found!');
+        // If we're on the app page (no hero but has app-container), redirect to landing page
+        if (!heroSection && appContainer) {
+            console.log('🔄 Redirecting from app to landing page...');
+            
+            // Hide the auth loading overlay immediately
+            const authLoadingOverlay = document.getElementById('auth-loading-overlay');
+            if (authLoadingOverlay) {
+                authLoadingOverlay.classList.add('hidden');
+            }
+            
+            // Prevent infinite redirects by checking if we're already redirecting
+            if (!this.isRedirecting && !window.location.href.includes('index.html')) {
+                this.isRedirecting = true;
+                window.location.href = 'index.html';
+                
+                // Reset redirect flag after redirect attempt
+                setTimeout(() => {
+                    this.isRedirecting = false;
+                }, 2000);
+            }
+            return;
         }
         
+        // If we're already on the landing page, show it
+        if (heroSection) {
+            heroSection.style.display = 'block';
+        }
         if (appContainer) {
-            console.log('✅ Hiding main app');
             appContainer.style.display = 'none';
-        } else {
-            console.error('❌ Main app element not found!');
         }
         
         // Reset account button to show "Account" when logged out
+        const accountBtn = document.getElementById('account-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        
         if (accountBtn) {
             const accountSpan = accountBtn.querySelector('span');
             if (accountSpan) {
@@ -638,77 +626,70 @@ window.Auth = {
         if (logoutBtn) {
             logoutBtn.style.display = 'none';
         }
-        
-        // Close any open modal
-        this.closeLandingAuthModal();
-    },
-    
-    // Show landing auth modal with login form
-    showLandingLoginModal() {
-        console.log('🔍 showLandingLoginModal called');
-        const modal = document.getElementById('landing-auth-modal');
-        const loginForm = document.getElementById('landing-login-form');
-        const signupForm = document.getElementById('landing-signup-form');
-        
-        if (modal && loginForm && signupForm) {
-            loginForm.classList.remove('hidden');
-            signupForm.classList.add('hidden');
-            modal.classList.add('visible');
-            this.clearLandingLoginForm();
-        } else {
-            console.error('❌ Landing auth modal elements not found!');
-        }
-    },
-
-    // Show landing auth modal with signup form
-    showLandingSignupModal() {
-        console.log('🔍 showLandingSignupModal called');
-        const modal = document.getElementById('landing-auth-modal');
-        const loginForm = document.getElementById('landing-login-form');
-        const signupForm = document.getElementById('landing-signup-form');
-        
-        if (modal && loginForm && signupForm) {
-            loginForm.classList.add('hidden');
-            signupForm.classList.remove('hidden');
-            modal.classList.add('visible');
-            this.clearLandingSignupForm();
-        } else {
-            console.error('❌ Landing auth modal elements not found!');
-        }
-    },
-
-    // Close landing auth modal
-    closeLandingAuthModal() {
-        console.log('🔍 closeLandingAuthModal called');
-        const modal = document.getElementById('landing-auth-modal');
-        if (modal) {
-            modal.classList.remove('visible');
-            this.clearLandingLoginForm();
-            this.clearLandingSignupForm();
-        }
     },
     
     // Show the main application
     showMainApp() {
-        const mainLanding = document.getElementById('main-landing');
-        const appContainer = document.querySelector('.app-container');
-        const authButtons = document.getElementById('auth-buttons');
-        const userMenu = document.getElementById('user-menu');
-        const userEmail = document.getElementById('user-email');
-        const accountBtn = document.getElementById('account-btn');
-        const logoutBtn = document.getElementById('logout-btn');
+        // Check if we're on the landing page (index.html) and need to redirect to app
+        const heroSection = document.querySelector('.hero'); // Landing page has hero section
+        const appContainer = document.querySelector('.app-container'); // App page has app-container
+        const isLandingPage = heroSection && !appContainer;
         
-        // Hide landing page
-        if (mainLanding) {
-            mainLanding.classList.add('hidden');
-            mainLanding.style.display = 'none';
+        console.log('🔍 Page detection:', {
+            heroSection: !!heroSection,
+            appContainer: !!appContainer,
+            isLandingPage: isLandingPage,
+            currentURL: window.location.href,
+            isRedirecting: this.isRedirecting
+        });
+        
+        // If we're on the landing page (has hero but no app-container), redirect to app.html
+        if (isLandingPage) {
+            console.log('🔄 Redirecting from landing page to main app...');
+            
+            // Prevent infinite redirects by checking if we're already redirecting
+            if (!this.isRedirecting && !window.location.href.includes('app.html')) {
+                this.isRedirecting = true;
+                console.log('✅ Executing redirect to app.html');
+                
+                // Use a small delay to ensure the auth state is fully processed
+                setTimeout(() => {
+                    console.log('🔄 Actually redirecting now...');
+                    window.location.href = 'app.html';
+                }, 100);
+                
+                // Reset redirect flag after redirect attempt
+                setTimeout(() => {
+                    this.isRedirecting = false;
+                }, 2000);
+            } else {
+                console.log('⚠️ Redirect blocked - already redirecting or already on app.html');
+            }
+            return;
         }
         
+        // If we're already on the app page, show the app and hide auth elements
+        if (heroSection) {
+            heroSection.style.display = 'none';
+        }
         if (appContainer) {
             appContainer.style.display = 'flex';
+            // Add auth-verified class to show the app with smooth transition
+            appContainer.classList.add('auth-verified');
+            
+            // Hide the auth loading overlay
+            const authLoadingOverlay = document.getElementById('auth-loading-overlay');
+            if (authLoadingOverlay) {
+                authLoadingOverlay.classList.add('hidden');
+            }
         }
         
         // Update toolbar UI
+        const authButtons = document.getElementById('auth-buttons');
+        const userMenu = document.getElementById('user-menu');
+        const accountBtn = document.getElementById('account-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        
         if (authButtons) {
             authButtons.classList.add('hidden');
         }
@@ -725,7 +706,6 @@ window.Auth = {
         }
         
         this.hideAuthModal();
-        this.closeLandingAuthModal();
     },
     
     // Show authentication modal
@@ -733,18 +713,11 @@ window.Auth = {
         console.log('🔍 showAuthModal called with mode:', mode);
         const authModal = document.getElementById('auth-modal');
         console.log('🔍 Auth modal element found:', authModal);
-        console.log('🔍 Modal current classList:', authModal?.classList?.toString());
         
         if (authModal) {
-            console.log('🔍 Adding visible class to auth modal');
-            authModal.classList.add('visible');
-            
-            // Force display as backup
-            authModal.style.display = 'flex';
-            authModal.style.zIndex = '10001';
-            
-            console.log('🔍 Modal classList after adding visible:', authModal.classList.toString());
-            console.log('🔍 Modal computed display style:', window.getComputedStyle(authModal).display);
+            console.log('🔍 Adding active class to auth modal');
+            authModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
             
             this.switchAuthForm(mode);
         } else {
@@ -759,8 +732,8 @@ window.Auth = {
         console.log('🔍 Hiding auth modal');
         const authModal = document.getElementById('auth-modal');
         if (authModal) {
-            authModal.classList.remove('visible');
-            authModal.style.display = 'none'; // Force hide
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
             console.log('🔍 Auth modal hidden');
         }
         this.clearAuthForms();
@@ -769,21 +742,18 @@ window.Auth = {
     // Switch between login and signup forms
     switchAuthForm(mode) {
         console.log('switchAuthForm called with mode:', mode);
-        const loginForm = document.getElementById('login-form');
+        const loginForm = document.getElementById('signin-form');
         const signupForm = document.getElementById('signup-form');
-        const modalTitle = document.getElementById('auth-modal-title');
         
-        console.log('Form elements found:', { loginForm, signupForm, modalTitle });
+        console.log('Form elements found:', { loginForm, signupForm });
         
         if (mode === 'signup') {
             if (loginForm) loginForm.classList.add('hidden');
             if (signupForm) signupForm.classList.remove('hidden');
-            if (modalTitle) modalTitle.textContent = 'Join FrameIt';
             console.log('Switched to signup form');
         } else {
             if (signupForm) signupForm.classList.add('hidden');
             if (loginForm) loginForm.classList.remove('hidden');
-            if (modalTitle) modalTitle.textContent = 'Welcome Back';
             console.log('Switched to login form');
         }
         
@@ -816,23 +786,33 @@ window.Auth = {
     // Handle login form submission
     async handleLogin(e) {
         e.preventDefault();
+        console.log('🔍 handleLogin called');
         
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        const submitBtn = document.getElementById('login-submit');
-        const errorElement = document.getElementById('login-error');
+        // Prevent multiple simultaneous login attempts
+        if (this.isLoggingIn) {
+            console.log('🔄 Login already in progress, ignoring duplicate attempt');
+            return;
+        }
         
+        const email = document.getElementById('signin-email').value;
+        const password = document.getElementById('signin-password').value;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const errorElement = document.getElementById('signin-error');
+        
+        console.log('🔍 Login form data:', { email: !!email, password: !!password, submitBtn: !!submitBtn });
         console.log('Login attempt for:', email);
         
         if (!email || !password) {
-            this.showError('login-error', 'Please fill in all fields');
+            this.showError('signin-error', 'Please fill in all fields');
             return;
         }
         
         if (!this.supabase) {
-            this.showError('login-error', 'Authentication service not initialized');
+            this.showError('signin-error', 'Authentication service not initialized');
             return;
         }
+        
+        this.isLoggingIn = true;
         
         this.setLoading(submitBtn, true);
         
@@ -863,9 +843,10 @@ window.Auth = {
                 errorMessage = 'Too many login attempts. Please wait a moment and try again.';
             }
             
-            this.showError('login-error', errorMessage);
+            this.showError('signin-error', errorMessage);
         } finally {
             this.setLoading(submitBtn, false);
+            this.isLoggingIn = false;
         }
     },
     
@@ -875,8 +856,8 @@ window.Auth = {
         
         const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm-password').value;
-        const submitBtn = document.getElementById('signup-submit');
+        const confirmPassword = document.getElementById('signup-confirm').value;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
         
         console.log('Signup attempt for:', email);
         
@@ -1376,6 +1357,9 @@ window.Auth = {
             
             console.log('📊 Processed data:', { globalStats });
 
+            // Cache the global stats for landing page use
+            this.cacheGlobalStatsForLanding(globalStats);
+
             // Hide loading and show content (removed recent users section)
             const loadingDiv = analyticsContainer.querySelector('.analytics-loading');
             const contentDiv = analyticsContainer.querySelector('.analytics-content');
@@ -1867,202 +1851,6 @@ window.Auth = {
         if (landingSignupConfirmPassword) landingSignupConfirmPassword.value = '';
         if (landingSignupError) landingSignupError.classList.add('hidden');
         if (landingSignupSuccess) landingSignupSuccess.classList.add('hidden');
-    },
-    
-    // Clear login page form
-    clearLoginPageForm() {
-        const loginPageEmail = document.getElementById('login-page-email');
-        const loginPagePassword = document.getElementById('login-page-password');
-        const loginPageError = document.getElementById('login-page-error');
-        
-        if (loginPageEmail) loginPageEmail.value = '';
-        if (loginPagePassword) loginPagePassword.value = '';
-        if (loginPageError) loginPageError.classList.add('hidden');
-    },
-    
-    // Clear signup page form
-    clearSignupPageForm() {
-        const signupPageEmail = document.getElementById('signup-page-email');
-        const signupPagePassword = document.getElementById('signup-page-password');
-        const signupPageConfirmPassword = document.getElementById('signup-page-confirm-password');
-        const signupPageError = document.getElementById('signup-page-error');
-        const signupPageSuccess = document.getElementById('signup-page-success');
-        
-        if (signupPageEmail) signupPageEmail.value = '';
-        if (signupPagePassword) signupPagePassword.value = '';
-        if (signupPageConfirmPassword) signupPageConfirmPassword.value = '';
-        if (signupPageError) signupPageError.classList.add('hidden');
-        if (signupPageSuccess) signupPageSuccess.classList.add('hidden');
-    },
-
-    // Clear landing login form
-    clearLandingLoginForm() {
-        const landingLoginEmail = document.getElementById('landing-login-email');
-        const landingLoginPassword = document.getElementById('landing-login-password');
-        const landingLoginError = document.getElementById('landing-login-error');
-        
-        if (landingLoginEmail) landingLoginEmail.value = '';
-        if (landingLoginPassword) landingLoginPassword.value = '';
-        if (landingLoginError) landingLoginError.classList.add('hidden');
-    },
-
-    // Clear landing signup form
-    clearLandingSignupForm() {
-        const landingSignupEmail = document.getElementById('landing-signup-email');
-        const landingSignupPassword = document.getElementById('landing-signup-password');
-        const landingSignupConfirmPassword = document.getElementById('landing-signup-confirm-password');
-        const landingSignupError = document.getElementById('landing-signup-error');
-        const landingSignupSuccess = document.getElementById('landing-signup-success');
-        
-        if (landingSignupEmail) landingSignupEmail.value = '';
-        if (landingSignupPassword) landingSignupPassword.value = '';
-        if (landingSignupConfirmPassword) landingSignupConfirmPassword.value = '';
-        if (landingSignupError) landingSignupError.classList.add('hidden');
-        if (landingSignupSuccess) landingSignupSuccess.classList.add('hidden');
-    },
-    
-    // Handle login page form submission
-    async handleLoginPageSubmit(e) {
-        e.preventDefault();
-        console.log('🔐 Login page form submitted');
-        
-        const email = document.getElementById('login-page-email').value;
-        const password = document.getElementById('login-page-password').value;
-        const submitBtn = document.getElementById('login-page-submit');
-        
-        console.log('🔍 Login attempt with:', { email, password: password ? '***' : 'empty', submitBtn: !!submitBtn });
-        
-        if (!email || !password) {
-            console.log('❌ Missing email or password');
-            this.showError('login-page-error', 'Please fill in all fields');
-            return;
-        }
-        
-        if (!this.supabase) {
-            console.log('❌ Supabase not initialized');
-            this.showError('login-page-error', 'Authentication service not available');
-            return;
-        }
-
-        this.setLoading(submitBtn, true);
-        this.hideError('login-page-error');
-        console.log('🔄 Starting authentication request...');
-
-        try {
-            console.log('🔐 Attempting login with:', email);
-            
-            const { data, error } = await this.supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-            
-            console.log('📡 Supabase response:', { data: !!data, error: error?.message || 'none' });
-            
-            if (error) {
-                throw error;
-            }
-            
-            console.log('✅ Login successful');
-            this.currentUser = data.user;
-            
-            // Clear form
-            this.clearLoginPageForm();
-            
-        } catch (error) {
-            console.error('❌ Login error:', error);
-            let errorMessage = 'Login failed. Please try again.';
-            
-            if (error.message.includes('Invalid login credentials')) {
-                errorMessage = 'Invalid email or password. Please check your credentials.';
-            } else if (error.message.includes('Email not confirmed')) {
-                errorMessage = 'Please check your email and click the confirmation link before logging in.';
-            } else if (error.message.includes('Too many requests')) {
-                errorMessage = 'Too many login attempts. Please wait a moment and try again.';
-            }
-            
-            this.showError('login-page-error', errorMessage);
-        } finally {
-            console.log('🔄 Setting loading to false');
-            this.setLoading(submitBtn, false);
-        }
-    },
-    
-    // Handle signup page form submission
-    async handleSignupPageSubmit(e) {
-        e.preventDefault();
-        console.log('📝 Signup page form submitted');
-        
-        const email = document.getElementById('signup-page-email').value;
-        const password = document.getElementById('signup-page-password').value;
-        const confirmPassword = document.getElementById('signup-page-confirm-password').value;
-        const submitBtn = document.getElementById('signup-page-submit');
-        
-        // Validate passwords match
-        if (password !== confirmPassword) {
-            this.showError('signup-page-error', 'Passwords do not match.');
-            return;
-        }
-        
-        // Validate password length
-        if (password.length < 6) {
-            this.showError('signup-page-error', 'Password must be at least 6 characters long.');
-            return;
-        }
-        
-        if (!this.supabase) {
-            this.showError('signup-page-error', 'Authentication service not available');
-            return;
-        }
-        
-        this.setLoading(submitBtn, true);
-        this.hideError('signup-page-error');
-        const successElement = document.getElementById('signup-page-success');
-        if (successElement) successElement.classList.add('hidden');
-        
-        try {
-            console.log('📝 Attempting signup with:', email);
-            
-            const { data, error } = await this.supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    emailRedirectTo: window.location.origin
-                }
-            });
-            
-            console.log('📡 Signup response:', { data: !!data, error: error?.message || 'none' });
-            
-            if (error) {
-                throw error;
-            }
-            
-            // Show success message
-            if (successElement) {
-                successElement.classList.remove('hidden');
-                successElement.textContent = 'Account created successfully! Please check your email to verify your account.';
-            }
-            
-            console.log('✅ Signup successful! Check email for confirmation.');
-            
-            // Clear form
-            this.clearSignupPageForm();
-            
-        } catch (error) {
-            console.error('❌ Signup error:', error);
-            let errorMessage = 'Signup failed. Please try again.';
-            
-            if (error.message.includes('User already registered')) {
-                errorMessage = 'An account with this email already exists. Please login instead.';
-            } else if (error.message.includes('Invalid email')) {
-                errorMessage = 'Please enter a valid email address.';
-            } else if (error.message.includes('Password')) {
-                errorMessage = 'Password must be at least 6 characters long.';
-            }
-            
-            this.showError('signup-page-error', errorMessage);
-        } finally {
-            this.setLoading(submitBtn, false);
-        }
     },
     
     // Handle landing page login
@@ -2887,67 +2675,98 @@ window.Auth = {
 
     // Update global canvas count
     async updateGlobalCanvasCount() {
-        try {
-            const { data: currentStats, error: fetchError } = await this.supabase
-                .from('global')
-                .select('total_canvases')
-                .single();
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not available for global canvas count update');
+            return;
+        }
 
-            if (fetchError) {
-                console.warn('Could not fetch global stats for canvas update:', fetchError);
-                return;
-            }
+        // Skip global stats update for dev users
+        if (await this.isDevUser()) {
+            console.log('📊 Skipping global canvas count update for dev user');
+            return;
+        }
 
-            const { error: updateError } = await this.supabase
-                .from('global')
-                .update({ total_canvases: (currentStats.total_canvases || 0) + 1 })
-                .eq('id', currentStats.id);
+        // Get current global stats
+        const { data: currentStats, error: fetchError } = await this.supabase
+            .from('global')
+            .select('total_canvases')
+            .single();
 
-            if (updateError) {
-                console.warn('Could not update global canvas count:', updateError);
-            } else {
-                console.log('✅ Global canvas count updated');
-            }
+        if (fetchError) {
+            console.warn('Could not fetch global stats for canvas count update:', fetchError);
+            return;
+        }
 
-        } catch (error) {
-            console.warn('Error updating global canvas count:', error);
+        // Update global stats
+        const { data: updateData, error: updateError } = await this.supabase
+            .from('global')
+            .update({ 
+                total_canvases: (currentStats?.total_canvases || 0) + 1
+            })
+            .eq('id', 1)
+            .select();
+
+        if (updateError) {
+            console.error('Failed to update global canvas count:', updateError);
+        } else {
+            console.log('✅ Global canvas count updated');
         }
     },
 
-    // Navigation functions for footer links
-    showPrivacyPage() {
-        console.log('📜 Showing Privacy Policy page');
-        document.getElementById('main-landing').style.display = 'none';
-        document.getElementById('privacy-page').classList.remove('hidden');
-        
-        // Scroll to top
-        window.scrollTo(0, 0);
+    // Cache global stats for landing page use
+    cacheGlobalStatsForLanding(globalStats) {
+        try {
+            const landingStats = {
+                users: globalStats.total_users || 0,
+                canvases: globalStats.total_canvases || 0,
+                images: globalStats.total_uploads || 0,
+                exports: globalStats.total_exports || 0,
+                lastUpdated: new Date().toISOString(),
+                source: 'dev_cache'
+            };
+
+            localStorage.setItem('frameit_global_stats_cache', JSON.stringify(landingStats));
+            console.log('📊 Cached global stats for landing page:', landingStats);
+
+            // Also set a flag that real data is available
+            localStorage.setItem('frameit_real_data_available', 'true');
+
+        } catch (error) {
+            console.error('❌ Failed to cache global stats:', error);
+        }
     },
 
-    showTermsPage() {
-        console.log('📜 Showing Terms of Service page');
-        document.getElementById('main-landing').style.display = 'none';
-        document.getElementById('terms-page').classList.remove('hidden');
-        
-        // Scroll to top
-        window.scrollTo(0, 0);
-    },
+    // Get cached global stats for landing page
+    getCachedGlobalStats() {
+        try {
+            const cached = localStorage.getItem('frameit_global_stats_cache');
+            const hasRealData = localStorage.getItem('frameit_real_data_available');
+            
+            if (!cached || !hasRealData) {
+                return null;
+            }
 
-    hidePrivacyPage() {
-        console.log('📜 Hiding Privacy Policy page');
-        document.getElementById('privacy-page').classList.add('hidden');
-        document.getElementById('main-landing').style.display = 'block';
-        
-        // Scroll to top
-        window.scrollTo(0, 0);
-    },
+            const stats = JSON.parse(cached);
+            const lastUpdated = new Date(stats.lastUpdated);
+            const now = new Date();
+            
+            // Cache expires after 1 hour
+            const cacheAgeHours = (now - lastUpdated) / (1000 * 60 * 60);
+            if (cacheAgeHours > 1) {
+                console.log('📊 Global stats cache expired (age: ' + cacheAgeHours.toFixed(1) + ' hours)');
+                return null;
+            }
 
-    hideTermsPage() {
-        console.log('📜 Hiding Terms of Service page');
-        document.getElementById('terms-page').classList.add('hidden');
-        document.getElementById('main-landing').style.display = 'block';
-        
-        // Scroll to top
-        window.scrollTo(0, 0);
-    },
+            console.log('📊 Using cached global stats (age: ' + cacheAgeHours.toFixed(1) + ' hours)');
+            return {
+                users: stats.users,
+                canvases: stats.canvases,
+                images: stats.images,
+                exports: stats.exports
+            };
+        } catch (error) {
+            console.error('❌ Failed to get cached global stats:', error);
+            return null;
+        }
+    }
 }; 

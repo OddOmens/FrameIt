@@ -241,7 +241,7 @@ window.Config = {
             ]
         }
     ],
-
+    
     // Gradient presets - organized as separate sections
     lightToDarkGradients: [
         // Light Gradients First
@@ -2253,5 +2253,34 @@ window.Config = {
     // Legacy function for compatibility - returns patterns as if they were images
     getAllBackgroundImages() {
         return this.backgroundCategories.flatMap(category => category.images || []);
+    }
+};
+
+// Stripe Configuration
+// Live Stripe keys and price IDs
+window.STRIPE_CONFIG = {
+    // Live publishable key
+    publishableKey: 'pk_live_51RUuRmDPf1P0vqteljEmZO11snOf6NwOeWf4q2A9pKusGkJXwQ94R8zzcRAI619piYbSUUBORmKb7DVY4Pbf8NOJ00XDT4adYq',
+    
+    // Price IDs from Stripe Dashboard
+    prices: {
+        proMonthly: 'price_1RUunYDPf1P0vqteAOYtil8e',   // Monthly $5
+        proYearly: 'price_1RUunYDPf1P0vqte5ltuJRYL'     // Yearly $29.99
+    },
+    
+    // Subscription tiers and limits
+    subscriptionPlans: {
+        free: {
+            name: 'Free',
+            exportsPerMonth: 10,
+            premiumTemplates: false,
+            priority_support: false
+        },
+        pro: {
+            name: 'Pro',
+            exportsPerMonth: 'unlimited',
+            premiumTemplates: true,
+            priority_support: true
+        }
     }
 }; 

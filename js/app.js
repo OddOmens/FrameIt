@@ -9,7 +9,6 @@ window.App = {
         images: [], // Array of image objects for multi-image support
         selectedImageIndex: 0, // Currently selected image for manipulation
         currentLayout: 'single', // Current multi-image layout
-        imageSettings: [], // Individual settings for each image slot
         backgroundColor: '#FFFFFF',
         backgroundGradientId: null,
         backgroundImageId: null,
@@ -41,6 +40,9 @@ window.App = {
         rotation: Config.defaultRotation,
         isFlippedHorizontally: false,
         isFlippedVertically: false,
+        smartFillEnabled: false,
+        panX: 0,
+        panY: 0,
         watermarkImage: null,
         watermarkOpacity: 0.5,
         watermarkScale: 1.0,
@@ -91,9 +93,6 @@ window.App = {
                 this.state.images.push(null);
             }
         }
-        
-        // Reinitialize image settings for the new layout
-        this.initializeImageSettings();
         
         // Update the selected image for backward compatibility
         this.state.selectedImage = this.state.images[0];
@@ -174,141 +173,12 @@ window.App = {
         this.state.selectedImageIndex = slotIndex;
         this.state.selectedImage = this.state.images[slotIndex];
         
-        // Apply individual image settings to UI controls
-        this.applyIndividualImageSettingsToUI(slotIndex);
-        
         UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
         
         // Show which image is selected
         if (this.state.selectedImage) {
             UI.showNotification(`Selected image ${slotIndex + 1}`, 'info', 1500);
         }
-        
-        this.renderPreview();
-    },
-
-    // Apply individual image settings to UI controls
-    applyIndividualImageSettingsToUI(slotIndex) {
-        if (!this.state.imageSettings || !this.state.imageSettings[slotIndex]) return;
-        
-        const settings = this.state.imageSettings[slotIndex];
-        
-        // Update corner radius
-        const cornerRadiusSlider = document.getElementById('corner-radius-slider');
-        const cornerRadiusValue = document.getElementById('corner-radius-value');
-        if (cornerRadiusSlider && cornerRadiusValue) {
-            cornerRadiusSlider.value = settings.cornerRadius;
-            cornerRadiusValue.textContent = `${settings.cornerRadius}px`;
-        }
-        
-        // Update padding
-        const paddingSlider = document.getElementById('padding-slider');
-        const paddingValue = document.getElementById('padding-value');
-        if (paddingSlider && paddingValue) {
-            paddingSlider.value = settings.padding;
-            paddingValue.textContent = `${settings.padding}px`;
-        }
-        
-        // Update rotation
-        const rotationSlider = document.getElementById('rotation-slider');
-        const rotationValue = document.getElementById('rotation-value');
-        if (rotationSlider && rotationValue) {
-            rotationSlider.value = settings.rotation;
-            rotationValue.textContent = `${settings.rotation}°`;
-        }
-        
-        // Update shadow opacity
-        const shadowOpacitySlider = document.getElementById('shadow-opacity-slider');
-        const shadowOpacityValue = document.getElementById('shadow-opacity-value');
-        if (shadowOpacitySlider && shadowOpacityValue) {
-            shadowOpacitySlider.value = settings.shadowOpacity;
-            shadowOpacityValue.textContent = `${Math.round(settings.shadowOpacity * 100)}%`;
-        }
-        
-        // Update shadow radius
-        const shadowRadiusSlider = document.getElementById('shadow-radius-slider');
-        const shadowRadiusValue = document.getElementById('shadow-radius-value');
-        if (shadowRadiusSlider && shadowRadiusValue) {
-            shadowRadiusSlider.value = settings.shadowRadius;
-            shadowRadiusValue.textContent = `${settings.shadowRadius}px`;
-        }
-        
-        // Update shadow offset X
-        const shadowOffsetXSlider = document.getElementById('shadow-offset-x-slider');
-        const shadowOffsetXValue = document.getElementById('shadow-offset-x-value');
-        if (shadowOffsetXSlider && shadowOffsetXValue) {
-            shadowOffsetXSlider.value = settings.shadowOffsetX;
-            shadowOffsetXValue.textContent = `${settings.shadowOffsetX}px`;
-        }
-        
-        // Update shadow offset Y
-        const shadowOffsetYSlider = document.getElementById('shadow-offset-y-slider');
-        const shadowOffsetYValue = document.getElementById('shadow-offset-y-value');
-        if (shadowOffsetYSlider && shadowOffsetYValue) {
-            shadowOffsetYSlider.value = settings.shadowOffsetY;
-            shadowOffsetYValue.textContent = `${settings.shadowOffsetY}px`;
-        }
-        
-        // Update shadow color
-        const shadowColorInput = document.getElementById('shadow-color-input');
-        const shadowColorValue = document.getElementById('shadow-color-value');
-        if (shadowColorInput && shadowColorValue) {
-            shadowColorInput.value = settings.shadowColor;
-            shadowColorValue.textContent = settings.shadowColor;
-        }
-        
-        // Update image scale
-        const imageScaleSlider = document.getElementById('image-scale-slider');
-        const imageScaleValue = document.getElementById('image-scale-value');
-        if (imageScaleSlider && imageScaleValue) {
-            imageScaleSlider.value = settings.scale;
-            imageScaleValue.textContent = `${Math.round(settings.scale * 100)}%`;
-        }
-        
-        // Update mask enabled toggle
-        const maskEnabledToggle = document.getElementById('mask-enabled-toggle');
-        if (maskEnabledToggle) {
-            maskEnabledToggle.checked = settings.maskEnabled;
-        }
-
-        // Update pan controls
-        const panXSlider = document.getElementById('pan-x-slider');
-        const panYSlider = document.getElementById('pan-y-slider');
-        const panXValue = document.getElementById('pan-x-value');
-        const panYValue = document.getElementById('pan-y-value');
-        
-        if (panXSlider && panXValue) {
-            panXSlider.value = settings.panX || 0;
-            panXValue.textContent = `${Math.round((settings.panX || 0) * 100)}%`;
-        }
-        
-        if (panYSlider && panYValue) {
-            panYSlider.value = settings.panY || 0;
-            panYValue.textContent = `${Math.round((settings.panY || 0) * 100)}%`;
-        }
-        
-        // Update the shadow position handle if it exists
-        if (settings.shadowOffsetX !== undefined && settings.shadowOffsetY !== undefined) {
-            // Convert offset values (-50 to 50) to percentages (0 to 1)
-            const xPercent = (settings.shadowOffsetX + 50) / 100;
-            const yPercent = (settings.shadowOffsetY + 50) / 100;
-            UI.updateShadowHandlePosition(xPercent, yPercent);
-        }
-        
-        console.log('🎨 Applied individual settings for slot', slotIndex, settings);
-    },
-
-    // Update individual image setting
-    updateIndividualImageSetting(property, value) {
-        if (!this.state.imageSettings || this.state.selectedImageIndex < 0 || 
-            this.state.selectedImageIndex >= this.state.imageSettings.length) {
-            return;
-        }
-        
-        this.saveStateForUndo();
-        this.state.imageSettings[this.state.selectedImageIndex][property] = value;
-        this.renderPreview();
-        console.log('🎯 Updated', property, 'for slot', this.state.selectedImageIndex, 'to', value);
     },
     
     // Replace image in specific slot
@@ -417,11 +287,6 @@ window.App = {
     getCurrentLayout() {
         return Config.multiImageLayouts.find(l => l.id === this.state.currentLayout) || Config.multiImageLayouts[0];
     },
-
-    // Check if we're in a multi-image layout mode
-    isMultiImageLayout() {
-        return this.state.currentLayout !== 'single' && this.state.imageSettings && this.state.imageSettings.length > 0;
-    },
     
     // Initialize multi-image system
     initializeMultiImageSystem() {
@@ -431,9 +296,6 @@ window.App = {
         
         // Initialize images array with empty slots
         this.state.images = new Array(defaultLayout.maxImages).fill(null);
-        
-        // Initialize individual image settings
-        this.initializeImageSettings();
         
         // If there's a selected image, put it in the first slot
         if (this.state.selectedImage) {
@@ -448,38 +310,6 @@ window.App = {
         UI.recalculateCollapsibleSections();
         
         console.log('✅ Multi-image system initialized');
-    },
-
-    // Initialize individual image settings for each slot
-    initializeImageSettings() {
-        const layout = Config.multiImageLayouts.find(l => l.id === this.state.currentLayout);
-        if (!layout) return;
-        
-        // Preserve existing settings if they exist
-        const existingSettings = this.state.imageSettings || [];
-        this.state.imageSettings = [];
-        
-        for (let i = 0; i < layout.maxImages; i++) {
-            const existing = existingSettings[i] || {};
-            this.state.imageSettings.push({
-                cornerRadius: existing.cornerRadius ?? 25,
-                padding: existing.padding ?? 20,
-                rotation: existing.rotation ?? 0,
-                flipH: existing.flipH ?? false,
-                flipV: existing.flipV ?? false,
-                shadowOpacity: existing.shadowOpacity ?? 0.15,
-                shadowColor: existing.shadowColor ?? '#000000',
-                shadowRadius: existing.shadowRadius ?? 8,
-                shadowOffsetX: existing.shadowOffsetX ?? 0,
-                shadowOffsetY: existing.shadowOffsetY ?? 4,
-                scale: existing.scale ?? 1.2,
-                maskEnabled: existing.maskEnabled ?? true,
-                panX: existing.panX ?? 0,  // Pan offset X (-1 to 1, where 0 is centered)
-                panY: existing.panY ?? 0   // Pan offset Y (-1 to 1, where 0 is centered)
-            });
-        }
-        
-        console.log('🎨 Individual image settings initialized for', layout.maxImages, 'slots');
     },
     
     // Initialize the application
@@ -586,7 +416,10 @@ window.App = {
             watermarkFontSize: this.state.watermarkFontSize,
             watermarkColor: this.state.watermarkColor,
             watermarkOpacity: this.state.watermarkOpacity,
-            watermarkPosition: this.state.watermarkPosition
+            watermarkPosition: this.state.watermarkPosition,
+            smartFillEnabled: this.state.smartFillEnabled,
+            panX: this.state.panX,
+            panY: this.state.panY
         };
         
         this.state.undoManager.saveState(stateToSave);
@@ -786,7 +619,10 @@ window.App = {
             watermarkPosition: this.state.watermarkPosition,
             watermarkText: this.state.watermarkText,
             watermarkFontSize: this.state.watermarkFontSize,
-            watermarkColor: this.state.watermarkColor
+            watermarkColor: this.state.watermarkColor,
+            smartFillEnabled: this.state.smartFillEnabled,
+            panX: this.state.panX,
+            panY: this.state.panY
         };
         
         Utils.saveToStorage(Config.storageKeys.settings, settingsToSave);
@@ -1144,7 +980,10 @@ window.App = {
             // Multi-image layout data
             currentLayout: this.state.currentLayout,
             images: this.state.images,
-            selectedImageIndex: this.state.selectedImageIndex
+            selectedImageIndex: this.state.selectedImageIndex,
+            smartFillEnabled: this.state.smartFillEnabled,
+            panX: this.state.panX,
+            panY: this.state.panY
         };
     },
     
@@ -1183,6 +1022,9 @@ window.App = {
         this.state.rotation = settings.rotation || 0;
         this.state.isFlippedHorizontally = settings.isFlippedHorizontally || false;
         this.state.isFlippedVertically = settings.isFlippedVertically || false;
+        this.state.smartFillEnabled = settings.smartFillEnabled || false;
+        this.state.panX = settings.panX || 0;
+        this.state.panY = settings.panY || 0;
         
         // Apply resolution if saved in settings
         if (settings.resolution) {
@@ -1317,6 +1159,9 @@ window.App = {
         // Update multi-image UI
         UI.updateLayoutSelection(this.state.currentLayout);
         UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
+        
+        // Update Smart Fill UI
+        this.updateSmartFillUI();
     },
     
     // Add to history without persisting to localStorage
@@ -1646,8 +1491,9 @@ window.App = {
         const textLayer = this.getTextLayerById(id);
         if (textLayer) {
             textLayer.position = { x, y };
-            // Don't call renderPreview here - the dragging code handles immediate rendering
-            // Just save to localStorage periodically
+            // Always render preview when position is updated via buttons
+            this.renderPreview();
+            // Save to localStorage
             this.saveToLocalStorage();
         }
     },
@@ -1991,6 +1837,9 @@ window.App = {
         // Clear text editor
         UI.hideTextEditor();
         UI.renderTextLayers([], null);
+        
+        // Update Smart Fill UI
+        this.updateSmartFillUI();
         
         // Update button states
         UI.updateButtonStates();
@@ -2421,7 +2270,87 @@ window.App = {
     // Set background blur
     setBackgroundBlur(value) {
         this.state.backgroundBlurRadius = Number(value);
-        document.getElementById('bg-blur-value').textContent = `${value}px`;
+        document.getElementById('blur-value').textContent = `${value}px`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background saturation
+    setBackgroundSaturation(value) {
+        this.state.backgroundSaturation = Number(value);
+        document.getElementById('saturation-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background hue rotation
+    setBackgroundHueRotation(value) {
+        this.state.backgroundHueRotation = Number(value);
+        document.getElementById('hue-value').textContent = `${value}°`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background contrast
+    setBackgroundContrast(value) {
+        this.state.backgroundContrast = Number(value);
+        document.getElementById('contrast-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background brightness
+    setBackgroundBrightness(value) {
+        this.state.backgroundBrightness = Number(value);
+        document.getElementById('brightness-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background twirl effect
+    setBackgroundTwirl(value) {
+        this.state.backgroundTwirlAmount = Number(value);
+        document.getElementById('twirl-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background wave distortion
+    setBackgroundWaveAmount(value) {
+        this.state.backgroundWaveAmount = Number(value);
+        document.getElementById('wave-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background ripple effect
+    setBackgroundRippleAmount(value) {
+        this.state.backgroundRippleAmount = Number(value);
+        document.getElementById('ripple-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background zoom scale
+    setBackgroundZoomAmount(value) {
+        this.state.backgroundZoomAmount = Number(value);
+        document.getElementById('zoom-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background shake effect
+    setBackgroundShakeAmount(value) {
+        this.state.backgroundShakeAmount = Number(value);
+        document.getElementById('shake-value').textContent = `${value}%`;
+        this.renderPreview();
+        this.saveSettings();
+    },
+    
+    // Set background lens distortion
+    setBackgroundLensAmount(value) {
+        this.state.backgroundLensAmount = Number(value);
+        document.getElementById('lens-value').textContent = `${value}%`;
         this.renderPreview();
         this.saveSettings();
     },
@@ -2429,52 +2358,28 @@ window.App = {
     // Set corner radius
     setCornerRadius(value) {
         this.saveStateForUndo();
-        
-        // Update individual image setting if multi-image layout
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('cornerRadius', Number(value));
-        } else {
-            // Fallback to global setting for single image
         this.state.cornerRadius = Number(value);
+        document.getElementById('corner-radius-value').textContent = `${value}px`;
         this.renderPreview();
         this.saveSettings();
-        }
-        
-        document.getElementById('corner-radius-value').textContent = `${value}px`;
     },
 
     // Set padding
     setPadding(value) {
         this.saveStateForUndo();
-        
-        // Update individual image setting if multi-image layout
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('padding', Number(value));
-        } else {
-            // Fallback to global setting for single image
         this.state.padding = Number(value);
+        document.getElementById('padding-value').textContent = `${value}px`;
         this.renderPreview();
         this.saveSettings();
-        }
-        
-        document.getElementById('padding-value').textContent = `${value}px`;
     },
 
     // Set shadow opacity
     setShadowOpacity(value) {
         this.saveStateForUndo();
-        
-        // Update individual image setting if multi-image layout
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('shadowOpacity', Number(value));
-        } else {
-            // Fallback to global setting for single image
         this.state.shadowOpacity = Number(value);
+        document.getElementById('shadow-opacity-value').textContent = `${Math.round(value * 100)}%`;
         this.renderPreview();
         this.saveSettings();
-        }
-        
-        document.getElementById('shadow-opacity-value').textContent = `${Math.round(value * 100)}%`;
     },
 
     // Set shadow radius
@@ -2523,94 +2428,10 @@ window.App = {
     // Set rotation
     setRotation(value) {
         this.saveStateForUndo();
-        
-        // Update individual image setting if multi-image layout
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('rotation', Number(value));
-        } else {
-            // Fallback to global setting for single image
         this.state.rotation = Number(value);
+        document.getElementById('rotation-value').textContent = `${value}°`;
         this.renderPreview();
         this.saveSettings();
-        }
-        
-        document.getElementById('rotation-value').textContent = `${value}°`;
-    },
-
-    // Set image scale
-    setImageScale(value) {
-        this.saveStateForUndo();
-        
-        // Update individual image setting if multi-image layout
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('scale', Number(value));
-        } else {
-            // For single image, just render without saving to state
-            this.renderPreview();
-        }
-        
-        document.getElementById('image-scale-value').textContent = `${Math.round(value * 100)}%`;
-    },
-
-    // Reset image scale to default
-    resetImageScale() {
-        this.saveStateForUndo();
-        
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('scale', 1.2);
-        }
-        
-        document.getElementById('image-scale-slider').value = 1.2;
-        document.getElementById('image-scale-value').textContent = '120%';
-    },
-
-    // Set mask enabled state
-    setMaskEnabled(enabled) {
-        this.saveStateForUndo();
-        
-        // Update individual image setting if multi-image layout
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('maskEnabled', enabled);
-        } else {
-            // For single image, just render without saving to state
-            this.renderPreview();
-        }
-    },
-
-    // Set horizontal pan offset
-    setPanX(value) {
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('panX', value);
-            
-            // Update UI display
-            document.getElementById('pan-x-value').textContent = `${Math.round(value * 100)}%`;
-        }
-        
-        this.renderPreview();
-    },
-
-    // Set vertical pan offset
-    setPanY(value) {
-        if (this.state.imageSettings && this.state.selectedImageIndex >= 0) {
-            this.updateIndividualImageSetting('panY', value);
-            
-            // Update UI display
-            document.getElementById('pan-y-value').textContent = `${Math.round(value * 100)}%`;
-        }
-        
-        this.renderPreview();
-    },
-
-    // Reset horizontal pan to center
-    resetPanX() {
-        this.setPanX(0);
-        document.getElementById('pan-x-slider').value = 0;
-    },
-
-    // Reset vertical pan to center
-    resetPanY() {
-        this.setPanY(0);
-        document.getElementById('pan-y-slider').value = 0;
     },
 
     // Reset shadow offset Y to default
@@ -2667,7 +2488,6 @@ window.App = {
         CanvasRenderer.renderMockup({
             image: image,
                     images: this.state.images,
-                    imageSettings: this.state.imageSettings,
                     currentLayout: this.state.currentLayout,
                     selectedImageIndex: this.state.selectedImageIndex,
             backgroundColor: this.state.backgroundColor,
@@ -2702,6 +2522,9 @@ window.App = {
             rotation: this.state.rotation,
             isFlippedHorizontally: this.state.isFlippedHorizontally,
             isFlippedVertically: this.state.isFlippedVertically,
+            smartFillEnabled: this.state.smartFillEnabled,
+            panX: this.state.panX,
+            panY: this.state.panY,
             watermarkImage: this.state.watermarkImage,
             watermarkOpacity: this.state.watermarkOpacity,
             watermarkScale: this.state.watermarkScale,
@@ -2821,10 +2644,295 @@ window.App = {
         this.state.isFlippedVertically = !this.state.isFlippedVertically;
         this.renderPreview();
         this.saveSettings();
-        UI.updateButtonStates();
+        
+        // Update UI
+        const flipVBtn = document.getElementById('flip-v-btn');
+        if (flipVBtn) {
+            flipVBtn.classList.toggle('active', this.state.isFlippedVertically);
+        }
     },
 
-    // Apply current settings to all canvases
+    // Toggle Smart Fill and Crop
+    toggleSmartFill() {
+        this.saveStateForUndo();
+        this.state.smartFillEnabled = !this.state.smartFillEnabled;
+        
+        // Reset panning when toggling Smart Fill
+        if (!this.state.smartFillEnabled) {
+            this.state.panX = 0;
+            this.state.panY = 0;
+        }
+        
+        this.renderPreview();
+        this.saveSettings();
+        
+        // Update UI
+        this.updateSmartFillUI();
+    },
+
+    // Set pan X value
+    setPanX(value) {
+        this.saveStateForUndo();
+        this.state.panX = Number(value) || 0;
+        this.renderPreview();
+        this.saveSettings();
+        
+        // Update UI
+        const panXValue = document.getElementById('pan-x-value');
+        if (panXValue) {
+            panXValue.textContent = `${this.state.panX}%`;
+        }
+    },
+
+    // Set pan Y value
+    setPanY(value) {
+        this.saveStateForUndo();
+        this.state.panY = Number(value) || 0;
+        this.renderPreview();
+        this.saveSettings();
+        
+        // Update UI
+        const panYValue = document.getElementById('pan-y-value');
+        if (panYValue) {
+            panYValue.textContent = `${this.state.panY}%`;
+        }
+    },
+
+    // Reset pan X
+    resetPanX() {
+        this.setPanX(0);
+        const panXSlider = document.getElementById('pan-x-slider');
+        if (panXSlider) {
+            panXSlider.value = 0;
+        }
+    },
+
+    // Reset pan Y
+    resetPanY() {
+        this.setPanY(0);
+        const panYSlider = document.getElementById('pan-y-slider');
+        if (panYSlider) {
+            panYSlider.value = 0;
+        }
+    },
+    
+    // Reset all image manipulation settings to defaults
+    resetAllImageSettings() {
+        this.saveStateForUndo();
+        
+        // Reset Smart Fill and panning
+        this.state.smartFillEnabled = false;
+        this.state.panX = 0;
+        this.state.panY = 0;
+        
+        // Reset image manipulation settings
+        this.state.cornerRadius = Config.defaultCornerRadius;
+        this.state.padding = Config.defaultPadding;
+        this.state.rotation = Config.defaultRotation;
+        this.state.isFlippedHorizontally = false;
+        this.state.isFlippedVertically = false;
+        
+        // Reset shadow settings
+        this.state.shadowOpacity = Config.defaultShadowOpacity;
+        this.state.shadowRadius = Config.defaultShadowRadius;
+        this.state.shadowOffsetX = Config.defaultShadowOffsetX;
+        this.state.shadowOffsetY = Config.defaultShadowOffsetY;
+        this.state.shadowColor = Config.defaultShadowColor;
+        
+        // Update all UI elements
+        this.updateAllImageSettingsUI();
+        
+        // Re-render and save
+        this.renderPreview();
+        this.saveSettings();
+        
+        // Show notification
+        UI.showNotification('All image settings reset to defaults', 'success', 2000);
+    },
+    
+    // Reset all background effects to defaults
+    resetBackgroundEffects() {
+        this.saveStateForUndo();
+        
+        // Reset blur and filters
+        this.state.backgroundBlurRadius = 0;
+        this.state.backgroundSaturation = 100;
+        this.state.backgroundHueRotation = 0;
+        this.state.backgroundContrast = 100;
+        this.state.backgroundBrightness = 100;
+        
+        // Reset distortion effects
+        this.state.backgroundTwirlAmount = 0;
+        this.state.backgroundWaveAmount = 0;
+        this.state.backgroundRippleAmount = 0;
+        this.state.backgroundZoomAmount = 100;
+        this.state.backgroundShakeAmount = 0;
+        this.state.backgroundLensAmount = 0;
+        
+        // Update all UI elements
+        this.updateBackgroundEffectsUI();
+        
+        // Re-render and save
+        this.renderPreview();
+        this.saveSettings();
+        
+        // Show notification
+        UI.showNotification('All background effects reset to defaults', 'success', 2000);
+    },
+    
+    // Update all image settings UI elements
+    updateAllImageSettingsUI() {
+        // Smart Fill and panning
+        this.updateSmartFillUI();
+        
+        // Corner radius
+        const cornerRadiusSlider = document.getElementById('corner-radius-slider');
+        const cornerRadiusValue = document.getElementById('corner-radius-value');
+        if (cornerRadiusSlider) cornerRadiusSlider.value = this.state.cornerRadius;
+        if (cornerRadiusValue) cornerRadiusValue.textContent = `${this.state.cornerRadius}px`;
+        
+        // Padding
+        const paddingSlider = document.getElementById('padding-slider');
+        const paddingValue = document.getElementById('padding-value');
+        if (paddingSlider) paddingSlider.value = this.state.padding;
+        if (paddingValue) paddingValue.textContent = `${this.state.padding}px`;
+        
+        // Rotation
+        const rotationSlider = document.getElementById('rotation-slider');
+        const rotationValue = document.getElementById('rotation-value');
+        const resetRotationBtn = document.getElementById('reset-rotation-btn');
+        if (rotationSlider) rotationSlider.value = this.state.rotation;
+        if (rotationValue) rotationValue.textContent = `${this.state.rotation}°`;
+        if (resetRotationBtn) resetRotationBtn.disabled = this.state.rotation === 0;
+        
+        // Flip buttons
+        const flipHBtn = document.getElementById('flip-h-btn');
+        const flipVBtn = document.getElementById('flip-v-btn');
+        if (flipHBtn) flipHBtn.classList.toggle('active', this.state.isFlippedHorizontally);
+        if (flipVBtn) flipVBtn.classList.toggle('active', this.state.isFlippedVertically);
+        
+        // Shadow settings
+        const shadowOpacitySlider = document.getElementById('shadow-opacity-slider');
+        const shadowOpacityValue = document.getElementById('shadow-opacity-value');
+        if (shadowOpacitySlider) shadowOpacitySlider.value = this.state.shadowOpacity;
+        if (shadowOpacityValue) shadowOpacityValue.textContent = `${Math.round(this.state.shadowOpacity * 100)}%`;
+        
+        const shadowRadiusSlider = document.getElementById('shadow-radius-slider');
+        const shadowRadiusValue = document.getElementById('shadow-radius-value');
+        if (shadowRadiusSlider) shadowRadiusSlider.value = this.state.shadowRadius;
+        if (shadowRadiusValue) shadowRadiusValue.textContent = `${this.state.shadowRadius}px`;
+        
+        const shadowOffsetXSlider = document.getElementById('shadow-offset-x-slider');
+        const shadowOffsetXValue = document.getElementById('shadow-offset-x-value');
+        if (shadowOffsetXSlider) shadowOffsetXSlider.value = this.state.shadowOffsetX;
+        if (shadowOffsetXValue) shadowOffsetXValue.textContent = `${this.state.shadowOffsetX}px`;
+        
+        const shadowOffsetYSlider = document.getElementById('shadow-offset-y-slider');
+        const shadowOffsetYValue = document.getElementById('shadow-offset-y-value');
+        if (shadowOffsetYSlider) shadowOffsetYSlider.value = this.state.shadowOffsetY;
+        if (shadowOffsetYValue) shadowOffsetYValue.textContent = `${this.state.shadowOffsetY}px`;
+        
+        const shadowColorInput = document.getElementById('shadow-color-input');
+        const shadowColorValue = document.getElementById('shadow-color-value');
+        if (shadowColorInput) shadowColorInput.value = this.state.shadowColor;
+        if (shadowColorValue) shadowColorValue.textContent = this.state.shadowColor;
+        
+        // Update shadow position handle
+        if (UI && UI.updateShadowHandleFromState) {
+            UI.updateShadowHandleFromState();
+        }
+    },
+
+    // Update Smart Fill UI
+    updateSmartFillUI() {
+        const smartFillToggle = document.getElementById('smart-fill-toggle');
+        const panningControls = document.getElementById('panning-controls');
+        
+        if (smartFillToggle) {
+            smartFillToggle.checked = this.state.smartFillEnabled;
+        }
+        
+        if (panningControls) {
+            if (this.state.smartFillEnabled) {
+                panningControls.classList.remove('hidden');
+            } else {
+                panningControls.classList.add('hidden');
+            }
+        }
+        
+        // Update panning sliders and values
+        const panXSlider = document.getElementById('pan-x-slider');
+        const panYSlider = document.getElementById('pan-y-slider');
+        const panXValue = document.getElementById('pan-x-value');
+        const panYValue = document.getElementById('pan-y-value');
+        
+        if (panXSlider) panXSlider.value = this.state.panX;
+        if (panYSlider) panYSlider.value = this.state.panY;
+        if (panXValue) panXValue.textContent = `${this.state.panX}%`;
+        if (panYValue) panYValue.textContent = `${this.state.panY}%`;
+    },
+    
+    // Update background effects UI elements
+    updateBackgroundEffectsUI() {
+        // Blur & Filters
+        const blurSlider = document.getElementById('bg-blur-slider');
+        const blurValue = document.getElementById('blur-value');
+        if (blurSlider) blurSlider.value = this.state.backgroundBlurRadius;
+        if (blurValue) blurValue.textContent = `${this.state.backgroundBlurRadius}px`;
+        
+        const saturationSlider = document.getElementById('bg-saturation-slider');
+        const saturationValue = document.getElementById('saturation-value');
+        if (saturationSlider) saturationSlider.value = this.state.backgroundSaturation;
+        if (saturationValue) saturationValue.textContent = `${this.state.backgroundSaturation}%`;
+        
+        const hueSlider = document.getElementById('bg-hue-slider');
+        const hueValue = document.getElementById('hue-value');
+        if (hueSlider) hueSlider.value = this.state.backgroundHueRotation;
+        if (hueValue) hueValue.textContent = `${this.state.backgroundHueRotation}°`;
+        
+        const contrastSlider = document.getElementById('bg-contrast-slider');
+        const contrastValue = document.getElementById('contrast-value');
+        if (contrastSlider) contrastSlider.value = this.state.backgroundContrast;
+        if (contrastValue) contrastValue.textContent = `${this.state.backgroundContrast}%`;
+        
+        const brightnessSlider = document.getElementById('bg-brightness-slider');
+        const brightnessValue = document.getElementById('brightness-value');
+        if (brightnessSlider) brightnessSlider.value = this.state.backgroundBrightness;
+        if (brightnessValue) brightnessValue.textContent = `${this.state.backgroundBrightness}%`;
+        
+        // Distortion Effects
+        const twirlSlider = document.getElementById('bg-twirl-slider');
+        const twirlValue = document.getElementById('twirl-value');
+        if (twirlSlider) twirlSlider.value = this.state.backgroundTwirlAmount;
+        if (twirlValue) twirlValue.textContent = `${this.state.backgroundTwirlAmount}%`;
+        
+        const waveSlider = document.getElementById('bg-wave-slider');
+        const waveValue = document.getElementById('wave-value');
+        if (waveSlider) waveSlider.value = this.state.backgroundWaveAmount;
+        if (waveValue) waveValue.textContent = `${this.state.backgroundWaveAmount}%`;
+        
+        const rippleSlider = document.getElementById('bg-ripple-slider');
+        const rippleValue = document.getElementById('ripple-value');
+        if (rippleSlider) rippleSlider.value = this.state.backgroundRippleAmount;
+        if (rippleValue) rippleValue.textContent = `${this.state.backgroundRippleAmount}%`;
+        
+        const zoomSlider = document.getElementById('bg-zoom-slider');
+        const zoomValue = document.getElementById('zoom-value');
+        if (zoomSlider) zoomSlider.value = this.state.backgroundZoomAmount;
+        if (zoomValue) zoomValue.textContent = `${this.state.backgroundZoomAmount}%`;
+        
+        const shakeSlider = document.getElementById('bg-shake-slider');
+        const shakeValue = document.getElementById('shake-value');
+        if (shakeSlider) shakeSlider.value = this.state.backgroundShakeAmount;
+        if (shakeValue) shakeValue.textContent = `${this.state.backgroundShakeAmount}%`;
+        
+        const lensSlider = document.getElementById('bg-lens-slider');
+        const lensValue = document.getElementById('lens-value');
+        if (lensSlider) lensSlider.value = this.state.backgroundLensAmount;
+        if (lensValue) lensValue.textContent = `${this.state.backgroundLensAmount}%`;
+    },
+
+    // Apply settings to all canvases
     applySettingsToAll() {
         if (this.state.canvases.length <= 1) {
             UI.showError('Need at least 2 canvases to apply settings to all');
@@ -3198,6 +3306,14 @@ window.App = {
         // Load background images
         this.loadBackgroundImages();
         
+        // Force render backgrounds after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            console.log('🎨 Force rendering backgrounds...');
+            if (UI && UI.renderBackgroundImages) {
+                UI.renderBackgroundImages();
+            }
+        }, 100);
+        
         // Load saved settings
         this.loadSettings();
         
@@ -3232,6 +3348,27 @@ window.App = {
         if (UI && UI.updateResolutionSelection) {
             UI.updateResolutionSelection(`${width}x${height}`);
         }
+        
+        // Final check to ensure backgrounds are rendered
+        setTimeout(() => {
+            const colorContainer = document.getElementById('color-swatches');
+            const gradientContainer = document.getElementById('gradient-swatches');
+            
+            if (colorContainer && colorContainer.children.length === 0) {
+                console.log('🎨 Color swatches missing, forcing render...');
+                if (UI && UI.renderColorSwatches) {
+                    UI.renderColorSwatches();
+                }
+            }
+            
+            if (gradientContainer && gradientContainer.children.length === 0) {
+                console.log('🎨 Gradient swatches missing, forcing render...');
+                if (UI && UI.renderGradientSections) {
+                    UI._gradientSectionsRendered = false; // Reset flag
+                    UI.renderGradientSections();
+                }
+            }
+        }, 500);
         
         // Show dev features based on user level
         if (this.state.userLevel === 'developer') {
@@ -3337,6 +3474,9 @@ window.App = {
             rotation: 0,
             isFlippedHorizontally: false,
             isFlippedVertically: false,
+            smartFillEnabled: false,
+            panX: 0,
+            panY: 0,
             resolution: { width: 1080, height: 1080, name: 'Square (1:1)', id: 'square' },
             watermarkImage: null,
             watermarkFilename: null,

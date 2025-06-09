@@ -350,93 +350,23 @@ window.UI = {
                 btn.classList.remove('disabled');
             }
         });
-        
-        // Also ensure both buttons by ID for redundancy
-        const exportBtn = document.getElementById('export-btn');
-        const exportAllBtn = document.getElementById('export-all-btn');
-        
-        [exportBtn, exportAllBtn].forEach(btn => {
-            if (btn) {
-                btn.disabled = false;
-                btn.removeAttribute('disabled');
-                btn.style.pointerEvents = 'auto';
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-                btn.classList.remove('disabled');
-                
-                // Clear any inline styles that might interfere
-                btn.style.removeProperty('pointer-events');
-                btn.style.pointerEvents = 'auto';
-            }
-        });
-        
-        console.log('✅ Export buttons force-enabled with full properties');
-    },
-
-    // Setup export buttons with robust event handling
-    setupExportButtons() {
-        // Primary export button
-        const exportBtn = document.getElementById('export-btn');
-        if (exportBtn) {
-            // Remove any existing listeners to prevent duplicates
-            exportBtn.replaceWith(exportBtn.cloneNode(true));
-            const newExportBtn = document.getElementById('export-btn');
-            
-            // Add event listener
-            newExportBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔥 Export button clicked');
-                this.showExportSettingsModal();
-            });
-            
-            // Ensure it's enabled and clickable
-            newExportBtn.disabled = false;
-            newExportBtn.style.pointerEvents = 'auto';
-            newExportBtn.style.cursor = 'pointer';
-            
-            console.log('✅ Export button setup complete');
-        } else {
-            console.error('❌ Export button not found in DOM');
-        }
-
-        // Export all button
-        const exportAllBtn = document.getElementById('export-all-btn');
-        if (exportAllBtn) {
-            // Remove any existing listeners to prevent duplicates
-            exportAllBtn.replaceWith(exportAllBtn.cloneNode(true));
-            const newExportAllBtn = document.getElementById('export-all-btn');
-            
-            // Add event listener
-            newExportAllBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔥 Export All button clicked');
-                window.App.exportAllImages();
-            });
-            
-            // Ensure it's enabled and clickable
-            newExportAllBtn.disabled = false;
-            newExportAllBtn.style.pointerEvents = 'auto';
-            newExportAllBtn.style.cursor = 'pointer';
-            
-            console.log('✅ Export All button setup complete');
-        } else {
-            console.error('❌ Export All button not found in DOM');
-        }
-
-        // Update cached references to the new buttons
-        this.elements.exportBtn = document.getElementById('export-btn');
-        this.elements.exportAllBtn = document.getElementById('export-all-btn');
     },
     
     // Setup event listeners
     setupEventListeners() {
         // Button events
         this.elements.uploadBtn.addEventListener('click', () => window.App.createNewCanvas());
+        this.elements.exportBtn.addEventListener('click', () => this.showExportSettingsModal());
+        console.log('✅ Export button event listener attached');
         
-        // Setup export buttons with robust error handling
-        this.setupExportButtons();
+        // Export all button - find by ID since it might not be cached
+        const exportAllBtn = document.getElementById('export-all-btn');
+        if (exportAllBtn) {
+            exportAllBtn.addEventListener('click', () => window.App.exportAllImages());
+            console.log('✅ Export All button event listener attached');
+        } else {
+            console.error('❌ Export All button not found!');
+        }
         
         this.elements.randomBgBtn.addEventListener('click', () => window.App.selectRandomBackground());
         this.elements.flipHBtn.addEventListener('click', () => window.App.toggleFlipHorizontal());
@@ -465,41 +395,6 @@ window.UI = {
         this.elements.resetShadowColorBtn.addEventListener('click', () => window.App.resetShadowColor());
         this.elements.resetRotationBtn.addEventListener('click', () => window.App.resetRotation());
         
-        // Image scale controls
-        const imageScaleSlider = document.getElementById('image-scale-slider');
-        const resetImageScaleBtn = document.getElementById('reset-image-scale-btn');
-        if (imageScaleSlider) {
-            imageScaleSlider.addEventListener('input', (e) => window.App.setImageScale(e.target.value));
-        }
-        if (resetImageScaleBtn) {
-            resetImageScaleBtn.addEventListener('click', () => window.App.resetImageScale());
-        }
-        
-        // Mask enabled toggle
-        const maskEnabledToggle = document.getElementById('mask-enabled-toggle');
-        if (maskEnabledToggle) {
-            maskEnabledToggle.addEventListener('change', (e) => window.App.setMaskEnabled(e.target.checked));
-        }
-        
-        // Pan controls
-        const panXSlider = document.getElementById('pan-x-slider');
-        const panYSlider = document.getElementById('pan-y-slider');
-        const resetPanXBtn = document.getElementById('reset-pan-x-btn');
-        const resetPanYBtn = document.getElementById('reset-pan-y-btn');
-        
-        if (panXSlider) {
-            panXSlider.addEventListener('input', (e) => window.App.setPanX(parseFloat(e.target.value)));
-        }
-        if (panYSlider) {
-            panYSlider.addEventListener('input', (e) => window.App.setPanY(parseFloat(e.target.value)));
-        }
-        if (resetPanXBtn) {
-            resetPanXBtn.addEventListener('click', () => window.App.resetPanX());
-        }
-        if (resetPanYBtn) {
-            resetPanYBtn.addEventListener('click', () => window.App.resetPanY());
-        }
-        
         // Slider events
         this.elements.bgBlurSlider.addEventListener('input', (e) => window.App.setBackgroundBlur(e.target.value));
         this.elements.cornerRadiusSlider.addEventListener('input', (e) => window.App.setCornerRadius(e.target.value));
@@ -513,6 +408,76 @@ window.UI = {
             window.App.setShadowColor(e.target.value);
         });
         this.elements.rotationSlider.addEventListener('input', (e) => window.App.setRotation(e.target.value));
+        
+        // Smart Fill and panning controls
+        const smartFillToggle = document.getElementById('smart-fill-toggle');
+        if (smartFillToggle) {
+            smartFillToggle.addEventListener('change', () => window.App.toggleSmartFill());
+        }
+
+        // Subscription buttons
+        const subscribeProMonthly = document.getElementById('subscribe-pro-monthly');
+        const subscribeProYearly = document.getElementById('subscribe-pro-yearly');
+        
+        if (subscribeProMonthly) {
+            subscribeProMonthly.addEventListener('click', async () => {
+                try {
+                    if (window.StripeIntegration) {
+                        await window.StripeIntegration.createCheckoutSession(
+                            window.STRIPE_CONFIG?.prices?.proMonthly || 'demo_monthly', 
+                            'monthly'
+                        );
+                    } else {
+                        console.error('Stripe integration not initialized');
+                        alert('Subscription system not ready. Please try again in a moment.');
+                    }
+                } catch (error) {
+                    console.error('Monthly subscription failed:', error);
+                    this.showError('Subscription failed. Please try again.');
+                }
+            });
+        }
+        
+        if (subscribeProYearly) {
+            subscribeProYearly.addEventListener('click', async () => {
+                try {
+                    if (window.StripeIntegration) {
+                        await window.StripeIntegration.createCheckoutSession(
+                            window.STRIPE_CONFIG?.prices?.proYearly || 'demo_yearly', 
+                            'yearly'
+                        );
+                    } else {
+                        console.error('Stripe integration not initialized');
+                        alert('Subscription system not ready. Please try again in a moment.');
+                    }
+                } catch (error) {
+                    console.error('Yearly subscription failed:', error);
+                    this.showError('Subscription failed. Please try again.');
+                }
+            });
+        }
+        
+        const panXSlider = document.getElementById('pan-x-slider');
+        if (panXSlider) {
+            panXSlider.addEventListener('input', (e) => window.App.setPanX(e.target.value));
+        }
+        
+        const panYSlider = document.getElementById('pan-y-slider');
+        if (panYSlider) {
+            panYSlider.addEventListener('input', (e) => window.App.setPanY(e.target.value));
+        }
+        
+        const resetPanXBtn = document.getElementById('reset-pan-x-btn');
+        if (resetPanXBtn) {
+            resetPanXBtn.addEventListener('click', () => window.App.resetPanX());
+        }
+        
+        const resetPanYBtn = document.getElementById('reset-pan-y-btn');
+        if (resetPanYBtn) {
+            resetPanYBtn.addEventListener('click', () => window.App.resetPanY());
+        }
+        
+        // Reset all settings button - moved to Actions dropdown
         
         // Shadow position control
         this.setupShadowPositionControl();
@@ -1060,10 +1025,7 @@ window.UI = {
             App.setBackgroundLensAmount(value);
         });
 
-        // Reset all background effects
-        document.getElementById('reset-bg-effects-btn')?.addEventListener('click', () => {
-            App.resetBackgroundEffects();
-        });
+        // Reset all background effects - moved to Actions dropdown
         
         // Noise overlay controls
         document.getElementById('noise-overlay-select')?.addEventListener('change', (e) => {
@@ -1154,11 +1116,6 @@ window.UI = {
         // Watermark controls
         this.setupWatermarkControls();
         
-        // Add text layer button
-        this.elements.addTextBtn?.addEventListener('click', () => {
-            window.App.addTextLayer();
-        });
-        
         // Actions dropdown
         this.elements.actionsDropdownBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1174,6 +1131,18 @@ window.UI = {
         // Clear all watermarks action
         this.elements.clearAllWatermarksBtn?.addEventListener('click', () => {
             this.clearAllWatermarks();
+            this.hideActionsDropdown();
+        });
+        
+        // Reset all image settings action (moved from Image Manipulation section)
+        document.getElementById('reset-all-settings-btn')?.addEventListener('click', () => {
+            window.App.resetAllImageSettings();
+            this.hideActionsDropdown();
+        });
+        
+        // Reset background effects action (moved from Background section)
+        document.getElementById('reset-bg-effects-btn')?.addEventListener('click', () => {
+            window.App.resetBackgroundEffects();
             this.hideActionsDropdown();
         });
         
@@ -1627,7 +1596,7 @@ window.UI = {
         // Update export button text based on content
         const exportBtnText = this.elements.exportBtn.querySelector('span');
         if (exportBtnText) {
-            exportBtnText.textContent = appState.selectedImage ? 'Export' : 'Export Design';
+            exportBtnText.textContent = appState.selectedImage ? 'Export Mockup' : 'Export Design';
         }
         
         // Update reset buttons
@@ -1680,15 +1649,25 @@ window.UI = {
     
     // Renders color swatches
     renderColorSwatches() {
+        console.log('🎨 renderColorSwatches called');
         const container = document.getElementById('color-swatches');
         if (!container) {
-            console.warn('Color swatches container not found');
+            console.warn('❌ Color swatches container not found');
             return;
         }
         
+        console.log('✅ Color swatches container found:', container);
+        
+        if (!Config.colorPresets) {
+            console.warn('❌ Config.colorPresets not found');
+            return;
+        }
+        
+        console.log('✅ Config.colorPresets found:', Config.colorPresets.length, 'colors');
+        
         container.innerHTML = '';
         
-        Config.colorPresets.forEach(color => {
+        Config.colorPresets.forEach((color, index) => {
             const swatch = document.createElement('div');
             swatch.className = 'color-swatch';
             swatch.style.backgroundColor = color;
@@ -1697,9 +1676,10 @@ window.UI = {
             swatch.addEventListener('click', () => window.App.setBackgroundColor(color));
             
             container.appendChild(swatch);
+            console.log(`✅ Added color swatch ${index + 1}:`, color);
         });
         
-        console.log('Rendered', Config.colorPresets.length, 'color swatches');
+        console.log('✅ Rendered', Config.colorPresets.length, 'color swatches');
     },
     
     // Renders gradient swatches as separate sections
@@ -1711,6 +1691,11 @@ window.UI = {
     
     // Renders background images in the sidebar
     renderBackgroundImages() {
+        console.log('🎨 renderBackgroundImages called');
+        console.log('🎨 Config available:', !!window.Config);
+        console.log('🎨 Config.colorPresets available:', !!window.Config?.colorPresets);
+        console.log('🎨 Config.lightToDarkGradients available:', !!window.Config?.lightToDarkGradients);
+        
         // Render colors in the existing background section
         this.renderColorSwatches();
         
@@ -1725,18 +1710,20 @@ window.UI = {
     renderGradientSections() {
         // Prevent multiple calls during initialization
         if (this._gradientSectionsRendered) {
-            console.log('Gradient sections already rendered, skipping...');
+            console.log('🎨 Gradient sections already rendered, skipping...');
             return;
         }
         
-        console.log('Starting renderGradientSections');
+        console.log('🎨 Starting renderGradientSections');
         
         // Find the gradient container in the Color Options subsection
         const gradientContainer = document.getElementById('gradient-swatches');
         if (!gradientContainer) {
-            console.error('Gradient container not found');
+            console.error('❌ Gradient container not found');
             return;
         }
+        
+        console.log('✅ Gradient container found:', gradientContainer);
         
         // Clear any existing gradients
         gradientContainer.innerHTML = '';
@@ -3108,39 +3095,20 @@ window.UI = {
         
         // Mouse events for desktop
         canvasWrapper.addEventListener('mousedown', (e) => {
-            // Check if we're in multi-image mode and over an image
-            const canvas = document.getElementById('preview-canvas');
-            if (canvas && this.isMultiImageMode()) {
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width;
-                const y = (e.clientY - rect.top) / rect.height;
-                
-                const imageSlot = this.getImageSlotAtPosition(x, y);
-                if (imageSlot !== -1) {
-                    // Start image panning instead of canvas panning
-                    this.startImagePanning(e.clientX, e.clientY, imageSlot);
-                    e.preventDefault();
-                    return;
-                }
-            }
-            
-            // Default canvas panning behavior
+            // Allow dragging with any mouse button
+            // Left button (0), middle button (1), or when zoomed in
             this.startDragging(e.clientX, e.clientY);
             e.preventDefault();
         });
         
         document.addEventListener('mousemove', (e) => {
-            if (this.isPanningImage) {
-                this.doImagePan(e.clientX, e.clientY);
-                e.preventDefault();
-            } else if (this.isDragging) {
+            if (this.isDragging) {
                 this.doDrag(e.clientX, e.clientY);
                 e.preventDefault();
             }
         });
         
         document.addEventListener('mouseup', () => {
-            this.stopImagePanning();
             this.stopDragging();
         });
         
@@ -3210,103 +3178,6 @@ window.UI = {
         if (canvasWrapper) {
             canvasWrapper.style.cursor = 'grab';
         }
-    },
-
-    // Check if we're in multi-image mode
-    isMultiImageMode() {
-        return window.App?.state?.currentLayout !== 'single' && 
-               window.App?.state?.images && 
-               window.App.state.images.length > 0;
-    },
-
-    // Get image slot at canvas position
-    getImageSlotAtPosition(normalizedX, normalizedY) {
-        if (!window.App?.state?.currentLayout) return -1;
-        
-        const layout = Config.multiImageLayouts?.find(l => l.id === window.App.state.currentLayout);
-        if (!layout || !layout.slots) return -1;
-        
-        for (let i = 0; i < layout.slots.length; i++) {
-            const slot = layout.slots[i];
-            if (!window.App.state.images[i]) continue; // Skip empty slots
-            
-            // Check if position is within this slot
-            if (normalizedX >= slot.x && normalizedX <= slot.x + slot.width &&
-                normalizedY >= slot.y && normalizedY <= slot.y + slot.height) {
-                return i;
-            }
-        }
-        
-        return -1;
-    },
-
-    // Start image panning
-    startImagePanning(x, y, slotIndex) {
-        this.isPanningImage = true;
-        this.panningSlotIndex = slotIndex;
-        this.lastPanX = x;
-        this.lastPanY = y;
-        
-        // Select the slot being panned
-        window.App.selectImageSlot(slotIndex);
-        
-        const canvasWrapper = document.querySelector('.canvas-wrapper');
-        if (canvasWrapper) {
-            canvasWrapper.style.cursor = 'move';
-        }
-        
-        console.log('🖱️ Started panning image in slot', slotIndex);
-    },
-
-    // Perform image panning
-    doImagePan(x, y) {
-        if (!this.isPanningImage || this.panningSlotIndex === undefined) return;
-        
-        const dx = x - this.lastPanX;
-        const dy = y - this.lastPanY;
-        
-        // Convert pixel movement to normalized pan offsets
-        const canvas = document.getElementById('preview-canvas');
-        if (!canvas) return;
-        
-        const rect = canvas.getBoundingClientRect();
-        const normalizedDx = dx / rect.width;
-        const normalizedDy = dy / rect.height;
-        
-        // Get current pan values
-        const settings = window.App.state.imageSettings?.[this.panningSlotIndex];
-        if (!settings) return;
-        
-        // Update pan with sensitivity adjustment
-        const sensitivity = 2.0; // Adjust this to make panning more/less sensitive
-        const newPanX = Math.max(-1, Math.min(1, settings.panX + normalizedDx * sensitivity));
-        const newPanY = Math.max(-1, Math.min(1, settings.panY + normalizedDy * sensitivity));
-        
-        // Update the pan values
-        window.App.updateIndividualImageSetting('panX', newPanX);
-        window.App.updateIndividualImageSetting('panY', newPanY);
-        
-        // Update last positions
-        this.lastPanX = x;
-        this.lastPanY = y;
-        
-        // Re-render the preview
-        window.App.renderPreview();
-    },
-
-    // Stop image panning
-    stopImagePanning() {
-        if (!this.isPanningImage) return;
-        
-        this.isPanningImage = false;
-        this.panningSlotIndex = undefined;
-        
-        const canvasWrapper = document.querySelector('.canvas-wrapper');
-        if (canvasWrapper) {
-            canvasWrapper.style.cursor = 'grab';
-        }
-        
-        console.log('🖱️ Stopped image panning');
     },
     
     // Setup text layers dragging functionality
@@ -3719,17 +3590,32 @@ window.UI = {
             }
         }
         
-        // Expand the text layers section if it's collapsed
+        // First, ensure the section is expanded
         if (textLayersSection && textLayersSection.classList.contains('collapsed')) {
-            this.toggleSettingsSection(textLayersSection);
-            
-            // Wait for the section to expand before showing editor
-            setTimeout(() => {
-                this.showTextEditorContent(textLayer);
-            }, 350); // Wait for CSS transition
-        } else {
-            this.showTextEditorContent(textLayer);
+            textLayersSection.classList.remove('collapsed');
+            const content = textLayersSection.querySelector('.section-content');
+            if (content) {
+                // Set a temporary large max-height to allow content to show
+                content.style.maxHeight = '2000px';
+            }
         }
+        
+        // Then show and populate the editor content
+        requestAnimationFrame(() => {
+            this.showTextEditorContent(textLayer);
+            
+            // After content is populated, recalculate the proper height
+            if (textLayersSection) {
+                const content = textLayersSection.querySelector('.section-content');
+                if (content) {
+                    requestAnimationFrame(() => {
+                        // Get the actual content height and set it properly
+                        const actualHeight = content.scrollHeight;
+                        content.style.maxHeight = actualHeight + 'px';
+                    });
+                }
+            }
+        });
     },
     
     // Separated content population for better timing control

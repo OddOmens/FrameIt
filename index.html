@@ -3,2918 +3,563 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrameIt - Professional Screenshot Mockup Tool</title>
-    <meta name="description" content="Create beautiful screenshot mockups with customizable frames, shadows, and backgrounds. Perfect for app presentations and portfolios.">
-    <meta name="keywords" content="screenshot mockup, app presentation, device frames, mockup generator, design tool">
+    <title>FrameIt - Transform Screenshots into Professional Mockups</title>
+    <meta name="description" content="Create stunning screenshot mockups with professional frames, shadows, and backgrounds. Perfect for app presentations, portfolios, and marketing materials.">
+    <meta name="keywords" content="screenshot mockup, app presentation, device frames, mockup generator, design tool, app marketing">
     <meta name="author" content="Odd Omens">
-    <meta property="og:title" content="FrameIt - Professional Screenshot Mockup Tool">
-    <meta property="og:description" content="Create beautiful screenshot mockups with customizable frames, shadows, and backgrounds.">
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://frameit.social">
+    <meta property="og:title" content="FrameIt - Transform Screenshots into Professional Mockups">
+    <meta property="og:description" content="Create stunning screenshot mockups with professional frames, shadows, and backgrounds.">
+    <meta property="og:image" content="https://frameit.social/img/landing/hero_image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://frameit.social">
+    <meta property="twitter:title" content="FrameIt - Transform Screenshots into Professional Mockups">
+    <meta property="twitter:description" content="Create stunning screenshot mockups with professional frames, shadows, and backgrounds.">
+    <meta property="twitter:image" content="https://frameit.social/img/landing/hero_image.png">
+    
     <link rel="canonical" href="https://frameit.social">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
-    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/landing.css" as="style">
+    <link rel="preload" href="img/landing/hero_image.png" as="image">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/landing.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Lora:wght@400;700&family=PT+Serif:wght@400;700&family=Crimson+Text:wght@400;600;700&family=Fira+Sans:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Analytics -->
     <script defer data-domain="frameit.social" src="https://plausible.io/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
-
-    <style>
-        .platform-icons {
-            display: flex;
-            gap: 8px;
-            margin-left: auto;
-            padding-left: 16px;
-        }
-
-        .platform-icon {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-
-        .platform-icon:hover {
-            opacity: 1;
-        }
-
-        .platform-icon i {
-            font-size: 14px;
-            color: #888;
-        }
-
-        /* Updated resolution styles */
-        .resolution-option {
-            display: flex;
-            align-items: center;
-            padding: 10px 16px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 14px;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            margin-bottom: 4px;
-        }
-
-        .resolution-option:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .resolution-option.selected {
-            background-color: rgba(255, 255, 255, 0.15);
-            border: 1px solid var(--accent-color);
-        }
-
-        .resolution-option .resolution-name {
-            flex: 1;
-            font-weight: 500;
-            color: #fff;
-        }
-
-        .resolution-categories {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 4px;
-        }
-
-        .category-header {
-            display: none;
-        }
-
-        .category-content {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Updated section header styles */
-        .settings-section .section-header {
-            padding: var(--space-s) 0;
-            margin-bottom: var(--space-m);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: transparent;
-            position: relative;
-        }
-
-        .settings-section .section-header h5 {
-            font-size: 14px;
-            font-weight: 500;
-            color: #fff;
-            margin: 0;
-        }
-
-        .settings-section .section-header::after {
-            content: '\f078';  /* chevron-down */
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            font-size: 12px;
-            color: #888;
-            transition: transform 0.2s ease;
-            margin-left: 8px;
-        }
-
-        .settings-section.collapsed .section-header::after {
-            transform: rotate(-90deg);  /* Point right when collapsed */
-        }
-
-        .settings-section .section-content {
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            max-height: 2000px;
-            opacity: 1;
-            overflow: hidden;
-        }
-
-        .settings-section.collapsed .section-content {
-            max-height: 0;
-            opacity: 0;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Noise controls */
-        .noise-controls {
-            padding: 8px 0;
-        }
-        
-        .noise-controls .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .noise-controls .select-control {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #333;
-            border-radius: 6px;
-            background-color: #1a1a1a;
-            color: #fff;
-            font-size: 14px;
-        }
-        
-        .noise-controls .select-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        
-        .noise-options {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #333;
-        }
-        
-        .noise-options .adjustment-row {
-            margin-bottom: 8px;
-        }
-        
-        .noise-options .slider-container {
-            margin-bottom: 16px;
-        }
-        
-        /* Close upload zone button */
-        .close-upload-zone {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-        
-        .close-upload-zone:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: scale(1.1);
-        }
-        
-        /* Subsection styles */
-        .settings-subsection {
-            margin-bottom: 16px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        
-        .subsection-header {
-            padding: 12px 16px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            transition: background-color 0.2s ease;
-        }
-        
-        .subsection-header:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-        
-        .subsection-header h6 {
-            font-size: 13px;
-            font-weight: 500;
-            color: #fff;
-            margin: 0;
-        }
-        
-        .subsection-header::after {
-            content: '\f078';  /* chevron-down */
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            font-size: 11px;
-            color: #888;
-            transition: transform 0.2s ease;
-        }
-        
-        .settings-subsection.collapsed .subsection-header::after {
-            transform: rotate(-90deg);  /* Point right when collapsed */
-        }
-        
-        .subsection-content {
-            padding: 16px;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            max-height: 2000px;
-            opacity: 1;
-            overflow: hidden;
-        }
-        
-        .settings-subsection.collapsed .subsection-content {
-            max-height: 0;
-            opacity: 0;
-            padding: 0 16px;
-        }
-        
-        /* Header buttons container */
-        .header-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .header-buttons .btn {
-            font-size: 12px;
-            padding: 4px 8px;
-        }
-        
-        /* Watermark styles */
-        .upload-watermark-area {
-            border: 2px dashed #444;
-            border-radius: 8px;
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        
-        .upload-watermark-area:hover {
-            border-color: var(--accent-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .upload-watermark-area.dragover {
-            border-color: var(--accent-color);
-            background: rgba(67, 160, 71, 0.1);
-        }
-        
-        .upload-watermark-area i {
-            font-size: 32px;
-            color: #888;
-            margin-bottom: 12px;
-            display: block;
-        }
-        
-        .upload-watermark-area p {
-            color: #fff;
-            margin: 8px 0 4px 0;
-            font-weight: 500;
-        }
-        
-        .upload-watermark-area small {
-            color: #888;
-            font-size: 12px;
-        }
-        
-        .watermark-preview {
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 16px 0;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        
-        .watermark-preview img {
-            max-width: 100%;
-            max-height: 80px;
-            border-radius: 4px;
-            display: block;
-            margin: 0 auto 8px auto;
-        }
-        
-        .watermark-info {
-            text-align: center;
-        }
-        
-        .watermark-info span {
-            color: #fff;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .watermark-controls {
-            margin-top: 16px;
-        }
-        
-        .watermark-help {
-            margin-top: 16px;
-            padding: 12px;
-            background: rgba(67, 160, 71, 0.1);
-            border-radius: 6px;
-            border-left: 3px solid var(--accent-color);
-        }
-        
-        .watermark-help small {
-            color: #a8e6cf;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-        
-        .watermark-help i {
-            margin-right: 6px;
-            color: var(--accent-color);
-        }
-        
-        /* Text layer styling improvements */
-        .text-layers-list {
-            margin-bottom: 16px;
-        }
-        
-        .empty-text-layers {
-            padding: 24px 16px;
-            color: #666;
-            text-align: center;
-            font-style: italic;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 6px;
-            border: 1px dashed #333;
-        }
-        
-        .text-layer-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid #333;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .text-layer-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: #444;
-        }
-        
-        .text-layer-item.selected {
-            background: rgba(67, 160, 71, 0.1);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 1px rgba(67, 160, 71, 0.3);
-        }
-        
-        .text-layer-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .text-layer-visibility {
-            color: #888;
-            cursor: pointer;
-            transition: color 0.2s ease;
-            font-size: 14px;
-        }
-        
-        .text-layer-visibility:hover {
-            color: #fff;
-        }
-        
-        .text-layer-visibility.hidden {
-            color: #444;
-        }
-        
-        .text-layer-preview {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-        }
-        
-        .text-layer-actions {
-            display: flex;
-            gap: 8px;
-            opacity: 0.7;
-            transition: opacity 0.2s ease;
-        }
-        
-        .text-layer-item:hover .text-layer-actions {
-            opacity: 1;
-        }
-        
-        .text-layer-actions button {
-            background: transparent;
-            border: none;
-            color: #888;
-            padding: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .text-layer-actions button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-        
-        .text-layer-actions .delete-btn:hover {
-            background: rgba(244, 67, 54, 0.2);
-            color: #ff6b6b;
-        }
-        
-        /* Text editor styling improvements */
-        .text-editor {
-            margin-top: 16px;
-            padding: 0;
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            /* Remove fixed height constraints */
-            height: auto;
-            min-height: auto;
-            max-height: none;
-        }
-        
-        .text-editor .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .text-editor .form-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        .text-editor label {
-            display: block;
-            margin-bottom: 6px;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        
-        .text-editor textarea,
-        .text-editor select {
-            width: 100%;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #fff;
-            padding: 8px 12px;
-            font-size: 14px;
-            transition: border-color 0.2s ease;
-        }
-        
-        /* Color input styling to match other color inputs */
-        .text-editor input[type="color"] {
-            width: 100%;
-            height: 44px;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
-            padding: 4px;
-        }
-        
-        .text-editor textarea:focus,
-        .text-editor select:focus,
-        .text-editor input[type="color"]:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        
-        .text-editor textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        
-        /* Match the exact styling of other adjustment rows */
-        .text-editor .adjustment-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .text-editor .adjustment-row label {
-            margin: 0;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        
-        .text-editor .value-display {
-            color: #888;
-            font-size: 12px;
-            font-weight: 500;
-            min-width: 50px;
-            text-align: right;
-        }
-        
-        /* Match the exact slider container styling */
-        .text-editor .slider-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .text-editor .slider-container input[type="range"] {
-            flex: 1;
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-            outline: none;
-            -webkit-appearance: none;
-        }
-        
-        .text-editor .slider-container input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        .text-editor .slider-container input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-        }
-        
-        .text-editor .slider-container input[type="range"]::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            transition: transform 0.2s ease;
-        }
-        
-        .text-editor .slider-container input[type="range"]::-moz-range-thumb:hover {
-            transform: scale(1.1);
-        }
-        
-        .text-align-buttons,
-        .text-style-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .text-align-buttons button,
-        .text-style-buttons button {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #fff;
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 14px;
-        }
-        
-        .text-align-buttons button:hover,
-        .text-style-buttons button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #444;
-        }
-        
-        .text-align-buttons button.active,
-        .text-style-buttons button.active {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #fff;
-        }
-        
-        .text-position-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        
-        .text-position-controls button {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #fff;
-            padding: 6px 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 12px;
-        }
-        
-        .text-position-controls button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #444;
-        }
-        
-        .quick-position-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-top: 8px;
-        }
-        
-        .quick-pos-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #888;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 36px;
-        }
-        
-        .quick-pos-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #444;
-            color: #fff;
-        }
-        
-        .quick-pos-btn.active {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #fff;
-        }
-        
-        /* Checkbox styling improvements to match design exactly */
-        .text-editor .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-        }
-        
-        .text-editor .checkbox-container input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--accent-color);
-            cursor: pointer;
-        }
-        
-        .text-editor .checkbox-container input[type="checkbox"]:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .text-editor .checkbox-container label {
-            margin: 0;
-            cursor: pointer;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .text-editor .checkbox-container input[type="checkbox"]:disabled + label {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        /* Color input wrapper to match other color inputs */
-        .text-editor .color-input-wrapper {
-            position: relative;
-            margin-bottom: 0;
-        }
-        
-        .text-editor .color-input-wrapper input[type="color"] {
-            width: 100%;
-            height: 44px;
-            padding: 4px;
-            border: 1px solid #333;
-            border-radius: 6px;
-            background: #1a1a1a;
-            cursor: pointer;
-        }
-        
-        /* Shadow and background options - completely remove extra styling */
-        .text-editor #text-shadow-options,
-        .text-editor #text-bg-options {
-            margin-top: 16px;
-            display: none;
-            /* Remove all extra padding and backgrounds */
-            padding: 0;
-            background: transparent;
-            border: none;
-            border-radius: 0;
-        }
-        
-        .text-editor #text-shadow-options.visible,
-        .text-editor #text-bg-options.visible {
-            display: block;
-        }
-        
-        /* Ensure no extra styling on any shadow/background elements */
-        .text-editor .shadow-options,
-        .text-editor .background-options {
-            margin: 0;
-            padding: 0;
-            background: transparent;
-            border: none;
-            border-radius: 0;
-        }
-        
-        /* Form help text styling */
-        .text-editor .form-help {
-            display: block;
-            margin-top: 4px;
-            font-size: 12px;
-            color: #666;
-            font-style: italic;
-            line-height: 1.3;
-        }
-        
-        /* Hide the button row at the bottom */
-        .text-editor .button-row {
-            display: none;
-        }
-        
-        /* Subsection title styling to match other sections */
-        .text-editor .subsection-title {
-            font-size: 14px;
-            font-weight: 500;
-            color: #fff;
-            margin: 0 0 16px 0;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #333;
-        }
-        
-        /* Divider styling */
-        .text-editor .divider {
-            height: 1px;
-            background: #333;
-            margin: 16px 0;
-            border: none;
-        }
-        
-        /* Dropdown styles */
-        .dropdown-container {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .dropdown-btn {
-            position: relative;
-        }
-        
-        .dropdown-arrow {
-            margin-left: 8px;
-            font-size: 12px;
-            transition: transform 0.2s ease;
-        }
-        
-        .dropdown-container.active .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-        
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            min-width: 200px;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-        }
-        
-        .dropdown-container.active .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-            padding: 12px 16px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-        }
-        
-        .dropdown-item:first-child {
-            border-radius: 8px 8px 0 0;
-        }
-        
-        .dropdown-item:last-child {
-            border-radius: 0 0 8px 8px;
-        }
-        
-        .dropdown-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .dropdown-item i {
-            width: 16px;
-            text-align: center;
-            opacity: 0.8;
-        }
-        
-        .dropdown-item:hover i {
-            opacity: 1;
-        }
-        
-        /* Layout Grid Styles */
-        .layout-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .layout-item {
-            position: relative;
-            border: 2px solid #333;
-            border-radius: 8px;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .layout-item:hover {
-            border-color: var(--accent-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .layout-item.selected {
-            border-color: var(--accent-color);
-            background: rgba(67, 160, 71, 0.1);
-        }
-        
-        .layout-item img {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 6px;
-            opacity: 0.8;
-            transition: opacity 0.2s ease;
-        }
-        
-        .layout-item:hover img,
-        .layout-item.selected img {
-            opacity: 1;
-        }
-        
-        .layout-item .layout-name {
-            font-size: 11px;
-            color: #fff;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-        
-        /* Image Slots Styles */
-        .image-slots-container {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
-        }
-        
-        .slots-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #fff;
-            margin: 0 0 12px 0;
-        }
-        
-        .image-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 12px;
-        }
-        
-        .image-slot {
-            position: relative;
-            border: 2px dashed #444;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.02);
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .image-slot:hover {
-            border-color: var(--accent-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .image-slot.selected {
-            border-color: var(--accent-color);
-            border-style: solid;
-            background: rgba(67, 160, 71, 0.1);
-        }
-        
-        .image-slot.filled {
-            border-style: solid;
-            border-color: #666;
-            padding: 4px;
-        }
-        
-        .image-slot.filled:hover {
-            border-color: var(--accent-color);
-        }
-        
-        .image-slot.filled.selected {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.3);
-        }
-        
-        .slot-preview {
-            width: 100%;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 6px;
-        }
-        
-        .slot-label {
-            font-size: 11px;
-            color: #aaa;
-            font-weight: 500;
-            text-align: center;
-        }
-        
-        .image-slot.filled .slot-label {
-            color: #fff;
-        }
-        
-        .slot-empty-icon {
-            font-size: 24px;
-            color: #666;
-            margin-bottom: 6px;
-        }
-        
-        .image-slot:hover .slot-empty-icon {
-            color: var(--accent-color);
-        }
-        
-        .slot-actions {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            display: flex;
-            gap: 4px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        
-        .image-slot.filled:hover .slot-actions {
-            opacity: 1;
-        }
-        
-        .slot-action {
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            padding: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .slot-action:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: scale(1.1);
-        }
-        
-        .slot-action.remove:hover {
-            background: rgba(244, 67, 54, 0.8);
-        }
-        
-        .slot-action.replace:hover {
-            background: rgba(33, 150, 243, 0.8);
-        }
-        
-        .slot-action.duplicate:hover {
-            background: rgba(76, 175, 80, 0.8);
-        }
-        
-        /* Drag and drop feedback */
-        .image-slot.dragging {
-            opacity: 0.5;
-            transform: scale(0.95);
-            border-color: var(--accent-color);
-        }
-        
-        .image-slot.drag-over {
-            border-color: var(--accent-color);
-            background: rgba(67, 160, 71, 0.2);
-            transform: scale(1.05);
-        }
-        
-        /* Context menu styles */
-        .slot-context-menu {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .context-menu-item {
-            transition: background-color 0.2s ease;
-        }
-        
-        /* Duplicate modal styles */
-        .duplicate-slot-modal {
-            animation: fadeIn 0.2s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .duplicate-option:hover {
-            background: rgba(67, 160, 71, 0.8) !important;
-            transform: scale(1.05);
-        }
-        
-        .cancel-duplicate:hover {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-color: #888 !important;
-        }
-
-        /* Checkbox styles */
-        .checkbox-row {
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-            color: #e0e0e0;
-            user-select: none;
-        }
-
-        .checkbox-container input[type="checkbox"] {
-            display: none;
-        }
-
-        .checkmark {
-            width: 18px;
-            height: 18px;
-            background-color: #2a2a2a;
-            border: 1px solid #555;
-            border-radius: 3px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .checkbox-container:hover .checkmark {
-            border-color: #43A047;
-            background-color: #333;
-        }
-
-        .checkbox-container input[type="checkbox"]:checked + .checkmark {
-            background-color: #43A047;
-            border-color: #43A047;
-        }
-
-        .checkbox-container input[type="checkbox"]:checked + .checkmark::after {
-            content: '✓';
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-        }
-    </style>
+    
+    <!-- Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "FrameIt",
+        "description": "Create stunning screenshot mockups with professional frames, shadows, and backgrounds. Perfect for app presentations, portfolios, and marketing materials.",
+        "url": "https://frameit.social",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "Odd Omens"
+        },
+        "image": "https://frameit.social/img/landing/hero_image.png"
+    }
+    </script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Toolbar and Content Wrapper -->
-        <div class="toolbar-and-content-wrapper">
-            <!-- Top Toolbar -->
-            <div class="toolbar">
-                <div class="toolbar-left">
-                    <div class="app-logo">
-                        <span class="logo-text">FrameIt</span>
-                    </div>
-                    
-                    <!-- Authentication UI (moved here to be next to logo) -->
-                    <div id="auth-section" class="auth-section">
-                        <button id="account-btn" class="btn">
-                            <i class="fas fa-user-circle"></i>
-                            <span>Account</span>
-                        </button>
-                        
-                        <!-- Hidden elements for auth state management -->
-                        <div id="auth-buttons" class="auth-buttons hidden">
-                            <button id="login-btn" class="btn">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span>Login</span>
-                            </button>
-                            <button id="signup-btn" class="btn primary-btn">
-                                <i class="fas fa-user-plus"></i>
-                                <span>Sign Up</span>
-                            </button>
-                        </div>
-                        
-                        <div id="user-menu" class="user-menu hidden">
-                            <div class="user-info">
-                                <span id="user-email"></span>
-                                <button id="user-settings-btn" class="btn icon-btn">
-                                    <i class="fas fa-user-circle"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button id="help-btn" class="btn">
-                        <i class="fas fa-question-circle"></i>
-                        <span>Help</span>
-                    </button>
-                    
-                    <button id="logout-btn" class="btn" style="display: none;">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🖼️</span>
+                <span class="brand-text">FrameIt</span>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="btn btn-ghost" id="signin-btn">Sign In</button>
+                <button class="btn btn-primary" id="get-started-btn">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-magic"></i>
+                    <span>Professional Mockup Tool</span>
                 </div>
                 
-                <div class="toolbar-right">
-                    <button id="add-image-btn" class="btn">
-                        <i class="fas fa-image"></i>
-                        <span>Add Image</span>
+                <h1 class="hero-title">Transform Screenshots into Professional Mockups</h1>
+                <p class="hero-description">Create stunning app presentations with customizable frames, shadows, and backgrounds. No design skills required.</p>
+                
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-large" id="hero-cta">
+                        <i class="fas fa-rocket"></i>
+                        Start Creating Free
                     </button>
-                    <button id="upload-btn" class="btn">
-                        <i class="fas fa-plus"></i>
-                        <span>New Canvas</span>
-                    </button>
-                    
-                    <!-- Actions Dropdown -->
-                    <div class="dropdown-container">
-                        <button id="actions-dropdown-btn" class="btn dropdown-btn">
-                            <i class="fas fa-cog"></i>
-                            <span>Actions</span>
-                            <i class="fas fa-chevron-down dropdown-arrow"></i>
-                        </button>
-                        <div class="dropdown-menu" id="actions-dropdown-menu">
-                            <button class="dropdown-item" id="clear-all-canvases-btn">
-                                <i class="fas fa-trash-alt"></i>
-                                <span>Clear All Canvases</span>
-                            </button>
-                            <button class="dropdown-item" id="clear-all-watermarks-btn">
-                                <i class="fas fa-stamp"></i>
-                                <span>Clear All Watermarks</span>
-                            </button>
-                        </div>
+                    <div class="hero-stats">
+                        <span><strong id="stat-users">0</strong> creators</span>
+                        <span><strong id="stat-exports">0</strong> mockups created</span>
                     </div>
-                    
-                    <button id="export-btn" class="btn primary-btn" disabled>
-                        <i class="fas fa-download"></i>
-                        <span>Export</span>
-                    </button>
-                    <button id="export-all-btn" class="btn">
-                        <i class="fas fa-file-export"></i>
-                        <span>Export All</span>
-                    </button>
                 </div>
             </div>
             
-            <!-- Main Content Area -->
-            <div class="main-content">
-                <!-- Gallery Panel (vertical left side) -->
-                <div class="gallery-bar" id="gallery-container">
-                    <h5 class="panel-title">Gallery
-                        <button id="gallery-upload-btn" class="btn success-btn">
-                            <i class="fas fa-plus"></i>
-                            <span>New Canvas</span>
-                        </button>
-                    </h5>
-                    <div class="gallery-content-wrapper">
-                        <div class="gallery-content" id="gallery-content">
-                            <!-- Gallery items will be added here dynamically -->
-                        </div>
-                    </div>
+            <div class="hero-visual">
+                <div class="hero-image-container">
+                    <img src="img/landing/hero_image.png" 
+                         alt="FrameIt interface showing professional screenshot mockup creation" 
+                         class="hero-image"
+                         loading="eager">
+                    <div class="hero-glow"></div>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- Left Column with Canvas -->
-                <div class="left-column">
-                    <!-- Canvas Preview Area -->
-                    <div class="canvas-container">
-                        <div class="canvas-wrapper">
-                            <div id="canvas-preview" class="canvas-preview">
-                                <div id="image-drop-zone" class="image-drop-zone">
-                                    <button class="close-upload-zone" id="close-upload-zone">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    <div class="upload-prompt">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p>Add Image</p>
-                                        <button class="btn upload-btn">Add Image</button>
-                                    </div>
-                                </div>
-                                <canvas id="preview-canvas"></canvas>
-                            </div>
-                        </div>
-                        <div class="canvas-zoom-controls">
-                            <button id="zoom-out-btn" class="zoom-btn" title="Zoom Out">
-                                <i class="fas fa-search-minus"></i>
-                            </button>
-                            <button id="zoom-reset-btn" class="zoom-btn" title="Reset Zoom">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                            <button id="zoom-in-btn" class="zoom-btn" title="Zoom In">
-                                <i class="fas fa-search-plus"></i>
-                            </button>
-                        </div>
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Everything you need to create stunning mockups</h2>
+                <p class="section-subtitle">Professional tools designed for creators, marketers, and developers</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
                     </div>
+                    <h3>Custom Backgrounds</h3>
+                    <p>Choose from colors, gradients, or upload custom images with professional filters and effects</p>
                 </div>
                 
-                <!-- Control Panels -->
-                <div class="control-panels">
-                    <!-- Combined Settings Panel -->
-                    <div class="control-panel">
-                        <h5 class="panel-title">Customize
-                            <button id="apply-to-all-btn" class="btn success-btn">
-                                <i class="fas fa-sync"></i>
-                                <span>Apply to All</span>
-                            </button>
-                        </h5>
-                        <div class="panel-content">
-                            <!-- Resolution Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Resolution</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="resolution-categories">
-                                        <!-- Resolution categories will be populated dynamically -->
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Multi-Image Layout Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Layout</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="layout-grid" id="layout-grid">
-                                        <!-- Layout templates will be populated dynamically -->
-                                    </div>
-                                    
-                                    <!-- Image Slots -->
-                                    <div id="image-slots-container" class="image-slots-container">
-                                        <h6 class="slots-title">Image Slots</h6>
-                                        <div id="image-slots" class="image-slots">
-                                            <!-- Image slots will be populated dynamically -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Image Manipulation Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Image Manipulation</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="adjustment-row">
-                                        <label>Corner Radius</label>
-                                        <span class="value-display" id="corner-radius-value">25px</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="corner-radius-slider" min="0" max="100" value="25" step="1">
-                                        <button id="reset-corner-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Padding</label>
-                                        <span class="value-display" id="padding-value">75px</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="padding-slider" min="0" max="150" value="75" step="1">
-                                        <button id="reset-padding-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Rotation</label>
-                                        <span class="value-display" id="rotation-value">0°</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="rotation-slider" min="0" max="360" value="0" step="1">
-                                        <button id="reset-rotation-btn" class="reset-btn" disabled>
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Image Scale</label>
-                                        <span class="value-display" id="image-scale-value">120%</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="image-scale-slider" min="0.5" max="2.0" value="1.2" step="0.1">
-                                        <button id="reset-image-scale-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="checkbox-row">
-                                        <label class="checkbox-container">
-                                            <input type="checkbox" id="mask-enabled-toggle" checked>
-                                            <span class="checkmark"></span>
-                                            Smart Fill & Crop
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Pan Horizontal</label>
-                                        <span class="value-display" id="pan-x-value">0%</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="pan-x-slider" min="-1" max="1" value="0" step="0.01">
-                                        <button id="reset-pan-x-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Pan Vertical</label>
-                                        <span class="value-display" id="pan-y-value">0%</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="pan-y-slider" min="-1" max="1" value="0" step="0.01">
-                                        <button id="reset-pan-y-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="button-row">
-                                        <button id="flip-h-btn" class="btn">
-                                            <i class="fas fa-arrows-alt-h"></i>
-                                            <span>Flip H</span>
-                                        </button>
-                                        <button id="flip-v-btn" class="btn">
-                                            <i class="fas fa-arrows-alt-v"></i>
-                                            <span>Flip V</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Shadow Settings Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Shadow Settings</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="adjustment-row">
-                                        <label>Shadow Opacity</label>
-                                        <span class="value-display" id="shadow-opacity-value">15%</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="shadow-opacity-slider" min="0" max="1" value="0.15" step="0.01">
-                                        <button id="reset-shadow-opacity-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Shadow Color</label>
-                                        <span class="value-display" id="shadow-color-value">#000000</span>
-                                    </div>
-                                    <div class="color-input-wrapper">
-                                        <input type="color" id="shadow-color-input" value="#000000">
-                                        <button id="reset-shadow-color-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Shadow Radius</label>
-                                        <span class="value-display" id="shadow-radius-value">8px</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="shadow-radius-slider" min="0" max="200" value="8" step="1">
-                                        <button id="reset-shadow-radius-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Shadow Offset X</label>
-                                        <span class="value-display" id="shadow-offset-x-value">0px</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="shadow-offset-x-slider" min="-50" max="50" value="0" step="1">
-                                        <button id="reset-shadow-offset-x-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Shadow Offset Y</label>
-                                        <span class="value-display" id="shadow-offset-y-value">4px</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="shadow-offset-y-slider" min="-50" max="50" value="4" step="1">
-                                        <button id="reset-shadow-offset-y-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Shadow Position</label>
-                                    </div>
-                                    <div class="shadow-position-control">
-                                        <div class="shadow-position-grid">
-                                            <div class="shadow-position-handle" id="shadow-position-handle"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Templates Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Templates</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="templates-grid" id="templates-grid">
-                                        <!-- Template swatches will be added here via JavaScript -->
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Background Options Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Background</h5>
-                                    <div class="header-buttons">
-                                        <button id="reset-bg-effects-btn" class="btn small-btn danger-btn">
-                                            <i class="fas fa-undo-alt"></i>
-                                            <span>Reset Effects</span>
-                                        </button>
-                                        <button id="random-bg-btn" class="btn small-btn">
-                                            <i class="fas fa-dice"></i>
-                                            <span>Random</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="section-content">
-                                    <!-- Blur & Filters Subsection -->
-                                    <div class="settings-subsection">
-                                        <div class="subsection-header">
-                                            <h6>Blur & Filters</h6>
-                                        </div>
-                                        <div class="subsection-content">
-                                            <div class="adjustment-row">
-                                                <label>Background Blur</label>
-                                                <span class="value-display" id="blur-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-blur-slider" min="0" max="20" value="0" step="1">
-                                                <button id="reset-blur-btn" class="reset-btn" disabled>
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Saturation</label>
-                                                <span class="value-display" id="saturation-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-saturation-slider" min="0" max="200" value="100" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Hue Rotation</label>
-                                                <span class="value-display" id="hue-value">0°</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-hue-slider" min="0" max="360" value="0" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Contrast</label>
-                                                <span class="value-display" id="contrast-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-contrast-slider" min="0" max="200" value="100" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Brightness</label>
-                                                <span class="value-display" id="brightness-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-brightness-slider" min="0" max="200" value="100" step="5">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Distortion Effects Subsection -->
-                                    <div class="settings-subsection">
-                                        <div class="subsection-header">
-                                            <h6>Distortion Effects</h6>
-                                        </div>
-                                        <div class="subsection-content">
-                                            <div class="adjustment-row">
-                                                <label>Twirl Effect</label>
-                                                <span class="value-display" id="twirl-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-twirl-slider" min="0" max="100" value="0" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Wave Distortion</label>
-                                                <span class="value-display" id="wave-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-wave-slider" min="0" max="100" value="0" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Ripple Effect</label>
-                                                <span class="value-display" id="ripple-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-ripple-slider" min="0" max="100" value="0" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Zoom Scale</label>
-                                                <span class="value-display" id="zoom-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-zoom-slider" min="50" max="200" value="100" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Shake Effect</label>
-                                                <span class="value-display" id="shake-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-shake-slider" min="0" max="100" value="0" step="5">
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Lens Distortion</label>
-                                                <span class="value-display" id="lens-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-lens-slider" min="0" max="100" value="0" step="5">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Color Options Subsection -->
-                                    <div class="settings-subsection">
-                                        <div class="subsection-header">
-                                            <h6>Color Options</h6>
-                                        </div>
-                                        <div class="subsection-content">
-                                            <!-- Color swatches -->
-                                            <h5 class="subsection-title">Colors</h5>
-                                            <div class="color-grid" id="color-swatches">
-                                                <!-- Color swatches will be added here via JavaScript -->
-                                            </div>
-                                            
-                                            <!-- Gradients -->
-                                            <h5 class="subsection-title">Gradients</h5>
-                                            <div class="gradient-grid" id="gradient-swatches">
-                                                <!-- Gradient swatches will be added here via JavaScript -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Noise Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Noise & Texture</h5>
-                                    <button id="random-noise-btn" class="btn small-btn">
-                                        <i class="fas fa-dice"></i>
-                                        <span>Random</span>
-                                    </button>
-                                </div>
-                                <div class="section-content">
-                                    <div class="noise-controls">
-                                        <div class="form-group">
-                                            <label for="noise-overlay-select">Noise Type:</label>
-                                            <select id="noise-overlay-select" class="select-control">
-                                                <!-- Options will be populated by JavaScript -->
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="noise-options" id="noise-options" style="display: none;">
-                                            <div class="adjustment-row">
-                                                <label>Noise Intensity</label>
-                                                <span class="value-display" id="noise-intensity-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="noise-intensity-slider" min="0" max="2" value="1" step="0.1">
-                                                <button id="reset-noise-intensity-btn" class="reset-btn">
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Noise Opacity</label>
-                                                <span class="value-display" id="noise-opacity-value">70%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="noise-opacity-slider" min="0" max="1" value="0.7" step="0.05">
-                                                <button id="reset-noise-opacity-btn" class="reset-btn">
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label for="noise-blend-mode">Blend Mode:</label>
-                                                <select id="noise-blend-mode" class="select-control">
-                                                    <option value="multiply">Multiply</option>
-                                                    <option value="overlay">Overlay</option>
-                                                    <option value="soft-light">Soft Light</option>
-                                                    <option value="hard-light">Hard Light</option>
-                                                    <option value="screen">Screen</option>
-                                                    <option value="darken">Darken</option>
-                                                    <option value="lighten">Lighten</option>
-                                                    <option value="normal">Normal</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="adjustment-row">
-                                                <label>Scale</label>
-                                                <span class="value-display" id="noise-scale-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="noise-scale-slider" min="0.1" max="3" value="1" step="0.1">
-                                                <button id="reset-noise-scale-btn" class="reset-btn">
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <div class="checkbox-container">
-                                                    <input type="checkbox" id="noise-invert-toggle">
-                                                    <label for="noise-invert-toggle">Invert Colors</label>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="button-row">
-                                                <button id="clear-noise-btn" class="btn danger-btn">
-                                                    <i class="fas fa-times"></i>
-                                                    <span>Clear Noise</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Text Layers Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Text Layers</h5>
-                                    <button id="add-text-btn" class="btn primary-btn small-btn">
-                                        <i class="fas fa-plus"></i>
-                                        <span>Add Text</span>
-                                    </button>
-                                </div>
-                                <div class="section-content">
-                                    <div id="text-layers-list" class="text-layers-list">
-                                        <!-- Text layers will be added here via JavaScript -->
-                                        <div class="empty-text-layers">
-                                            <p>No text layers yet. Click "Add Text" to create one.</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div id="text-editor" class="text-editor hidden">
-                                        <div class="divider"></div>
-                                        <h5 class="subsection-title">Edit Text Layer</h5>
-                                        
-                                        <div class="form-group">
-                                            <label>Text Content</label>
-                                            <textarea id="text-content" rows="4" placeholder="Enter your text. Press Enter for new lines."></textarea>
-                                            <small class="form-help">Text will automatically wrap at 90% of the canvas width. Press Enter for manual line breaks.</small>
-                                        </div>
-                                        
-                                        <div class="adjustment-row">
-                                            <label>Font Size</label>
-                                            <span class="value-display" id="font-size-value">36px</span>
-                                        </div>
-                                        <div class="slider-container">
-                                            <input type="range" id="font-size-slider" min="10" max="500" value="36" step="1">
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label>Font Family</label>
-                                            <select id="font-family-select">
-                                                <option value="Arial, sans-serif">Arial</option>
-                                                <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
-                                                <option value="'Times New Roman', serif">Times New Roman</option>
-                                                <option value="Georgia, serif">Georgia</option>
-                                                <option value="Verdana, sans-serif">Verdana</option>
-                                                <option value="'Roboto', sans-serif">Roboto</option>
-                                                <option value="'Open Sans', sans-serif">Open Sans</option>
-                                                <option value="'Montserrat', sans-serif">Montserrat</option>
-                                                <option value="'Playfair Display', serif">Playfair Display</option>
-                                                <option value="'Lato', sans-serif">Lato</option>
-                                                <option value="'Source Sans Pro', sans-serif">Source Sans Pro</option>
-                                                <option value="'Nunito', sans-serif">Nunito</option>
-                                                <option value="'Poppins', sans-serif">Poppins</option>
-                                                <option value="'Inter', sans-serif">Inter</option>
-                                                <option value="'Raleway', sans-serif">Raleway</option>
-                                                <option value="'Oswald', sans-serif">Oswald</option>
-                                                <option value="'Merriweather', serif">Merriweather</option>
-                                                <option value="'Lora', serif">Lora</option>
-                                                <option value="'PT Serif', serif">PT Serif</option>
-                                                <option value="'Crimson Text', serif">Crimson Text</option>
-                                                <option value="'Fira Sans', sans-serif">Fira Sans</option>
-                                                <option value="'Ubuntu', sans-serif">Ubuntu</option>
-                                                <option value="'Work Sans', sans-serif">Work Sans</option>
-                                                <option value="'Quicksand', sans-serif">Quicksand</option>
-                                                <option value="'Barlow', sans-serif">Barlow</option>
-                                                <option value="'DM Sans', sans-serif">DM Sans</option>
-                                                <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
-                                                <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                                                <option value="'Fira Code', monospace">Fira Code</option>
-                                                <option value="'Source Code Pro', monospace">Source Code Pro</option>
-                                                <option value="monospace">Monospace</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label>Position</label>
-                                            <div class="text-position-controls">
-                                                <button id="bring-to-front-btn" class="btn small-btn">
-                                                    <i class="fas fa-level-up-alt"></i>
-                                                    <span>Bring to Front</span>
-                                                </button>
-                                                <button id="send-to-back-btn" class="btn small-btn">
-                                                    <i class="fas fa-level-down-alt"></i>
-                                                    <span>Send to Back</span>
-                                                </button>
-                                            </div>
-                                            <div class="quick-position-grid">
-                                                <button id="pos-top-left" class="quick-pos-btn" title="Top Left">⬉</button>
-                                                <button id="pos-top" class="quick-pos-btn" title="Top Center">⬆</button>
-                                                <button id="pos-top-right" class="quick-pos-btn" title="Top Right">⬈</button>
-                                                <button id="pos-left" class="quick-pos-btn" title="Middle Left">⬅</button>
-                                                <button id="pos-center" class="quick-pos-btn" title="Center">⦿</button>
-                                                <button id="pos-right" class="quick-pos-btn" title="Middle Right">➡</button>
-                                                <button id="pos-bottom-left" class="quick-pos-btn" title="Bottom Left">⬋</button>
-                                                <button id="pos-bottom" class="quick-pos-btn" title="Bottom Center">⬇</button>
-                                                <button id="pos-bottom-right" class="quick-pos-btn" title="Bottom Right">⬊</button>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label>Font Color</label>
-                                            <div class="color-input-wrapper">
-                                                <input type="color" id="text-color-input" value="#FFFFFF">
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label>Text Align</label>
-                                            <div class="text-align-buttons">
-                                                <button id="align-left-btn" class="btn small-btn">
-                                                    <i class="fas fa-align-left"></i>
-                                                </button>
-                                                <button id="align-center-btn" class="btn small-btn active">
-                                                    <i class="fas fa-align-center"></i>
-                                                </button>
-                                                <button id="align-right-btn" class="btn small-btn">
-                                                    <i class="fas fa-align-right"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label>Text Style</label>
-                                            <div class="text-style-buttons">
-                                                <button id="bold-btn" class="btn small-btn">
-                                                    <i class="fas fa-bold"></i>
-                                                </button>
-                                                <button id="italic-btn" class="btn small-btn">
-                                                    <i class="fas fa-italic"></i>
-                                                </button>
-                                                <button id="underline-btn" class="btn small-btn">
-                                                    <i class="fas fa-underline"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="adjustment-row">
-                                            <label>Text Opacity</label>
-                                            <span class="value-display" id="text-opacity-value">100%</span>
-                                        </div>
-                                        <div class="slider-container">
-                                            <input type="range" id="text-opacity-slider" min="0" max="1" value="1" step="0.01">
-                                        </div>
-                                        
-                                        <div id="text-shadow-options" class="shadow-options">
-                                            <div class="form-group">
-                                                <label>Shadow Color</label>
-                                                <div class="color-input-wrapper">
-                                                    <input type="color" id="text-shadow-color" value="#000000">
-                                                </div>
-                                            </div>
-                                            <div class="adjustment-row">
-                                                <label>Shadow Opacity</label>
-                                                <span class="value-display" id="text-shadow-opacity-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="text-shadow-opacity-slider" min="0" max="1" value="0" step="0.01">
-                                            </div>
-                                            <div class="adjustment-row">
-                                                <label>Shadow Blur</label>
-                                                <span class="value-display" id="text-shadow-blur-value">3px</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="text-shadow-blur-slider" min="0" max="20" value="3" step="1">
-                                            </div>
-                                        </div>
-                                        
-                                        <div id="text-bg-options" class="background-options">
-                                            <div class="form-group">
-                                                <label>Background Color</label>
-                                                <div class="color-input-wrapper">
-                                                    <input type="color" id="text-bg-color" value="#333333">
-                                                </div>
-                                            </div>
-                                            <div class="adjustment-row">
-                                                <label>Background Opacity</label>
-                                                <span class="value-display" id="text-bg-opacity-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="text-bg-opacity-slider" min="0" max="1" value="0" step="0.01">
-                                            </div>
-                                            <div class="adjustment-row">
-                                                <label>Padding</label>
-                                                <span class="value-display" id="text-padding-value">10px</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="text-padding-slider" min="0" max="50" value="10" step="1">
-                                            </div>
-                                            <div class="adjustment-row">
-                                                <label>Rounded Corners</label>
-                                                <span class="value-display" id="text-bg-radius-value">4px</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="text-bg-radius-slider" min="0" max="100" value="4" step="1">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <!-- Watermark Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Text Watermark</h5>
-                                    <div class="header-buttons">
-                                        <button id="clear-watermark-btn" class="btn small-btn danger-btn">
-                                            <i class="fas fa-times"></i>
-                                            <span>Clear</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="section-content">
-                                    <div class="form-group">
-                                        <label for="watermark-text">Watermark Text</label>
-                                        <input type="text" id="watermark-text" class="select-control" placeholder="Enter watermark text" maxlength="50">
-                                        <small class="form-help">Add your watermark text (e.g., your name, website, or logo text)</small>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="watermark-position-select">Position</label>
-                                        <select id="watermark-position-select" class="select-control">
-                                            <option value="top-left">Top Left</option>
-                                            <option value="top-right">Top Right</option>
-                                            <option value="bottom-left">Bottom Left</option>
-                                            <option value="bottom-right" selected>Bottom Right</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="watermark-color-select">Text Color</label>
-                                        <select id="watermark-color-select" class="select-control">
-                                            <option value="white" selected>White</option>
-                                            <option value="black">Black</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Opacity</label>
-                                        <span class="value-display" id="watermark-opacity-value">70%</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="watermark-opacity-slider" min="0" max="1" value="0.7" step="0.01">
-                                        <button id="reset-watermark-opacity-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Font Size</label>
-                                        <span class="value-display" id="watermark-font-size-value">16px</span>
-                                    </div>
-                                    <div class="slider-container">
-                                        <input type="range" id="watermark-font-size-slider" min="10" max="48" value="16" step="1">
-                                        <button id="reset-watermark-font-size-btn" class="reset-btn">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="button-row">
-                                        <button id="apply-watermark-to-all-btn" class="btn success-btn">
-                                            <i class="fas fa-sync"></i>
-                                            <span>Apply to All</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-adjust"></i>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modals -->
-    <div class="modal" id="history-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Screenshot History</h3>
-                <div class="modal-actions">
-                    <button id="clear-history-btn" class="btn danger-btn small-btn">
-                        <i class="fas fa-trash"></i>
-                        <span>Clear All</span>
-                    </button>
-                    <button class="modal-close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div id="history-items" class="history-items">
-                    <!-- History items will be added here dynamically -->
-                </div>
-                <div id="empty-history" class="empty-history">
-                    <i class="fas fa-photo-video"></i>
-                    <h4>No History</h4>
-                    <p>Your exported mockups will appear here</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Export Settings Modal -->
-    <div class="modal" id="export-settings-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Export Settings</h3>
-                <div class="modal-actions">
-                    <button class="modal-close-btn" id="export-settings-close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div class="settings-section">
-                    <h4>Export Dimensions</h4>
-                    <div class="setting-row">
-                        <label for="export-dimension-select">Size:</label>
-                        <select id="export-dimension-select" class="select-control">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
-                    </div>
-                    <div id="custom-size-controls" class="setting-row hidden">
-                        <div class="dimension-input-container">
-                            <label for="custom-width">Width:</label>
-                            <input type="number" id="custom-width" class="number-input" min="50" max="8000">
-                        </div>
-                        <div class="dimension-input-container">
-                            <label for="custom-height">Height:</label>
-                            <input type="number" id="custom-height" class="number-input" min="50" max="8000">
-                        </div>
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="maintain-aspect-ratio" checked>
-                            <label for="maintain-aspect-ratio">Maintain aspect ratio</label>
-                        </div>
-                    </div>
+                    <h3>Advanced Shadows</h3>
+                    <p>Fine-tune shadow positioning, blur, opacity, and color for realistic depth and dimension</p>
                 </div>
                 
-                <div class="settings-section">
-                    <h4>Export Format</h4>
-                    <div class="setting-row">
-                        <label for="export-format-select">Format:</label>
-                        <select id="export-format-select" class="select-control">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-texture"></i>
                     </div>
-                    <div class="setting-row" id="quality-container">
-                        <label for="export-quality-select">Quality:</label>
-                        <select id="export-quality-select" class="select-control">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
-                    </div>
+                    <h3>Textures & Effects</h3>
+                    <p>Add paper, canvas, grain, and fabric textures with customizable blend modes and intensity</p>
                 </div>
                 
-                <div class="button-row">
-                    <button id="cancel-export-btn" class="btn">Cancel</button>
-                    <button id="confirm-export-btn" class="btn primary-btn">Export</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Help Modal -->
-    <div class="modal" id="help-modal">
-        <div class="modal-content help-modal-content">
-            <div class="modal-header help-modal-header">
-                <h3>Welcome to FrameIt</h3>
-                <button class="modal-close-btn" id="help-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body help-modal-body">
-                <div class="help-section">
-                    <h4><i class="fas fa-cloud-upload-alt"></i> Getting Started</h4>
-                    <p>Create beautiful designs with or without images! Add images by clicking "Add Image" or drag & drop files directly onto the canvas. You can also create stunning text and background-only designs.</p>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-palette"></i> Background Options</h4>
-                    <p>Choose from solid colors, gradients, or upload custom background images. Use the "Random" button to quickly try different backgrounds.</p>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-texture"></i> Noise & Texture</h4>
-                    <p>Add realistic textures to enhance your backgrounds:</p>
-                    <ul>
-                        <li><strong>Types:</strong> Paper, canvas, grain, Perlin noise, static, fabric, and dot patterns</li>
-                        <li><strong>Intensity:</strong> Control how strong the texture appears</li>
-                        <li><strong>Opacity:</strong> Adjust transparency of the texture overlay</li>
-                        <li><strong>Blend Modes:</strong> Choose how texture interacts with background</li>
-                        <li><strong>Scale:</strong> Make texture patterns larger or smaller</li>
-                        <li><strong>Invert:</strong> Reverse texture colors for different effects</li>
-                    </ul>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-sliders-h"></i> Image Controls</h4>
-                    <p>Fine-tune your mockups with corner radius, padding, rotation, flipping, and advanced shadow settings including color, opacity, blur, and positioning.</p>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-font"></i> Text Layers</h4>
-                    <p>Add custom text overlays with full typography control, positioning, shadows, backgrounds, and layering options.</p>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-stamp"></i> Watermarks</h4>
-                    <p>Add your logo or watermark to protect your designs:</p>
-                    <ul>
-                        <li><strong>Upload:</strong> Click or drag to upload PNG/JPG watermark images</li>
-                        <li><strong>Transparency:</strong> PNG files with transparency work best</li>
-                        <li><strong>Positioning:</strong> Choose from 5 preset positions</li>
-                        <li><strong>Opacity:</strong> Adjust transparency from 0-100%</li>
-                        <li><strong>Size:</strong> Scale from 10% to 200% of original size</li>
-                    </ul>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-expand-arrows-alt"></i> Resolutions</h4>
-                    <p>Choose from preset resolutions optimized for social media platforms or create custom dimensions.</p>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-keyboard"></i> Shortcuts</h4>
-                    <ul>
-                        <li><strong>Ctrl/Cmd + Z:</strong> Undo</li>
-                        <li><strong>Ctrl/Cmd + Y:</strong> Redo</li>
-                        <li><strong>Ctrl/Cmd + Scroll:</strong> Zoom</li>
-                        <li><strong>Drag:</strong> Pan canvas when zoomed</li>
-                    </ul>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-download"></i> Export</h4>
-                    <p>Export individual mockups or batch export all images with custom formats (PNG, JPEG, WebP) and quality settings.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Authentication Modal -->
-    <div class="modal" id="auth-modal">
-        <div class="modal-content auth-modal-content">
-            <div class="modal-header auth-modal-header">
-                <h3 id="auth-modal-title">Welcome to FrameIt</h3>
-                <button class="modal-close-btn" id="auth-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body auth-modal-body">
-                <!-- Login Form -->
-                <div id="login-form" class="auth-form">
-                    <h4>Login to Your Account</h4>
-                    <p class="auth-subtitle">Continue creating beautiful mockups</p>
-                    
-                    <form id="login-form-element">
-                        <div class="form-group">
-                            <label for="login-email">Email</label>
-                            <input type="email" id="login-email" required placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password">Password</label>
-                            <input type="password" id="login-password" required placeholder="Enter your password">
-                        </div>
-                        <div id="login-error" class="auth-error hidden"></div>
-                        <button type="submit" class="btn primary-btn auth-submit-btn" id="login-submit">
-                            <span class="btn-text">Login</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-forgot-password">
-                        <button id="forgot-password-btn" class="forgot-password-link">
-                            Forgot your password?
-                        </button>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-font"></i>
                     </div>
-                    
-                    <div class="auth-divider">
-                        <span>Don't have an account?</span>
-                    </div>
-                    
-                    <button id="show-signup" class="btn auth-switch-btn">
-                        <span>Sign up for free</span>
-                    </button>
+                    <h3>Text Overlays</h3>
+                    <p>Add custom typography with multiple layers, shadows, and positioning controls</p>
                 </div>
                 
-                <!-- Signup Form -->
-                <div id="signup-form" class="auth-form hidden">
-                    <h4>Create Your Account</h4>
-                    <p class="auth-subtitle">Join FrameIt and start creating amazing mockups</p>
-                    
-                    <form id="signup-form-element">
-                        <div class="form-group">
-                            <label for="signup-email">Email</label>
-                            <input type="email" id="signup-email" required placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password">Password</label>
-                            <input type="password" id="signup-password" required placeholder="Create a password (min 6 characters)" minlength="6">
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-confirm-password">Confirm Password</label>
-                            <input type="password" id="signup-confirm-password" required placeholder="Confirm your password">
-                        </div>
-                        <div id="signup-error" class="auth-error hidden"></div>
-                        <div id="signup-success" class="auth-success hidden">
-                            Account created successfully! Please check your email to verify your account.
-                        </div>
-                        <button type="submit" class="btn primary-btn auth-submit-btn" id="signup-submit">
-                            <span class="btn-text">Create Account</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-divider">
-                        <span>Already have an account?</span>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-stamp"></i>
                     </div>
-                    
-                    <button id="show-login" class="btn auth-switch-btn">
-                        <span>Login instead</span>
-                    </button>
+                    <h3>Watermarks</h3>
+                    <p>Brand your mockups with logo watermarks and precise opacity and positioning controls</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Platform Ready</h3>
+                    <p>Export for Instagram, LinkedIn, App Store, or custom dimensions with one click</p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Main Landing Page (shown when not logged in) -->
-    <div id="main-landing" class="main-landing">
-        <div class="landing-hero">
-            <div class="hero-content">
-                <div class="hero-logo">
-                    <span class="logo-text">FrameIt</span>
-                </div>
-                
-                <h1 class="hero-title">Create Professional Screenshot Mockups</h1>
-                <p class="hero-subtitle">Transform your screenshots into stunning presentations with beautiful frames, backgrounds, and effects</p>
-                
-                <div class="hero-badges">
-                    <div class="badge">
-                        <i class="fas fa-star"></i>
-                        <span>100% Free</span>
-                    </div>
-                    <div class="badge">
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
                         <i class="fas fa-bolt"></i>
-                        <span>No Sign-up Required</span>
                     </div>
-                    <div class="badge">
+                    <h3>Lightning Fast</h3>
+                    <p>Create professional mockups in seconds, not hours</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>No Design Skills</h3>
+                    <p>Professional results without any design experience</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3>Web-Based</h3>
+                    <p>Works on any device with a browser - no downloads</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
                         <i class="fas fa-download"></i>
-                        <span>Unlimited Exports</span>
                     </div>
+                    <h3>High Quality</h3>
+                    <p>Export in multiple formats and resolutions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to create stunning mockups?</h2>
+                <p class="cta-subtitle">Join thousands of creators, developers, and marketers who trust FrameIt</p>
+                <button class="btn btn-primary btn-large" id="final-cta">
+                    <i class="fas fa-rocket"></i>
+                    Get Started Free
+                </button>
+                <p class="cta-note">No credit card required • Start creating immediately</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="brand-icon">🖼️</span>
+                    <span class="brand-text">FrameIt</span>
+                    <p>Professional screenshot mockups made simple</p>
                 </div>
                 
-                <div class="hero-cta">
-                    <button id="hero-signup-btn" class="cta-btn primary">
-                        <span>Get Started Free</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button id="hero-login-btn" class="cta-btn secondary">
-                        <span>Sign In</span>
-                    </button>
-                </div>
-                
-                <p class="hero-note">
-                    <i class="fas fa-shield-alt"></i>
-                    No credit card required • Start creating in seconds
-                </p>
-            </div>
-        </div>
-        
-        <div class="landing-features-section">
-            <div class="features-container">
-                <h2 class="features-title">Everything You Need to Create Amazing Mockups</h2>
-                <p class="features-subtitle">Professional-grade tools that are completely free to use</p>
-                
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-palette"></i>
-                        </div>
-                        <h3>Beautiful Backgrounds</h3>
-                        <p>Choose from solid colors, gradients, or upload custom images with advanced filters and effects</p>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Product</h4>
+                        <ul>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#" id="app-link">Launch App</a></li>
+                        </ul>
                     </div>
                     
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-th-large"></i>
-                        </div>
-                        <h3>Flexible Layouts</h3>
-                        <p>Choose from various layout options including single image, grid arrangements, and custom positioning for your screenshots</p>
+                    <div class="footer-section">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="mailto:hello@frameit.social">Contact</a></li>
+                            <li><a href="#" id="help-link">Help Center</a></li>
+                        </ul>
                     </div>
                     
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-magic"></i>
-                        </div>
-                        <h3>Advanced Effects</h3>
-                        <p>Add realistic textures, shadows, distortion effects, and noise to enhance your designs</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-font"></i>
-                        </div>
-                        <h3>Custom Typography</h3>
-                        <p>Add professional text overlays with custom fonts, shadows, backgrounds, and positioning</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <h3>High Quality Exports</h3>
-                        <p>Export in multiple formats with custom resolutions optimized for any platform or use case</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-infinity"></i>
-                        </div>
-                        <h3>Unlimited Usage</h3>
-                        <p>Create and export unlimited mockups with no restrictions, watermarks, or hidden fees</p>
+                    <div class="footer-section">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="#privacy">Privacy Policy</a></li>
+                            <li><a href="#terms">Terms of Service</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="landing-testimonials">
-            <div class="testimonials-container">
-                <h2>Loved by Designers & Developers</h2>
-                <div class="testimonials-grid">
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"FrameIt has revolutionized how we create mockups for our app presentations. The quality and ease of use is unmatched."</p>
-                        </div>
-                    </div>
-                    
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"Finally, a mockup tool that's actually free and doesn't compromise on quality. Perfect for our startup's needs."</p>
-                        </div>
-                    </div>
-                    
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"The export quality is incredible and the interface is so intuitive. I can create professional mockups in minutes."</p>
-                        </div>
-                    </div>
-                </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 FrameIt by Odd Omens. All rights reserved.</p>
             </div>
         </div>
-        
-        <div class="landing-cta-section">
-            <div class="cta-container">
-                <h2>Ready to Create Amazing Mockups?</h2>
-                <p>Join thousands of designers and developers who trust FrameIt for their mockup needs</p>
-                <div class="cta-buttons">
-                    <button id="footer-signup-btn" class="cta-btn primary large">
-                        <span>Start Creating Free</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button id="footer-login-btn" class="cta-btn secondary large">
-                        <span>Sign In to Account</span>
-                    </button>
-                </div>
-                <p class="cta-note">
-                    <i class="fas fa-heart"></i>
-                    Always free • No limits • No watermarks
-                </p>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <footer class="landing-footer">
-            <div class="footer-container">
-                <div class="footer-content">
-                    <div class="footer-brand">
-                        <span class="footer-logo">FrameIt.Social</span>
-                        <p class="footer-tagline">Professional mockups made simple</p>
-                    </div>
-                    <div class="footer-links">
-                        <a href="#" id="privacy-link">Privacy Policy</a>
-                        <a href="#" id="terms-link">Terms of Service</a>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <p>&copy; 2025 FrameIt.Social by <a href="https://oddomens.com" target="_blank" rel="noopener">Odd Omens</a>. All rights reserved.</p>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Privacy Policy Page -->
-    <div id="privacy-page" class="legal-page hidden">
-        <div class="legal-header">
-            <button id="privacy-back-btn" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                Back to FrameIt
-            </button>
-            <h1>Privacy Policy</h1>
-        </div>
-        <div class="legal-content">
-            <div class="legal-container">
-                <p class="last-updated">Last updated on January 28th, 2025</p>
-                
-                <h2>1. Introduction</h2>
-                <p>Welcome to FrameIt.Social, owned and operated by Odd Omens LLC. This privacy policy explains how we collect, use, and protect your personal information when you visit our website and use our web application.</p>
-
-                <h2>2. Contact Information</h2>
-                <p>For any privacy-related inquiries, questions, or concerns, please contact us at support@oddomens.com. Your satisfaction and peace of mind are our top priorities.</p>
-
-                <h2>3. Data Collection</h2>
-                <p>FrameIt.Social uses Plausible Analytics for basic, privacy-focused website tracking. This information is generalized and doesn't capture any personally identifiable information. The information collected includes Country, Device type, Browser, and visitor count on pages.</p>
-                <p>Our web application stores data locally in your browser and optionally in our secure cloud database when you create an account. We only gather personally identifiable data that you willingly provide through our registration forms or support submissions.</p>
-
-                <h2>4. Types of Data Collected</h2>
-                <p>We collect non-personalized information through Plausible Analytics:</p>
-                <ul>
-                    <li>Country (general location)</li>
-                    <li>Page visit counts</li>
-                    <li>Browser type</li>
-                    <li>Device type (desktop/mobile/tablet)</li>
-                    <li>Referrer websites</li>
-                </ul>
-                <p>We collect personalized information only when you voluntarily provide it:</p>
-                <ul>
-                    <li><strong>Email Address:</strong> For account creation, authentication, and support communications.</li>
-                    <li><strong>Usage Data:</strong> Information about how you use our application (number of mockups created, exports, etc.) to improve our service.</li>
-                </ul>
-
-                <h2>5. Data Usage</h2>
-                <p>We use Plausible Analytics, a privacy-focused analytics service that does not use cookies or track users across websites. Our web application does not employ invasive tracking technologies. We use collected data solely to improve our service and provide user support.</p>
-
-                <h2>6. Third-Party Tools</h2>
-                <ul>
-                    <li><strong>Plausible Analytics</strong> - Privacy-focused website analytics that doesn't track individual users.</li>
-                    <li><strong>Supabase</strong> - Secure database and authentication service for user accounts and data storage.</li>
-                    <li><strong>Email Service</strong> - For sending account verification emails and support communications.</li>
-                </ul>
-
-                <h2>7. Analytics</h2>
-                <p>FrameIt.Social uses Plausible Analytics to understand general website usage patterns. This service is privacy-focused and does not track individual users or create user profiles. All analytics data is aggregated and anonymized.</p>
-
-                <h2>8. User Consent</h2>
-                <p>Given our privacy-focused approach, explicit consent is not required for our basic analytics as they don't track individual users. However, when you create an account with FrameIt.Social, you consent to the storage of your email address and usage data to provide our service.</p>
-
-                <h2>9. Data Storage and Retention</h2>
-                <p>FrameIt.Social stores user account data securely using Supabase, a trusted cloud database provider. We retain account information for as long as your account is active. You may request account deletion at any time, which will permanently remove all your personal data from our systems.</p>
-
-                <h2>10. Compliance with Data Protection Laws</h2>
-                <p>FrameIt.Social complies with relevant data protection laws including GDPR and CCPA. We implement appropriate technical and organizational measures to protect your personal data and respect your privacy rights, including the right to access, correct, or delete your data.</p>
-
-                <h2>11. Privacy Policy Updates</h2>
-                <p>We may update this privacy policy from time to time to reflect changes in our practices or legal requirements. Any significant changes will be communicated through our website and, if you have an account, via email notification.</p>
-
-                <h2>12. Age Restriction</h2>
-                <p>FrameIt.Social is intended for users 13 years of age and older. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.</p>
-
-                <h2>13. Contact Information</h2>
-                <p>For any privacy-related inquiries, questions, or concerns, please do not hesitate to contact us at support@oddomens.com. Your satisfaction and peace of mind are our top priorities.</p>
-
-                <h2>14. Legal Disclaimers</h2>
-                <p>This privacy policy adheres to standard legal disclaimers and terms and conditions to ensure clarity and fairness in our interactions with users.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Terms of Service Page -->
-    <div id="terms-page" class="legal-page hidden">
-        <div class="legal-header">
-            <button id="terms-back-btn" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                Back to FrameIt
-            </button>
-            <h1>Terms of Service</h1>
-        </div>
-        <div class="legal-content">
-            <div class="legal-container">
-                <p class="last-updated">Last updated on February 26th, 2025</p>
-                
-                <h2>1. Acceptance of Terms</h2>
-                <p>By accessing or using FrameIt.Social, a web application provided by FrameIt.Social (owned and operated by Odd Omens LLC) ("Company"), you agree to be bound by these Terms of Service ("TOS"). If you do not agree to these TOS, please do not use our web application or services.</p>
-
-                <h2>2. Changes to Terms</h2>
-                <p>FrameIt.Social reserves the right to modify or revise these TOS at any time. You will be notified of any changes through an updated "Last Updated" date on this page. It is your responsibility to review these TOS periodically. Your continued use of our web application and services following any changes constitutes acceptance of those changes.</p>
-
-                <h2>3. Use of Web Application and Services</h2>
-                <h3>3.1. License:</h3>
-                <p>FrameIt.Social grants you a limited, non-exclusive, non-transferable, and revocable license to use our web application and services for personal or business purposes, subject to these TOS.</p>
-
-                <h3>3.2. Prohibited Activities:</h3>
-                <p>You agree not to:</p>
-                <ul>
-                    <li>Use our web application or services for any unlawful or fraudulent purposes.</li>
-                    <li>Copy, distribute, or modify our web application or services without our express consent.</li>
-                    <li>Attempt to access or use accounts, data, or information not belonging to you.</li>
-                    <li>Engage in any activity that disrupts or interferes with the proper functioning of our web application or services.</li>
-                    <li>Reverse engineer, decompile, or disassemble any part of our web application.</li>
-                    <li>Use our web application to transmit any viruses, malware, or other harmful code.</li>
-                    <li>Create multiple accounts or use automated systems to access our services.</li>
-                </ul>
-
-                <h2>4. Privacy</h2>
-                <p>Your use of FrameIt.Social is also governed by our Privacy Policy, which can be found <a href="#" id="terms-privacy-link">here</a>. By using our web application, you consent to the collection and use of your personal information as described in the Privacy Policy.</p>
-
-                <h2>5. Termination</h2>
-                <p>FrameIt.Social reserves the right to terminate or suspend your account and access to our web application, with or without notice, for any violation of these TOS or for any other reason. Upon termination, you must cease all use of our services. You may also delete your account at any time through your account settings.</p>
-
-                <h2>6. Service Availability and Fees</h2>
-                <h3>6.1. Free Service</h3>
-                <p>FrameIt.Social is currently provided as a free web application. We reserve the right to introduce paid features or subscription plans in the future, with appropriate notice to users.</p>
-
-                <h3>6.2. Service Availability</h3>
-                <p>While we strive to maintain continuous service availability, FrameIt.Social may experience downtime for maintenance, updates, or technical issues. We do not guarantee uninterrupted access to our services.</p>
-
-                <h2>7. Disclaimer of Warranties</h2>
-                <p>FrameIt.Social is provided "as is" and "as available." FrameIt.Social makes no warranties, expressed or implied, regarding the quality, accuracy, or reliability of our web application. Your use of our services is at your own risk. To the fullest extent permitted by law, FrameIt.Social disclaims all warranties, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, and non-infringement.</p>
-
-                <h2>8. Limitation of Liability</h2>
-                <p>In no event shall FrameIt.Social be liable for any indirect, consequential, special, incidental, or punitive damages, or for any loss of profits or revenues, whether incurred directly or indirectly, arising from your use of our web application or services, even if FrameIt.Social has been advised of the possibility of such damages. Since our service is currently free, our total liability shall be limited to the maximum extent permitted by law.</p>
-
-                <h2>9. Indemnification</h2>
-                <p>You agree to indemnify and hold FrameIt.Social, Odd Omens LLC, and their affiliates, officers, directors, employees, and agents harmless from any claims, losses, or damages, including reasonable attorney's fees, arising out of or related to your use of our web application, your violation of these TOS, or your violation of any rights of another.</p>
-
-                <h2>10. Governing Law</h2>
-                <p>These TOS shall be governed by and construed in accordance with the laws of the State of Michigan, without regard to its conflict of law principles. Any legal action or proceeding arising under these TOS will be brought exclusively in the federal or state courts located in Michigan, and the parties hereby consent to the personal jurisdiction and venue therein.</p>
-
-                <h2>11. Severability</h2>
-                <p>If any provision of these TOS is found to be invalid or unenforceable, the remaining provisions will continue to be valid and enforceable to the fullest extent permitted by law.</p>
-
-                <h2>12. Entire Agreement</h2>
-                <p>These TOS, together with our Privacy Policy, constitute the entire agreement between you and FrameIt.Social regarding the use of our web application and services, and supersede all prior agreements and understandings, whether written or oral, regarding such subject matter.</p>
-
-                <h2>13. Waiver</h2>
-                <p>No waiver of any term of these TOS shall be deemed a further or continuing waiver of such term or any other term, and FrameIt.Social's failure to assert any right or provision under these TOS shall not constitute a waiver of such right or provision.</p>
-
-                <h2>14. Contact Information</h2>
-                <p>If you have any questions or concerns about these TOS, please contact us at:</p>
-                <p><strong>Email:</strong> support@oddomens.com</p>
-            </div>
-        </div>
-    </div>
+    </footer>
 
     <!-- Auth Modal -->
-    <div id="landing-auth-modal" class="landing-auth-modal">
-        <div class="landing-auth-modal-content">
-            <div class="landing-auth-modal-header">
-                <h3 id="landing-auth-modal-title">Welcome to FrameIt</h3>
-                <button class="landing-auth-modal-close" id="landing-auth-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="landing-auth-modal-body">
-                <!-- Login Form -->
-                <div id="landing-login-form" class="landing-auth-form">
-                    <h4>Welcome Back</h4>
-                    <p class="auth-subtitle">Sign in to continue creating amazing mockups</p>
-                    
-                    <form id="landing-login-form-element">
-                        <div class="form-group">
-                            <label for="landing-login-email">Email</label>
-                            <input type="email" id="landing-login-email" required placeholder="Enter your email" autocomplete="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="landing-login-password">Password</label>
-                            <input type="password" id="landing-login-password" required placeholder="Enter your password" autocomplete="current-password">
-                        </div>
-                        <div id="landing-login-error" class="auth-error hidden"></div>
-                        <button type="submit" class="auth-btn primary" id="landing-login-submit">
-                            <span class="btn-text">Sign In</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-forgot">
-                        <button id="landing-forgot-password-btn" class="forgot-link">
-                            Forgot your password?
-                        </button>
-                    </div>
-                    
-                    <div class="auth-switch">
-                        <p>Don't have an account? <button id="show-landing-signup" class="switch-link">Sign up for free</button></p>
-                    </div>
+    <div class="modal" id="auth-modal">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- Sign In Form -->
+            <div class="auth-form" id="signin-form">
+                <div class="auth-header">
+                    <h2>Welcome back</h2>
+                    <p>Sign in to continue creating amazing mockups</p>
                 </div>
                 
-                <!-- Signup Form -->
-                <div id="landing-signup-form" class="landing-auth-form hidden">
-                    <h4>Get Started Free</h4>
-                    <p class="auth-subtitle">Create your account and start designing in minutes</p>
-                    
-                    <form id="landing-signup-form-element">
-                        <div class="form-group">
-                            <label for="landing-signup-email">Email</label>
-                            <input type="email" id="landing-signup-email" required placeholder="Enter your email" autocomplete="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="landing-signup-password">Password</label>
-                            <input type="password" id="landing-signup-password" required placeholder="Create a password (min 6 characters)" minlength="6" autocomplete="new-password">
-                        </div>
-                        <div class="form-group">
-                            <label for="landing-signup-confirm-password">Confirm Password</label>
-                            <input type="password" id="landing-signup-confirm-password" required placeholder="Confirm your password" autocomplete="new-password">
-                        </div>
-                        <div id="landing-signup-error" class="auth-error hidden"></div>
-                        <div id="landing-signup-success" class="auth-success hidden">
-                            Account created successfully! Please check your email to verify your account.
-                        </div>
-                        <button type="submit" class="auth-btn primary" id="landing-signup-submit">
-                            <span class="btn-text">Create Free Account</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-switch">
-                        <p>Already have an account? <button id="show-landing-login" class="switch-link">Sign in instead</button></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Settings Modal -->
-    <div id="user-settings-modal" class="modal">
-        <div class="modal-content user-settings-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-cog"></i> Account Settings</h3>
-                <button class="modal-close-btn" id="user-settings-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="user-settings-section">
-                    <h4><i class="fas fa-info-circle"></i> Account Information</h4>
-                    <p class="section-description">View your account details and verification status.</p>
-                    <div class="user-info-display">
-                        <div class="info-item">
-                            <label><i class="fas fa-envelope"></i> Email</label>
-                            <span id="account-settings-email"></span>
-                        </div>
-                        <div class="info-item">
-                            <label><i class="fas fa-shield-alt"></i> Verification Status</label>
-                            <span id="verification-status" class="verification-status unverified">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Unverified
-                            </span>
-                        </div>
-                        <div class="info-item">
-                            <label><i class="fas fa-calendar-alt"></i> Member Since</label>
-                            <span id="member-since">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="user-settings-section">
-                    <h4><i class="fas fa-user-edit"></i> Update Profile</h4>
-                    <p class="section-description">Change your email address and account preferences.</p>
+                <form id="signin-form-element">
                     <div class="form-group">
-                        <label for="new-email">New Email Address</label>
-                        <input type="email" id="new-email" placeholder="Enter new email address">
+                        <label for="signin-email">Email</label>
+                        <input type="email" id="signin-email" name="email" required placeholder="Enter your email">
                     </div>
-                    <button id="update-email-btn" class="btn primary-btn">
-                        <i class="fas fa-save"></i>
-                        Update Email
+                    
+                    <div class="form-group">
+                        <label for="signin-password">Password</label>
+                        <input type="password" id="signin-password" name="password" required placeholder="Enter your password">
+                    </div>
+                    
+                    <div class="auth-error hidden" id="signin-error"></div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <span class="btn-text">Sign In</span>
+                        <div class="btn-spinner hidden"></div>
                     </button>
-                    <div class="auth-error hidden" id="update-email-error"></div>
-                    <div class="auth-success hidden" id="update-email-success"></div>
-                </div>
-
-                <div class="user-settings-section">
-                    <h4><i class="fas fa-key"></i> Change Password</h4>
-                    <p class="section-description">Update your password to keep your account secure.</p>
-                    <div class="form-group">
-                        <label for="current-password">Current Password</label>
-                        <input type="password" id="current-password" placeholder="Enter current password">
-                    </div>
-                    <div class="form-group">
-                        <label for="new-password">New Password</label>
-                        <input type="password" id="new-password" placeholder="Enter new password">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm-password">Confirm New Password</label>
-                        <input type="password" id="confirm-password" placeholder="Confirm new password">
-                    </div>
-                    <button id="change-password-btn" class="btn primary-btn">
-                        <i class="fas fa-lock"></i>
-                        Change Password
-                    </button>
-                    <div class="auth-error hidden" id="change-password-error"></div>
-                    <div class="auth-success hidden" id="change-password-success"></div>
-                </div>
-
-                <div class="user-settings-section danger-section">
-                    <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
-                    <p class="section-description">Permanently delete your account and all associated data.</p>
-                    <div class="danger-warning">
-                        <i class="fas fa-warning"></i>
-                        <span>This action cannot be undone. All your data, including saved bookmarks, will be permanently deleted.</span>
-                    </div>
-                    <div class="danger-actions">
-                        <button id="delete-account-btn" class="btn danger-btn">
-                            <i class="fas fa-trash-alt"></i>
-                            Delete Account
-                        </button>
-                    </div>
+                </form>
+                
+                <div class="auth-footer">
+                    <button class="forgot-password" id="forgot-password">Forgot password?</button>
+                    <p>Don't have an account? <button class="auth-switch" id="show-signup">Sign up</button></p>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Delete Account Confirmation Modal -->
-    <div class="modal" id="delete-account-modal">
-        <div class="modal-content delete-account-content">
-            <div class="modal-header">
-                <h3>Delete Account</h3>
-                <button class="modal-close-btn" id="delete-account-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="delete-confirmation">
-                    <div class="warning-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <h4>Are you absolutely sure?</h4>
-                    <p>This action <strong>cannot be undone</strong>. This will permanently delete your account and remove all your data from our servers.</p>
-                    
-                    <div class="form-group">
-                        <label for="delete-confirmation-email">Please type your email address to confirm:</label>
-                        <input type="email" id="delete-confirmation-email" placeholder="Enter your email address">
-                    </div>
-                    
-                    <div id="delete-account-error" class="auth-error hidden"></div>
-                    
-                    <div class="delete-actions">
-                        <button id="cancel-delete-btn" class="btn">Cancel</button>
-                        <button id="confirm-delete-btn" class="btn danger-btn" disabled>
-                            <span class="btn-text">Delete My Account</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pricing Modal -->
-    <div id="pricing-modal" class="modal">
-        <div class="modal-content pricing-content">
-            <div class="modal-header">
-                <h3>Choose Your Plan</h3>
-                <button class="modal-close-btn" id="pricing-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="pricing-plans">
-                    <!-- Free Plan -->
-                    <div class="pricing-card">
-                        <h4>Free</h4>
-                        <div class="price">$0<span>/month</span></div>
-                        <ul class="features">
-                            <li>5 exports per month</li>
-                            <li>Basic templates</li>
-                            <li>Standard resolution</li>
-                            <li>Watermark on exports</li>
-                        </ul>
-                        <button class="btn current-plan" disabled>Current Plan</button>
-                    </div>
-                    
-                    <!-- Pro Plan -->
-                    <div class="pricing-card featured">
-                        <div class="popular-badge">Most Popular</div>
-                        <h4>Pro</h4>
-                        <div class="price">$9<span>/month</span></div>
-                        <ul class="features">
-                            <li>Unlimited exports</li>
-                            <li>Premium templates</li>
-                            <li>4K resolution exports</li>
-                            <li>No watermarks</li>
-                            <li>Advanced effects</li>
-                            <li>Priority support</li>
-                        </ul>
-                        <button class="btn primary-btn" id="subscribe-pro">
-                            <span class="btn-text">Upgrade to Pro</span>
-                            <span class="btn-spinner" style="display: none;"></span>
-                        </button>
-                    </div>
-                    
-                    <!-- Team Plan -->
-                    <div class="pricing-card">
-                        <h4>Team</h4>
-                        <div class="price">$29<span>/month</span></div>
-                        <ul class="features">
-                            <li>Everything in Pro</li>
-                            <li>Team collaboration</li>
-                            <li>Shared template library</li>
-                            <li>Brand kit management</li>
-                            <li>Usage analytics</li>
-                            <li>API access</li>
-                            <li>Custom integrations</li>
-                        </ul>
-                        <button class="btn primary-btn" id="subscribe-team">
-                            <span class="btn-text">Upgrade to Team</span>
-                            <span class="btn-spinner" style="display: none;"></span>
-                        </button>
-                    </div>
+            
+            <!-- Sign Up Form -->
+            <div class="auth-form hidden" id="signup-form">
+                <div class="auth-header">
+                    <h2>Create your account</h2>
+                    <p>Start creating professional mockups in minutes</p>
                 </div>
                 
-                <!-- Usage Meter Demo -->
-                <div class="usage-meter">
-                    <h4>Current Usage</h4>
-                    <div class="usage-progress">
-                        <div class="usage-progress-bar" style="width: 60%;"></div>
+                <form id="signup-form-element">
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" name="email" required placeholder="Enter your email">
                     </div>
-                    <div class="usage-text">
-                        <span>3 of 5 exports used</span>
-                        <span>Resets in 18 days</span>
+                    
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="password" required placeholder="Create a password (min 6 characters)" minlength="6">
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" name="confirm" required placeholder="Confirm your password">
+                    </div>
+                    
+                    <div class="auth-error hidden" id="signup-error"></div>
+                    <div class="auth-success hidden" id="signup-success">
+                        Account created! Please check your email to verify your account.
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <span class="btn-text">Create Account</span>
+                        <div class="btn-spinner hidden"></div>
+                    </button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>Already have an account? <button class="auth-switch" id="show-signin">Sign in</button></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Hidden file input for uploads -->
-    <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
-    
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/frameit-config.js"></script>
-    <script src="js/noise.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/models/export.js"></script>
-    <script src="js/models/image.js"></script>
-    <script src="js/models/text.js"></script>
-    <script src="js/models.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/analytics.js"></script>
-    <script src="js/payments.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/canvas.js"></script>
-    <script src="js/app.js"></script>
     <script>
-        // Initialize authentication when page loads
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('DOM loaded, initializing Auth...');
-            await Auth.init();
+        // Modern landing page functionality
+        class LandingPage {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.setupNavbar();
+                this.setupModals();
+                this.setupAuth();
+                this.loadStats();
+                this.setupSmoothScroll();
+            }
+
+            setupNavbar() {
+                const navbar = document.getElementById('navbar');
+                
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                });
+            }
+
+            setupModals() {
+                const modal = document.getElementById('auth-modal');
+                const backdrop = document.getElementById('modal-backdrop');
+                const closeBtn = document.getElementById('modal-close');
+                const signinForm = document.getElementById('signin-form');
+                const signupForm = document.getElementById('signup-form');
+
+                // Show modal
+                const showModal = () => {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                };
+
+                // Hide modal
+                const hideModal = () => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                };
+
+                // Switch forms
+                const showSignin = () => {
+                    signinForm.classList.remove('hidden');
+                    signupForm.classList.add('hidden');
+                };
+
+                const showSignup = () => {
+                    signupForm.classList.remove('hidden');
+                    signinForm.classList.add('hidden');
+                };
+
+                // Event listeners
+                document.getElementById('signin-btn').addEventListener('click', () => {
+                    showSignin();
+                    showModal();
+                });
+
+                ['get-started-btn', 'hero-cta', 'final-cta'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.addEventListener('click', () => {
+                            // Check if user is already authenticated
+                            if (typeof Auth !== 'undefined' && Auth.isAuthenticated && Auth.isAuthenticated()) {
+                                // User is already logged in, go directly to app
+                                window.location.href = 'app.html';
+                            } else {
+                                // User needs to sign up/in
+                                showSignup();
+                                showModal();
+                            }
+                        });
+                    }
+                });
+
+                document.getElementById('show-signup').addEventListener('click', showSignup);
+                document.getElementById('show-signin').addEventListener('click', showSignin);
+                
+                closeBtn.addEventListener('click', hideModal);
+                backdrop.addEventListener('click', hideModal);
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') hideModal();
+                });
+            }
+
+            setupAuth() {
+                // Initialize auth system
+                console.log('🔍 LandingPage setupAuth called');
+                console.log('🔍 Auth object available:', typeof Auth !== 'undefined');
+                if (typeof Auth !== 'undefined') {
+                    console.log('🔍 Calling Auth.init()...');
+                    Auth.init();
+                } else {
+                    console.error('❌ Auth object not found!');
+                }
+            }
+
+            async loadStats() {
+                try {
+                    // Try to get cached stats first
+                    const cachedStats = this.getCachedStats();
+                    if (cachedStats) {
+                        this.updateStats(cachedStats);
+                        return;
+                    }
+
+                    // Fallback to API
+                    const response = await fetch('/api/global-stats');
+                    if (response.ok) {
+                        const stats = await response.json();
+                        this.updateStats(stats);
+                    }
+                } catch (error) {
+                    console.log('Using default stats');
+                    // Keep default 0 values
+                }
+            }
+
+            getCachedStats() {
+                try {
+                    const cached = localStorage.getItem('frameit_global_stats_cache');
+                    const hasRealData = localStorage.getItem('frameit_real_data_available');
+                    
+                    if (!cached || !hasRealData) return null;
+
+                    const stats = JSON.parse(cached);
+                    const lastUpdated = new Date(stats.lastUpdated);
+                    const now = new Date();
+                    
+                    // Cache expires after 1 hour
+                    if ((now - lastUpdated) / (1000 * 60 * 60) > 1) return null;
+
+                    return {
+                        users: stats.users || 0,
+                        exports: stats.exports || 0
+                    };
+                } catch {
+                    return null;
+                }
+            }
+
+            updateStats(stats) {
+                this.animateNumber('stat-users', stats.users || 0);
+                this.animateNumber('stat-exports', stats.exports || 0);
+            }
+
+            animateNumber(elementId, targetValue, duration = 2000) {
+                const element = document.getElementById(elementId);
+                if (!element || targetValue === 0) return;
+
+                const startValue = 0;
+                const increment = targetValue / (duration / 16);
+                let currentValue = startValue;
+
+                const updateNumber = () => {
+                    currentValue += increment;
+                    if (currentValue >= targetValue) {
+                        element.textContent = this.formatNumber(targetValue);
+                        return;
+                    }
+                    element.textContent = this.formatNumber(Math.floor(currentValue));
+                    requestAnimationFrame(updateNumber);
+                };
+
+                updateNumber();
+            }
+
+            formatNumber(num) {
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+                return num.toLocaleString();
+            }
+
+            setupSmoothScroll() {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new LandingPage();
         });
     </script>
 </body>
