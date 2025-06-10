@@ -115,6 +115,37 @@ window.Auth = {
         // this.setupEventListeners();
         // this.checkAuthState();
     },
+
+    // Callback system for auth state changes (for compatibility with other scripts like Stripe)
+    onAuthStateChanged(callback) {
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not initialized for onAuthStateChanged');
+            return;
+        }
+        
+        console.log('📡 Setting up onAuthStateChanged callback');
+        
+        // Set up Supabase auth state listener that calls the provided callback
+        this.supabase.auth.onAuthStateChange((event, session) => {
+            console.log('📡 Auth state change for callback:', event, session?.user?.email || 'No user');
+            if (event === 'SIGNED_IN' && session) {
+                callback(session.user);
+            } else if (event === 'SIGNED_OUT') {
+                callback(null);
+            }
+        });
+        
+        // Also call immediately with current session if available
+        this.supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                console.log('📡 Calling callback with current session:', session.user.email);
+                callback(session.user);
+            } else {
+                console.log('📡 Calling callback with no user');
+                callback(null);
+            }
+        });
+    },
     
     // Handle URL-based login for testing
     async performUrlLogin(email, password) {
@@ -238,10 +269,11 @@ window.Auth = {
     setupEventListeners() {
         console.log('Setting up authentication event listeners...');
         
-        // New modal structure elements
-        const loginFormElement = document.getElementById('signin-form-element');
+        // Try different form element IDs for different pages
+        // Landing page uses 'signin-form-element', app page uses 'login-form-element'
+        let loginFormElement = document.getElementById('signin-form-element') || document.getElementById('login-form-element');
         const signupFormElement = document.getElementById('signup-form-element');
-        const forgotPasswordBtn = document.getElementById('forgot-password');
+        let forgotPasswordBtn = document.getElementById('forgot-password') || document.getElementById('forgot-password-btn');
         
         console.log('🔍 Form availability check:', {
             loginFormElement: !!loginFormElement,
@@ -251,7 +283,7 @@ window.Auth = {
         
         // Debug: Check if the modal exists
         const authModalEl = document.getElementById('auth-modal');
-        const signinFormEl = document.getElementById('signin-form');
+        const signinFormEl = document.getElementById('signin-form') || document.getElementById('login-form');
         const signupFormEl = document.getElementById('signup-form');
         
         console.log('🔍 Modal structure check:', {
@@ -263,9 +295,9 @@ window.Auth = {
         // Form submissions
         if (loginFormElement) {
             loginFormElement.addEventListener('submit', (e) => this.handleLogin(e));
-            console.log('✅ Signin form event listener attached');
+            console.log('✅ Login form event listener attached');
         } else {
-            console.warn('⚠️ Signin form element not found, will retry later');
+            console.warn('⚠️ Login form element not found, will retry later');
         }
         if (signupFormElement) {
             signupFormElement.addEventListener('submit', (e) => this.handleSignup(e));
@@ -277,14 +309,14 @@ window.Auth = {
         
         // Retry mechanism for missing form elements
         if (!loginFormElement) {
-            console.log('🔄 Setting up retry for signin form...');
+            console.log('🔄 Setting up retry for login form...');
             setTimeout(() => {
-                const retryLoginForm = document.getElementById('signin-form-element');
+                const retryLoginForm = document.getElementById('signin-form-element') || document.getElementById('login-form-element');
                 if (retryLoginForm) {
                     retryLoginForm.addEventListener('submit', (e) => this.handleLogin(e));
-                    console.log('✅ Signin form event listener attached (retry)');
+                    console.log('✅ Login form event listener attached (retry)');
                 } else {
-                    console.warn('⚠️ Signin form still not found after retry');
+                    console.warn('⚠️ Login form still not found after retry');
                 }
             }, 1000);
         }
@@ -605,7 +637,7 @@ window.Auth = {
         
         // If we're already on the landing page, show it
         if (heroSection) {
-            heroSection.style.display = 'block';
+            heroSection.style.display = 'flex';
         }
         if (appContainer) {
             appContainer.style.display = 'none';
@@ -742,7 +774,7 @@ window.Auth = {
     // Switch between login and signup forms
     switchAuthForm(mode) {
         console.log('switchAuthForm called with mode:', mode);
-        const loginForm = document.getElementById('signin-form');
+        const loginForm = document.getElementById('signin-form') || document.getElementById('login-form');
         const signupForm = document.getElementById('signup-form');
         
         console.log('Form elements found:', { loginForm, signupForm });
@@ -794,21 +826,24 @@ window.Auth = {
             return;
         }
         
-        const email = document.getElementById('signin-email').value;
-        const password = document.getElementById('signin-password').value;
+        // Try different email/password field IDs for different pages
+        const email = (document.getElementById('signin-email') || document.getElementById('login-email'))?.value;
+        const password = (document.getElementById('signin-password') || document.getElementById('login-password'))?.value;
         const submitBtn = e.target.querySelector('button[type="submit"]');
-        const errorElement = document.getElementById('signin-error');
+        const errorElement = document.getElementById('signin-error') || document.getElementById('login-error');
         
         console.log('🔍 Login form data:', { email: !!email, password: !!password, submitBtn: !!submitBtn });
         console.log('Login attempt for:', email);
         
         if (!email || !password) {
-            this.showError('signin-error', 'Please fill in all fields');
+            const errorId = document.getElementById('signin-error') ? 'signin-error' : 'login-error';
+            this.showError(errorId, 'Please fill in all fields');
             return;
         }
         
         if (!this.supabase) {
-            this.showError('signin-error', 'Authentication service not initialized');
+            const errorId = document.getElementById('signin-error') ? 'signin-error' : 'login-error';
+            this.showError(errorId, 'Authentication service not initialized');
             return;
         }
         
@@ -843,7 +878,8 @@ window.Auth = {
                 errorMessage = 'Too many login attempts. Please wait a moment and try again.';
             }
             
-            this.showError('signin-error', errorMessage);
+            const errorId = document.getElementById('signin-error') ? 'signin-error' : 'login-error';
+            this.showError(errorId, errorMessage);
         } finally {
             this.setLoading(submitBtn, false);
             this.isLoggingIn = false;
@@ -856,7 +892,7 @@ window.Auth = {
         
         const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm').value;
+        const confirmPassword = (document.getElementById('signup-confirm') || document.getElementById('signup-confirm-password'))?.value;
         const submitBtn = e.target.querySelector('button[type="submit"]');
         
         console.log('Signup attempt for:', email);
@@ -959,7 +995,8 @@ window.Auth = {
             setTimeout(() => {
                 this.switchAuthForm('login');
                 // Pre-fill email
-                document.getElementById('login-email').value = email;
+                const emailField = document.getElementById('signin-email') || document.getElementById('login-email');
+                if (emailField) emailField.value = email;
             }, 3000);
             
         } catch (error) {

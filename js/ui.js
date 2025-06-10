@@ -571,6 +571,28 @@ window.UI = {
             helpCloseBtn.addEventListener('click', () => this.hideHelpModal());
         }
         
+        // Donation modal events
+        const donateBtn = document.getElementById('donate-btn');
+        if (donateBtn) {
+            donateBtn.addEventListener('click', () => this.showDonationModal());
+        }
+        
+        const donationCloseBtn = document.getElementById('donation-close-btn');
+        if (donationCloseBtn) {
+            donationCloseBtn.addEventListener('click', () => this.hideDonationModal());
+        }
+        
+        const donationDeclineBtn = document.getElementById('donation-decline-btn');
+        if (donationDeclineBtn) {
+            donationDeclineBtn.addEventListener('click', () => this.hideDonationModal());
+        }
+        
+        // What's New modal events
+        const whatsNewCloseBtn = document.getElementById('whats-new-close-btn');
+        if (whatsNewCloseBtn) {
+            whatsNewCloseBtn.addEventListener('click', () => this.hideWhatsNewModal());
+        }
+        
         // Drag and drop events
         this.elements.imageDropZone.addEventListener('dragover', (e) => this.handleDragOver(e));
         this.elements.imageDropZone.addEventListener('dragleave', () => this.handleDragLeave());
@@ -3999,6 +4021,50 @@ window.UI = {
         const helpModal = document.getElementById('help-modal');
         if (helpModal) {
             helpModal.classList.remove('visible');
+        }
+    },
+
+    // Show donation modal
+    showDonationModal() {
+        const donationModal = document.getElementById('donation-modal');
+        if (donationModal) {
+            donationModal.classList.add('visible');
+            // Track analytics
+            if (window.Analytics) {
+                window.Analytics.trackEvent('donation_modal_opened', {
+                    source: 'donate_button'
+                });
+            }
+        }
+    },
+
+    // Hide donation modal
+    hideDonationModal() {
+        const donationModal = document.getElementById('donation-modal');
+        if (donationModal) {
+            donationModal.classList.remove('visible');
+        }
+    },
+
+    // Show what's new modal
+    showWhatsNewModal() {
+        const whatsNewModal = document.getElementById('whats-new-modal');
+        if (whatsNewModal) {
+            whatsNewModal.classList.add('visible');
+            // Track analytics
+            if (window.Analytics) {
+                window.Analytics.trackEvent('whats_new_modal_opened', {
+                    source: 'manual'
+                });
+            }
+        }
+    },
+
+    // Hide what's new modal
+    hideWhatsNewModal() {
+        const whatsNewModal = document.getElementById('whats-new-modal');
+        if (whatsNewModal) {
+            whatsNewModal.classList.remove('visible');
         }
     },
     

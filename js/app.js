@@ -363,6 +363,9 @@ window.App = {
         // Update UI with initial state
         UI.updateButtonStates();
         
+        // Show What's New modal for first-time visitors or after updates
+        this.checkAndShowWhatsNew();
+        
         // Force enable export buttons to ensure they're always clickable
         const exportBtn = document.getElementById('export-btn');
         const exportAllBtn = document.getElementById('export-all-btn');
@@ -3535,6 +3538,36 @@ window.App = {
         this.state.watermarkPosition = position;
         this.renderPreview();
         this.saveSettings();
+    },
+
+    // Check if we should show the What's New modal
+    checkAndShowWhatsNew() {
+        const currentVersion = '1.2.0'; // Update this when you add new features
+        const lastSeenVersion = localStorage.getItem('frameit_last_seen_version');
+        const isFirstVisit = !localStorage.getItem('frameit_first_visit_complete');
+        
+        // Show modal for first-time visitors or when version has been updated
+        if (isFirstVisit || lastSeenVersion !== currentVersion) {
+            // Delay showing modal slightly to ensure DOM is ready
+            setTimeout(() => {
+                if (UI && UI.showWhatsNewModal) {
+                    UI.showWhatsNewModal();
+                }
+                
+                // Mark first visit as complete and update version
+                localStorage.setItem('frameit_first_visit_complete', 'true');
+                localStorage.setItem('frameit_last_seen_version', currentVersion);
+                
+                // Track analytics
+                if (window.Analytics) {
+                    window.Analytics.trackEvent('whats_new_modal_shown', {
+                        version: currentVersion,
+                        is_first_visit: isFirstVisit,
+                        previous_version: lastSeenVersion || 'none'
+                    });
+                }
+            }, 1000); // 1 second delay
+        }
     }
 };
 

@@ -25,6 +25,9 @@
     --success: #10b981;
     --danger: #ef4444;
     
+    /* Layout */
+    --navbar-height: 80px; /* Safe height for navbar + some buffer */
+    
     /* Spacing */
     --space-1: 0.25rem;   /* 4px */
     --space-2: 0.5rem;    /* 8px */
@@ -73,6 +76,7 @@
 /* Base Styles */
 html {
     scroll-behavior: smooth;
+    font-display: swap;
 }
 
 body {
@@ -82,6 +86,7 @@ body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
 }
 
 /* Utilities */
@@ -212,10 +217,15 @@ body {
 /* Hero Section */
 .hero {
     min-height: 100vh;
+    min-height: 100dvh; /* Use dynamic viewport height when supported */
     display: flex;
     align-items: center;
+    justify-content: center;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
+    padding-top: var(--navbar-height);
+    padding-bottom: var(--space-8);
 }
 
 .hero::before {
@@ -237,11 +247,12 @@ body {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-24) var(--space-6) var(--space-16);
+    padding: 0 var(--space-6);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-16);
     align-items: center;
+    contain: layout style;
 }
 
 .hero-badge {
@@ -287,11 +298,16 @@ body {
     margin-top: var(--space-6);
     font-size: var(--font-size-sm);
     color: var(--text-muted);
+    contain: strict;
+    will-change: auto;
 }
 
 .hero-stats strong {
     color: var(--text-primary);
     font-weight: 600;
+    display: inline-block;
+    min-width: 2em;
+    text-align: left;
 }
 
 .hero-visual {
@@ -770,12 +786,16 @@ body {
 }
 
 @media (max-width: 768px) {
+    :root {
+        --navbar-height: 72px; /* Smaller navbar on mobile */
+    }
+    
     .nav-container {
         padding: var(--space-4);
     }
     
     .hero-container {
-        padding: var(--space-20) var(--space-4) var(--space-12);
+        padding: 0 var(--space-4);
     }
     
     .hero-title {

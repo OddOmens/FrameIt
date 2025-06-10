@@ -917,13 +917,13 @@
         
         .dropdown-menu {
             position: absolute;
-            top: 100%;
-            right: 0;
+            top: 130%;
+            right: -50px;
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            min-width: 200px;
+            min-width: 240px;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
@@ -1259,10 +1259,10 @@
                         <span>Help</span>
                     </button>
                     
-                    <a href="https://buy.stripe.com/fZuaEX1cCbCecyBfkIfbq02" target="_blank" id="donate-btn" class="btn" title="Support FrameIt Development">
+                    <button id="donate-btn" class="btn" title="Support FrameIt Development">
                         <i class="fas fa-heart"></i>
                         <span>Donate</span>
-                    </a>
+                    </button>
                     
                     <button id="logout-btn" class="btn" style="display: none;">
                         <i class="fas fa-sign-out-alt"></i>
@@ -2348,6 +2348,136 @@
     </div>
 
 
+
+    <!-- Donation Modal -->
+    <div class="modal" id="donation-modal">
+        <div class="modal-content donation-modal-content">
+            <div class="modal-header donation-modal-header">
+                <h3>Support FrameIt Development</h3>
+                <button class="modal-close-btn" id="donation-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body donation-modal-body">
+                <div class="donation-section">
+                    <div class="donation-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h4>Keep FrameIt Free & Growing</h4>
+                    <p>FrameIt is completely free to use, but maintaining and improving the platform comes with real costs:</p>
+                    
+                    <div class="cost-breakdown">
+                        <div class="cost-item">
+                            <i class="fas fa-server"></i>
+                            <span>Server hosting and infrastructure</span>
+                        </div>
+                        <div class="cost-item">
+                            <i class="fas fa-database"></i>
+                            <span>Database and storage services</span>
+                        </div>
+                        <div class="cost-item">
+                            <i class="fas fa-code"></i>
+                            <span>Development time for new features</span>
+                        </div>
+                        <div class="cost-item">
+                            <i class="fas fa-headset"></i>
+                            <span>User support and maintenance</span>
+                        </div>
+                    </div>
+                    
+                    <p>Your support helps us:</p>
+                    <ul class="support-benefits">
+                        <li>Add new device frames and templates</li>
+                        <li>Improve performance and reliability</li>
+                        <li>Develop advanced editing features</li>
+                        <li>Keep the service free for everyone</li>
+                    </ul>
+                    
+                    <p class="donation-note">Every contribution, no matter the size, makes a real difference in keeping FrameIt alive and thriving.</p>
+                </div>
+                
+                <div class="donation-actions">
+                    <button id="donation-decline-btn" class="btn donation-decline-btn">
+                        <span>No thanks</span>
+                    </button>
+                    <a href="https://buy.stripe.com/fZuaEX1cCbCecyBfkIfbq02" target="_blank" id="donation-support-btn" class="btn primary-btn donation-support-btn">
+                        <i class="fas fa-heart"></i>
+                        <span>Support FrameIt</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What's New Modal -->
+    <div class="modal" id="whats-new-modal">
+        <div class="modal-content whats-new-modal-content">
+            <div class="modal-header whats-new-modal-header">
+                <h3>Welcome to FrameIt</h3>
+                <button class="modal-close-btn" id="whats-new-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body whats-new-modal-body">
+                <!-- Important Notice Section -->
+                <div class="notice-section">
+                    <div class="notice-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4>Important: Your Work is Temporary</h4>
+                    <p>Images and projects are <strong>not saved</strong> between sessions.</p>
+                    <p class="notice-tip"><strong>Tip:</strong> Always export your mockups before leaving the page!</p>
+                </div>
+                
+                <!-- What's New Section -->
+                <div class="whats-new-section">
+                    <h4><i class="fas fa-star"></i> What's New in FrameIt</h4>
+                    
+                    <div class="feature-update">
+                        <div class="update-content">
+                            <div class="update-badge new">NEW</div>
+                            <h5>Multi-Image Layouts</h5>
+                            <p>Create stunning collages with multiple images using our new layout templates. Perfect for before/after shots, feature comparisons, and showcase galleries.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-update">
+                        <div class="update-content">
+                            <div class="update-badge improved">IMPROVED</div>
+                            <h5>Enhanced Text Layers</h5>
+                            <p>Advanced typography controls with custom fonts, shadows, backgrounds, and precise positioning. Create professional-looking annotations and captions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-update">
+                        <div class="update-content">
+                            <div class="update-badge new">NEW</div>
+                            <h5>Noise & Texture Effects</h5>
+                            <p>Add realistic textures to your backgrounds with our new noise overlay system. Choose from paper, canvas, grain, and more to enhance your designs.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-update">
+                        <div class="update-content">
+                            <div class="update-badge improved">IMPROVED</div>
+                            <h5>Smart Fill & Crop</h5>
+                            <p>Better image fitting with panning controls. Position your images exactly where you want them within the frame.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-update">
+                        <div class="update-content">
+                            <div class="update-badge new">NEW</div>
+                            <h5>Export Options</h5>
+                            <p>Multiple format support (PNG, JPEG, WebP) with quality controls and custom dimensions. Batch export all your mockups at once.</p>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
 
     <!-- User Settings Modal -->
     <div id="user-settings-modal" class="modal">

@@ -185,6 +185,8 @@ body {
     background-color: #4a4a4a; /* Darker for hover */
 }
 
+/* Donate button is now a proper button element, no special styling needed */
+
 /* Main Content */
 .main-content {
     display: flex;
@@ -5591,7 +5593,8 @@ textarea, select {
 
 /* Modal Close Button */
 .user-settings-content .modal-close-btn,
-.delete-account-content .modal-close-btn {
+.delete-account-content .modal-close-btn,
+.help-modal-content .modal-close-btn {
     background: #262626;
     border: 1px solid #3f3f46;
     color: #a1a1aa;
@@ -5608,7 +5611,8 @@ textarea, select {
 }
 
 .user-settings-content .modal-close-btn:hover,
-.delete-account-content .modal-close-btn:hover {
+.delete-account-content .modal-close-btn:hover,
+.help-modal-content .modal-close-btn:hover {
     background: #3f3f46;
     border-color: #52525b;
     color: #ffffff;
@@ -6452,4 +6456,473 @@ textarea, select {
 .header-buttons .btn.danger-btn:hover:not(:disabled) {
     background: #c62828;
     border-color: #c62828;
+}
+
+/* Donation Modal Styles */
+.donation-modal-content {
+    max-width: 600px;
+    background: #1a1a1a;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.donation-modal-header {
+    background: linear-gradient(135deg, #e91e63, #f06292);
+    color: white;
+    padding: 24px 32px;
+    border-bottom: none;
+}
+
+.donation-modal-header h3 {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.donation-modal-body {
+    padding: 32px;
+    background: #1a1a1a;
+}
+
+.donation-section {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.donation-icon {
+    background: linear-gradient(135deg, #e91e63, #f06292);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.donation-icon i {
+    font-size: 32px;
+    color: white;
+}
+
+.donation-section h4 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+}
+
+.donation-section p {
+    color: #a8a8a8;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.cost-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 24px 0;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cost-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cost-item i {
+    color: #e91e63;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.cost-item span {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.support-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.support-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.support-benefits li::before {
+    content: '✓';
+    color: #4caf50;
+    font-weight: bold;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.donation-note {
+    font-style: italic;
+    color: #888 !important;
+    font-size: 14px !important;
+    margin-top: 24px !important;
+}
+
+.donation-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+}
+
+.donation-decline-btn {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #888;
+    padding: 12px 24px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.donation-decline-btn:hover {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+}
+
+.donation-support-btn {
+    background: linear-gradient(135deg, #e91e63, #f06292);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.donation-support-btn:hover {
+    background: linear-gradient(135deg, #c2185b, #e91e63);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+}
+
+/* What's New Modal Styles */
+.whats-new-modal-content {
+    max-width: 800px;
+    background: #1a1a1a;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.whats-new-modal-header {
+    background: linear-gradient(135deg, #2b7de9, #66c3ff);
+    color: white;
+    padding: 24px 32px;
+    border-bottom: none;
+}
+
+.whats-new-modal-header h3 {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.whats-new-modal-body {
+    padding: 32px;
+    background: #1a1a1a;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.notice-section {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.notice-icon {
+    background: rgba(255, 193, 7, 0.2);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.notice-icon i {
+    font-size: 24px;
+    color: #ffc107;
+}
+
+.notice-section h4 {
+    color: #ffc107;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.notice-section p {
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.notice-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+    text-align: left;
+    display: inline-block;
+}
+
+.notice-list li {
+    color: #fff;
+    font-size: 14px;
+    padding: 4px 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.notice-list li::before {
+    content: '•';
+    color: #ffc107;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.notice-tip {
+    background: rgba(67, 160, 71, 0.1);
+    border: 1px solid rgba(67, 160, 71, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 16px;
+    color: #a8e6cf !important;
+    font-size: 13px !important;
+}
+
+.whats-new-section {
+    margin-bottom: 32px;
+}
+
+.whats-new-section h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.whats-new-section h4 i {
+    color: #2b7de9;
+}
+
+.feature-update {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.update-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    align-self: flex-start;
+    display: inline-block;
+    width: fit-content;
+    margin-bottom: 8px;
+}
+
+.update-badge.new {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+    color: white;
+}
+
+.update-badge.improved {
+    background: linear-gradient(135deg, #2196f3, #64b5f6);
+    color: white;
+}
+
+.update-content h5 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.update-content p {
+    color: #a8a8a8;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.quick-start-section h4 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quick-start-section h4 i {
+    color: #ff9800;
+}
+
+.quick-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.quick-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.step-number {
+    background: linear-gradient(135deg, #ff9800, #ffb74d);
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.step-content h6 {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.step-content p {
+    color: #a8a8a8;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Modal close button styling for new modals */
+.donation-modal-content .modal-close-btn,
+.whats-new-modal-content .modal-close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.donation-modal-content .modal-close-btn:hover,
+.whats-new-modal-content .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* Responsive design for new modals */
+@media (max-width: 768px) {
+    .donation-modal-content,
+    .whats-new-modal-content {
+        width: 95vw;
+        max-width: none;
+        margin: 10px;
+    }
+    
+    .donation-modal-header,
+    .whats-new-modal-header,
+    .donation-modal-body,
+    .whats-new-modal-body {
+        padding: 20px;
+    }
+    
+    .donation-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .donation-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cost-breakdown,
+    .support-benefits {
+        max-width: none;
+    }
+    
+    .feature-update {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .update-badge {
+        align-self: flex-start;
+    }
 }

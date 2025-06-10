@@ -12,7 +12,7 @@
     "@supabase/supabase-js": "^2.38.0"
   },
   "devDependencies": {
-    "vercel": "^42.0.0"
+    "vercel": "^42.3.0"
   },
   "engines": {
     "node": "22.x"
@@ -25,4 +25,4 @@
   ],
   "author": "FrameIt Team",
   "license": "MIT"
-} 
+}
