@@ -3047,8 +3047,8 @@ window.UI = {
                 style.textContent = `
                     .notification {
                         position: fixed;
-                        top: 20px;
-                        right: 20px;
+                        top: 50%;
+                        left: 20px;
                         padding: 12px 20px;
                         border-radius: 6px;
                         background-color: #333;
@@ -3056,13 +3056,13 @@ window.UI = {
                         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                         z-index: 9999;
                         transition: transform 0.3s ease, opacity 0.3s ease;
-                        transform: translateY(-20px);
+                        transform: translate(-20px, -50%);
                         opacity: 0;
                         font-size: 14px;
                         max-width: 300px;
                     }
                     .notification.visible {
-                        transform: translateY(0);
+                        transform: translate(0, -50%);
                         opacity: 1;
                     }
                     .notification.success {
