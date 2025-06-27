@@ -1235,17 +1235,17 @@ window.UI = {
         
         if (resetWatermarkOpacityBtn) {
             resetWatermarkOpacityBtn.addEventListener('click', () => {
-                watermarkOpacitySlider.value = 0.7;
-                document.getElementById('watermark-opacity-value').textContent = '70%';
-                window.App.setWatermarkOpacity(0.7);
+                        watermarkOpacitySlider.value = 1.0;
+        document.getElementById('watermark-opacity-value').textContent = '100%';
+        window.App.setWatermarkOpacity(1.0);
             });
         }
         
         if (resetWatermarkFontSizeBtn) {
             resetWatermarkFontSizeBtn.addEventListener('click', () => {
-                watermarkFontSizeSlider.value = 16;
-                document.getElementById('watermark-font-size-value').textContent = '16px';
-                window.App.setWatermarkFontSize(16);
+                        watermarkFontSizeSlider.value = 32;
+        document.getElementById('watermark-font-size-value').textContent = '32px';
+        window.App.setWatermarkFontSize(32);
             });
         }
     },
@@ -1680,19 +1680,19 @@ window.UI = {
         
         console.log('✅ Color swatches container found:', container);
         
-        if (!Config.colorPresets) {
+        if (!window.Config?.colorPresets) {
             console.warn('❌ Config.colorPresets not found');
             return;
         }
         
-        console.log('✅ Config.colorPresets found:', Config.colorPresets.length, 'colors');
+        console.log('✅ Config.colorPresets found:', window.Config.colorPresets.length, 'colors');
         
         container.innerHTML = '';
         
-        Config.colorPresets.forEach((color, index) => {
+        window.Config.colorPresets.forEach((color, index) => {
             const swatch = document.createElement('div');
-            swatch.className = 'color-swatch';
-            swatch.style.backgroundColor = color;
+            swatch.className = 'color-swatch gradient-swatch'; // Use same class as gradients for consistency
+            swatch.style.background = color;
             swatch.dataset.color = color;
             
             swatch.addEventListener('click', () => window.App.setBackgroundColor(color));
@@ -1724,6 +1724,8 @@ window.UI = {
         // Create separate gradient sections
         this.renderGradientSections();
         
+        // Background image categories removed per user request
+        
         // Populate noise overlay options
         this.populateNoiseOverlayOptions();
     },
@@ -1750,15 +1752,15 @@ window.UI = {
         // Clear any existing gradients
         gradientContainer.innerHTML = '';
         
-        // Define all gradients from all sections
+        // Define all gradients from all sections - fix config references
         const allGradients = [
-            ...Config.lightToDarkGradients,
-            ...Config.colorSpectrumGradients,
-            ...Config.natureEarthGradients,
-            ...Config.creativeFusionGradients,
-            ...Config.luxuryVibesGradients,
-            ...Config.cosmicEnergyGradients,
-            ...Config.retroVibesGradients
+            ...(window.Config.lightToDarkGradients || []),
+            ...(window.Config.colorSpectrumGradients || []),
+            ...(window.Config.natureEarthGradients || []),
+            ...(window.Config.creativeFusionGradients || []),
+            ...(window.Config.luxuryVibesGradients || []),
+            ...(window.Config.cosmicEnergyGradients || []),
+            ...(window.Config.retroVibesGradients || [])
         ];
         
         console.log(`Rendering ${allGradients.length} gradients`);
@@ -1793,6 +1795,8 @@ window.UI = {
         this._gradientSectionsRendered = true;
     },
     
+    // Background image functions removed per user request
+    
     // Renders templates
     renderTemplates() {
         const container = document.getElementById('templates-grid');
@@ -1800,7 +1804,7 @@ window.UI = {
         
         container.innerHTML = '';
         
-        Config.templates.forEach(template => {
+        window.Config.templates.forEach(template => {
             const templateItem = document.createElement('div');
             templateItem.className = 'template-item';
             templateItem.dataset.templateId = template.id;
@@ -1832,7 +1836,7 @@ window.UI = {
         
         container.innerHTML = '';
         
-        Config.multiImageLayouts.forEach(layout => {
+        window.Config.multiImageLayouts.forEach(layout => {
             const layoutItem = document.createElement('div');
             layoutItem.className = 'layout-item';
             layoutItem.dataset.layoutId = layout.id;
@@ -2264,15 +2268,43 @@ window.UI = {
         select.innerHTML = '';
         
         // Add noise overlay options
-        Config.noiseOverlayTypes.forEach(overlay => {
-            const option = document.createElement('option');
-            option.value = overlay.id;
-            option.textContent = overlay.name;
-            select.appendChild(option);
-        });
+        if (window.Config?.noiseOverlayTypes) {
+            window.Config.noiseOverlayTypes.forEach(overlay => {
+                const option = document.createElement('option');
+                option.value = overlay.id;
+                option.textContent = overlay.name;
+                select.appendChild(option);
+            });
+        }
         
         // Set default to "No Noise"
         select.value = 'none';
+    },
+    
+
+    
+    // Handle noise overlay selection
+    selectNoiseOverlay(noiseId) {
+        // Update dropdown selection
+        const select = document.getElementById('noise-overlay-select');
+        if (select) {
+            select.value = noiseId;
+        }
+        
+        // Apply to app
+        if (window.App && window.App.setNoiseOverlay) {
+            window.App.setNoiseOverlay(noiseId);
+        }
+        
+        // Show/hide noise controls based on selection
+        const noiseOptions = document.getElementById('noise-options');
+        if (noiseOptions) {
+            if (noiseId && noiseId !== 'none') {
+                noiseOptions.style.display = 'block';
+            } else {
+                noiseOptions.style.display = 'none';
+            }
+        }
     },
     
     // Renders history items
@@ -2510,16 +2542,10 @@ window.UI = {
         // Remove all selected states
         document.querySelectorAll('.color-swatch.selected').forEach(el => el.classList.remove('selected'));
         document.querySelectorAll('.gradient-swatch.selected').forEach(el => el.classList.remove('selected'));
-        document.querySelectorAll('.bg-image-item.selected').forEach(el => el.classList.remove('selected'));
         document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
         
         // Add selected state to the appropriate element
-        if (backgroundImageId) {
-            const imageElement = document.querySelector(`.bg-image-item[data-image-id="${backgroundImageId}"]`);
-            if (imageElement) {
-                imageElement.classList.add('selected');
-            }
-        } else if (gradientId) {
+        if (gradientId) {
             const gradientElement = document.querySelector(`.gradient-swatch[data-gradient-id="${gradientId}"]`);
             if (gradientElement) {
                 gradientElement.classList.add('selected');
@@ -2530,6 +2556,24 @@ window.UI = {
                 colorElement.classList.add('selected');
             }
         }
+        
+        // Update noise previews with new background
+        this.updateNoisePreviewsBackground();
+    },
+    
+    // Update noise previews to reflect current background
+    updateNoisePreviewsBackground() {
+        const noisePreviewSwatches = document.querySelectorAll('.noise-preview-swatch');
+        if (noisePreviewSwatches.length === 0) return;
+        
+        const currentBg = this.getCurrentBackgroundForNoisePreviews();
+        
+        noisePreviewSwatches.forEach(swatch => {
+            swatch.style.background = currentBg;
+        });
+        
+        // Reapply noise overlays
+        this.applyNoiseTexturesToPreviews();
     },
     
     // Updates template selection
@@ -4180,8 +4224,8 @@ window.UI = {
         const currentWatermark = {
             text: window.App.state.watermarkText || '',
             color: window.App.state.watermarkTextColor || '#FFFFFF',
-            fontSize: window.App.state.watermarkTextSize || 16,
-            opacity: window.App.state.watermarkOpacity || 0.7,
+            fontSize: window.App.state.watermarkTextSize || 32,
+            opacity: window.App.state.watermarkOpacity || 1.0,
             position: window.App.state.watermarkPosition || 'bottom-right'
         };
         

@@ -87,77 +87,143 @@ window.Config = {
         { id: 'high', name: 'High', value: 1.0 }
     ],
     
-    // Color presets
+    // Color presets - Organized by categories
     colorPresets: [
-        // Whites & Light Grays (5)
-        '#FFFFFF',                                   // White
+        // === NEUTRALS & GRAYS ===
+        // Pure Whites & Light Neutrals (8)
+        '#FFFFFF',                                   // Pure White
+        '#FEFEFE',                                   // Snow White
         '#FAFAFA',                                   // Off White
+        '#F8F8F8',                                   // Ghost White
+        '#F5F5F5',                                   // White Smoke
         '#F2F2F2',                                   // Lightest Gray
-        '#E6E6E6',                                   // Pale Gray
-        '#D9D9D9',                                   // Light Gray
+        '#EEEEEE',                                   // Very Light Gray
+        '#E8E8E8',                                   // Light Gray
         
-        // Dark Grays & Blacks (5)
-        '#999999',                                   // Medium Gray
-        '#666666',                                   // Gray
-        '#404040',                                   // Dark Gray
+        // Medium Grays (8)
+        '#DDDDDD',                                   // Silver
+        '#D0D0D0',                                   // Light Silver
+        '#C0C0C0',                                   // Silver Gray
+        '#B0B0B0',                                   // Medium Light Gray
+        '#A0A0A0',                                   // Medium Gray
+        '#909090',                                   // Gray
+        '#808080',                                   // Standard Gray
+        '#707070',                                   // Dark Gray
+        
+        // Dark Grays & Blacks (8)
+        '#606060',                                   // Charcoal Gray
+        '#505050',                                   // Dark Charcoal
+        '#404040',                                   // Very Dark Gray
+        '#303030',                                   // Almost Black
+        '#202020',                                   // Near Black
         '#1A1A1A',                                   // Charcoal
-        '#000000',                                   // Black
+        '#101010',                                   // Dark Black
+        '#000000',                                   // Pure Black
         
-        // Blues (5)
-        '#CCE6FF',                                   // Baby Blue
-        '#66B2FF',                                   // Sky Blue
-        '#0080E6',                                   // Royal Blue
-        '#004DB3',                                   // Navy Blue
-        '#001A66',                                   // Midnight Blue
+        // === VIBRANT COLORS ===
+        // Reds & Roses (10)
+        '#FFE4E1',                                   // Misty Rose
+        '#FFC0CB',                                   // Pink
+        '#FFB6C1',                                   // Light Pink
+        '#FF91A4',                                   // Blush Pink
+        '#FF69B4',                                   // Hot Pink
+        '#FF1493',                                   // Deep Pink
+        '#DC143C',                                   // Crimson
+        '#B22222',                                   // Fire Brick
+        '#8B0000',                                   // Dark Red
+        '#660000',                                   // Burgundy
         
-        // Reds (5)
-        '#FFCCCC',                                   // Light Red
-        '#FF8080',                                   // Salmon Red
-        '#FF3333',                                   // Bright Red
-        '#CC0000',                                   // Red
-        '#800000',                                   // Dark Red
+        // Oranges & Corals (10)
+        '#FFF8DC',                                   // Cornsilk
+        '#FFEFD5',                                   // Papaya Whip
+        '#FFE4B5',                                   // Moccasin
+        '#FFDAB9',                                   // Peach Puff
+        '#FFA07A',                                   // Light Salmon
+        '#FF7F50',                                   // Coral
+        '#FF6347',                                   // Tomato
+        '#FF4500',                                   // Orange Red
+        '#D2691E',                                   // Chocolate
+        '#A0522D',                                   // Sienna
         
-        // Yellows (5)
-        '#FFFACC',                                   // Cream
-        '#FFF299',                                   // Light Yellow
-        '#FFE64D',                                   // Yellow
-        '#F2CD19',                                   // Golden Yellow
-        '#CC9900',                                   // Amber
+        // Yellows & Golds (10)
+        '#FFFFFE',                                   // Ivory
+        '#FFFFF0',                                   // Ivory
+        '#FFFFE0',                                   // Light Yellow
+        '#FFFF99',                                   // Pale Yellow
+        '#FFFF00',                                   // Yellow
+        '#FFD700',                                   // Gold
+        '#FFA500',                                   // Orange
+        '#DAA520',                                   // Goldenrod
+        '#B8860B',                                   // Dark Goldenrod
+        '#8B7355',                                   // Olive Drab
         
-        // Oranges (5)
-        '#FFE6B3',                                   // Peach
-        '#FFB366',                                   // Light Orange
-        '#FF9933',                                   // Orange
-        '#E66600',                                   // Dark Orange
-        '#B34D00',                                   // Burnt Orange
+        // Greens & Emeralds (10)
+        '#F0FFF0',                                   // Honeydew
+        '#E0FFE0',                                   // Light Green
+        '#98FB98',                                   // Pale Green
+        '#90EE90',                                   // Light Green
+        '#32CD32',                                   // Lime Green
+        '#00FF00',                                   // Green
+        '#228B22',                                   // Forest Green
+        '#006400',                                   // Dark Green
+        '#2E8B57',                                   // Sea Green
+        '#355E3B',                                   // Hunter Green
         
-        // Purples (5)
-        '#E6CCFF',                                   // Lavender
-        '#B380E6',                                   // Light Purple
-        '#804DCC',                                   // Purple
-        '#661A99',                                   // Deep Purple
-        '#330066',                                   // Dark Purple
+        // Blues & Cyans (10)
+        '#F0F8FF',                                   // Alice Blue
+        '#E6F3FF',                                   // Light Blue
+        '#87CEEB',                                   // Sky Blue
+        '#4169E1',                                   // Royal Blue
+        '#0000FF',                                   // Blue
+        '#1E90FF',                                   // Dodger Blue
+        '#00BFFF',                                   // Deep Sky Blue
+        '#0080FF',                                   // Electric Blue
+        '#191970',                                   // Midnight Blue
+        '#000080',                                   // Navy
         
-        // Greens (5)
-        '#CCFFCC',                                   // Mint
-        '#80E699',                                   // Light Green
-        '#33CC66',                                   // Green
-        '#00994D',                                   // Forest Green
-        '#006633',                                   // Dark Green
+        // Purples & Violets (10)
+        '#F8F8FF',                                   // Ghost White
+        '#E6E6FA',                                   // Lavender
+        '#DDA0DD',                                   // Plum
+        '#DA70D6',                                   // Orchid
+        '#BA55D3',                                   // Medium Orchid
+        '#9370DB',                                   // Medium Purple
+        '#8A2BE2',                                   // Blue Violet
+        '#7B68EE',                                   // Medium Slate Blue
+        '#4B0082',                                   // Indigo
+        '#2E0A57',                                   // Deep Purple
         
-        // Browns (5)
-        '#E6CCB3',                                   // Tan
-        '#CC9966',                                   // Light Brown
-        '#996633',                                   // Brown
-        '#663300',                                   // Dark Brown
-        '#40200D',                                   // Chocolate
+        // === EARTH TONES ===
+        // Browns & Tans (8)
+        '#F5DEB3',                                   // Wheat
+        '#DEB887',                                   // Burlywood
+        '#D2B48C',                                   // Tan
+        '#BC9A6A',                                   // Sandy Brown
+        '#A0522D',                                   // Sienna
+        '#8B4513',                                   // Saddle Brown
+        '#654321',                                   // Dark Brown
+        '#3C2414',                                   // Very Dark Brown
         
-        // Pinks (5)
-        '#FFE6F2',                                   // Pale Pink
-        '#FFB3CC',                                   // Light Pink
-        '#FF80B2',                                   // Pink
-        '#E64D99',                                   // Hot Pink
-        '#B31966'                                    // Deep Pink
+        // === MODERN COLORS ===
+        // Tech & Digital (8)
+        '#00FFFF',                                   // Cyan
+        '#40E0D0',                                   // Turquoise
+        '#00CED1',                                   // Dark Turquoise
+        '#5F9EA0',                                   // Cadet Blue
+        '#2F4F4F',                                   // Dark Slate Gray
+        '#708090',                                   // Slate Gray
+        '#778899',                                   // Light Slate Gray
+        '#36454F',                                   // Charcoal
+        
+        // Neon & Electric (8)
+        '#39FF14',                                   // Neon Green
+        '#FF073A',                                   // Neon Red
+        '#FF6600',                                   // Neon Orange
+        '#FFFF33',                                   // Neon Yellow
+        '#FF1493',                                   // Neon Pink
+        '#9400D3',                                   // Neon Purple
+        '#00FFFF',                                   // Electric Blue
+        '#FF69B4'                                    // Electric Pink
     ],
     
     // Multi-image layout templates
@@ -348,6 +414,30 @@ window.Config = {
             name: 'Deep Space',
             colors: ['#2c3e50', '#1a252f', '#0d1421'],
             direction: 'to bottom'
+        },
+        {
+            id: 'concrete-wall',
+            name: 'Concrete Wall',
+            colors: ['#f5f5f5', '#e0e0e0', '#b8b8b8'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'steel-surface',
+            name: 'Steel Surface',
+            colors: ['#e8eaed', '#dadce0', '#9aa0a6'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'warm-snow',
+            name: 'Warm Snow',
+            colors: ['#ffffff', '#fefefe', '#f8f9fa'],
+            direction: 'radial-gradient(circle at 50% 50%'
+        },
+        {
+            id: 'gentle-breeze',
+            name: 'Gentle Breeze',
+            colors: ['#f1f3f4', '#e8eaed', '#dadce0'],
+            direction: 'to bottom right'
         }
     ],
     
@@ -446,15 +536,372 @@ window.Config = {
             name: 'Honey',
             colors: ['#E6B300', '#CC8800'],
             direction: 'to bottom'
+        },
+        
+        // Purple Gradients (6)
+        {
+            id: 'lavender',
+            name: 'Lavender',
+            colors: ['#E6CCFF', '#CCAAFF'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'violet',
+            name: 'Violet',
+            colors: ['#B380E6', '#9966CC'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'grape',
+            name: 'Grape',
+            colors: ['#804DCC', '#663399'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'plum',
+            name: 'Plum',
+            colors: ['#661A99', '#4D1A75'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'royal-purple',
+            name: 'Royal Purple',
+            colors: ['#330066', '#1A0033'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'magenta-burst',
+            name: 'Magenta Burst',
+            colors: ['#ff0080', '#cc0066', '#99004d'],
+            direction: 'to bottom right'
+        },
+        
+        // Orange Gradients (6)
+        {
+            id: 'tangerine',
+            name: 'Tangerine',
+            colors: ['#FFE6B3', '#FFCC80'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'citrus',
+            name: 'Citrus',
+            colors: ['#FFB366', '#FF9933'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'persimmon',
+            name: 'Persimmon',
+            colors: ['#FF8019', '#E66600'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'pumpkin',
+            name: 'Pumpkin',
+            colors: ['#E66600', '#CC4C00'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'burnt-orange',
+            name: 'Burnt Orange',
+            colors: ['#B34D00', '#803300'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'flame',
+            name: 'Flame',
+            colors: ['#ff6b35', '#f7931e', '#ffcc02'],
+            direction: 'to bottom left'
+        },
+        
+        // Pink Gradients (6)
+        {
+            id: 'blush',
+            name: 'Blush',
+            colors: ['#FFE6F2', '#FFCCDD'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'cherry-blossom',
+            name: 'Cherry Blossom',
+            colors: ['#FFB3CC', '#FF80AA'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'bubblegum',
+            name: 'Bubblegum',
+            colors: ['#FF80B2', '#E64D99'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'fuchsia',
+            name: 'Fuchsia',
+            colors: ['#E64D99', '#CC1A66'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'raspberry',
+            name: 'Raspberry',
+            colors: ['#B31966', '#801040'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'cotton-candy',
+            name: 'Cotton Candy',
+            colors: ['#ffafbd', '#ffc3a0', '#ff9a9e'],
+            direction: 'radial-gradient(circle at center'
+        },
+        
+        // Teal & Cyan Gradients (6)
+        {
+            id: 'aqua-mint',
+            name: 'Aqua Mint',
+            colors: ['#a8edea', '#fed6e3'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'turquoise',
+            name: 'Turquoise',
+            colors: ['#40e0d0', '#1ba3a3'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'caribbean',
+            name: 'Caribbean',
+            colors: ['#00ced1', '#008b8b'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'peacock',
+            name: 'Peacock',
+            colors: ['#4facfe', '#00f2fe'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'electric-blue',
+            name: 'Electric Blue',
+            colors: ['#667eea', '#764ba2'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'cyber-space',
+            name: 'Cyber Space',
+            colors: ['#00d4ff', '#00b4db', '#0083b0'],
+            direction: 'to bottom right'
+        }
+    ],
+    
+    // Metallic & Industrial Gradients
+    metallicGradients: [
+        {
+            id: 'chrome-shine',
+            name: 'Chrome Shine',
+            colors: ['#ffffff', '#e8e8e8', '#c0c0c0', '#a8a8a8'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'gold-luxury',
+            name: 'Gold Luxury',
+            colors: ['#ffd700', '#ffed4e', '#ffb000', '#cc8c00'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'silver-platinum',
+            name: 'Silver Platinum',
+            colors: ['#f8f8ff', '#dcdcdc', '#c0c0c0', '#808080'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'copper-bronze',
+            name: 'Copper Bronze',
+            colors: ['#ffb366', '#cd853f', '#a0522d', '#8b4513'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'titanium-steel',
+            name: 'Titanium Steel',
+            colors: ['#f0f8ff', '#b0c4de', '#778899', '#2f4f4f'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'iron-rust',
+            name: 'Iron Rust',
+            colors: ['#daa520', '#cd853f', '#a0522d', '#654321'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'brass-antique',
+            name: 'Antique Brass',
+            colors: ['#fff8dc', '#daa520', '#b8860b', '#6b6b47'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'aluminum-brushed',
+            name: 'Brushed Aluminum',
+            colors: ['#f5f5f5', '#e0e0e0', '#c0c0c0', '#a0a0a0'],
+            direction: 'linear-gradient(90deg'
+        }
+    ],
+    
+    // Gemstone & Precious Material Gradients
+    gemstoneGradients: [
+        {
+            id: 'emerald-deep',
+            name: 'Deep Emerald',
+            colors: ['#50c878', '#00a86b', '#006b3c', '#004225'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'sapphire-royal',
+            name: 'Royal Sapphire',
+            colors: ['#4169e1', '#0047ab', '#002fa7', '#001f3f'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'ruby-fire',
+            name: 'Fire Ruby',
+            colors: ['#e0115f', '#cc0000', '#8b0000', '#4b0000'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'amethyst-purple',
+            name: 'Amethyst Purple',
+            colors: ['#9966cc', '#8a2be2', '#6a0dad', '#4b0082'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'topaz-golden',
+            name: 'Golden Topaz',
+            colors: ['#ffc649', '#ffb347', '#ff8c00', '#ff6b00'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'diamond-sparkle',
+            name: 'Diamond Sparkle',
+            colors: ['#ffffff', '#f8f8ff', '#e6e6fa', '#d3d3d3'],
+            direction: 'radial-gradient(circle at 30% 30%'
+        },
+        {
+            id: 'opal-shimmer',
+            name: 'Opal Shimmer',
+            colors: ['#ff69b4', '#87ceeb', '#98fb98', '#ffd700'],
+            direction: 'conic-gradient(from 45deg'
+        },
+        {
+            id: 'pearl-lustrous',
+            name: 'Lustrous Pearl',
+            colors: ['#fffdd0', '#f5f5dc', '#e6e6fa', '#d8bfd8'],
+            direction: 'radial-gradient(ellipse at center'
+        }
+    ],
+    
+    // Atmospheric & Weather Gradients
+    atmosphericGradients: [
+        {
+            id: 'storm-clouds',
+            name: 'Storm Clouds',
+            colors: ['#2f4f4f', '#696969', '#708090', '#778899'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'aurora-borealis',
+            name: 'Aurora Borealis',
+            colors: ['#00ff7f', '#00ced1', '#9370db', '#ff1493'],
+            direction: 'to bottom right'
+        },
+        {
+            id: 'sunset-horizon',
+            name: 'Sunset Horizon',
+            colors: ['#ff6b35', '#f7931e', '#ffcc02', '#feb47b'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'misty-morning',
+            name: 'Misty Morning',
+            colors: ['#e0f6ff', '#87ceeb', '#b0e0e6', '#f0f8ff'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'desert-mirage',
+            name: 'Desert Mirage',
+            colors: ['#ffd700', '#ffa500', '#ff8c00', '#ff6347'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'winter-frost',
+            name: 'Winter Frost',
+            colors: ['#ffffff', '#f0f8ff', '#e6e6fa', '#dcdcdc'],
+            direction: 'radial-gradient(circle at 50% 20%'
+        },
+        {
+            id: 'tropical-rain',
+            name: 'Tropical Rain',
+            colors: ['#00ced1', '#20b2aa', '#008b8b', '#2f4f4f'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'lightning-storm',
+            name: 'Lightning Storm',
+            colors: ['#483d8b', '#6a5acd', '#9370db', '#ba55d3'],
+            direction: 'radial-gradient(circle at 70% 30%'
+        }
+    ],
+    
+    // Vintage & Retro Gradients
+    vintageGradients: [
+        {
+            id: 'sepia-tone',
+            name: 'Sepia Tone',
+            colors: ['#f4a460', '#daa520', '#cd853f', '#8b4513'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'vintage-film',
+            name: 'Vintage Film',
+            colors: ['#fff8dc', '#f5deb3', '#deb887', '#d2b48c'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'retro-neon',
+            name: 'Retro Neon',
+            colors: ['#ff1493', '#ff69b4', '#00ced1', '#9370db'],
+            direction: 'to right'
+        },
+        {
+            id: 'old-paper',
+            name: 'Old Paper',
+            colors: ['#fdf6e3', '#f5f5dc', '#eee8aa', '#d2b48c'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'faded-photo',
+            name: 'Faded Photo',
+            colors: ['#f0e68c', '#dda0dd', '#deb887', '#cd853f'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'polaroid-edge',
+            name: 'Polaroid Edge',
+            colors: ['#ffffff', '#fffaf0', '#f5f5dc', '#f0f0f0'],
+            direction: 'to bottom'
+        },
+        {
+            id: 'disco-fever',
+            name: 'Disco Fever',
+            colors: ['#ffd700', '#ff69b4', '#00ced1', '#9370db'],
+            direction: 'conic-gradient(from 180deg'
+        },
+        {
+            id: 'antique-gold',
+            name: 'Antique Gold',
+            colors: ['#ffd700', '#daa520', '#b8860b', '#8b7355'],
+            direction: 'to bottom'
         }
     ],
         
     natureEarthGradients: [
         // Light & Bright Nature Tones
         {
-            id: 'mint',
-            name: 'Mint',
-            colors: ['#CCFFCC', '#99E699'],
             id: 'peach',
             name: 'Peach',
             colors: ['#FFE6CC', '#FFCC99'],
@@ -1367,17 +1814,93 @@ window.Config = {
     gradientPresets: [],
     
     // Function to get all gradients flattened from all sections
+    // Organized gradient categories for better UI presentation
+    getGradientCategories() {
+        return [
+            {
+                id: 'essentials',
+                name: 'Essentials',
+                description: 'Essential light to dark gradients',
+                gradients: this.lightToDarkGradients
+            },
+            {
+                id: 'vibrant',
+                name: 'Vibrant Colors',
+                description: 'Bright and colorful gradients',
+                gradients: this.colorSpectrumGradients
+            },
+            {
+                id: 'metallic',
+                name: 'Metallic & Luxury',
+                description: 'Premium metallic finishes',
+                gradients: this.metallicGradients
+            },
+            {
+                id: 'gemstone',
+                name: 'Gemstones',
+                description: 'Precious stone inspired gradients',
+                gradients: this.gemstoneGradients
+            },
+            {
+                id: 'atmospheric',
+                name: 'Atmospheric',
+                description: 'Weather and sky gradients',
+                gradients: this.atmosphericGradients
+            },
+            {
+                id: 'vintage',
+                name: 'Vintage & Retro',
+                description: 'Classic and retro styles',
+                gradients: this.vintageGradients
+            },
+            {
+                id: 'nature',
+                name: 'Nature & Earth',
+                description: 'Natural and organic gradients',
+                gradients: this.natureEarthGradients
+            },
+            {
+                id: 'creative',
+                name: 'Creative Fusion',
+                description: 'Artistic and creative gradients',
+                gradients: this.creativeFusionGradients
+            },
+            {
+                id: 'luxury',
+                name: 'Luxury Vibes',
+                description: 'Sophisticated luxury gradients',
+                gradients: this.luxuryVibesGradients || []
+            },
+            {
+                id: 'cosmic',
+                name: 'Cosmic Energy',
+                description: 'Space and cosmic gradients',
+                gradients: this.cosmicEnergyGradients || []
+            },
+            {
+                id: 'retro',
+                name: 'Retro Vibes',
+                description: 'Retro and nostalgic gradients',
+                gradients: this.retroVibesGradients || []
+            }
+        ];
+    },
+    
     getAllGradients() {
         if (this.gradientPresets.length === 0) {
             // Flatten gradients from all sections for backward compatibility
             this.gradientPresets = [
                 ...this.lightToDarkGradients,
                 ...this.colorSpectrumGradients,
+                ...this.metallicGradients,
+                ...this.gemstoneGradients,
+                ...this.atmosphericGradients,
+                ...this.vintageGradients,
                 ...this.natureEarthGradients,
                 ...this.creativeFusionGradients,
-                ...this.luxuryVibesGradients,
-                ...this.cosmicEnergyGradients,
-                ...this.retroVibesGradients
+                ...this.luxuryVibesGradients || [],
+                ...this.cosmicEnergyGradients || [],
+                ...this.retroVibesGradients || []
             ];
         }
         return this.gradientPresets;
@@ -2204,13 +2727,793 @@ window.Config = {
             type: 'earth',
             intensity: 0.18,
             scale: 1.2
+        },
+        
+        // More Professional Textures
+        {
+            id: 'linen-fine',
+            name: 'Fine Linen',
+            type: 'linen',
+            intensity: 0.12,
+            scale: 0.8
+        },
+        {
+            id: 'linen-coarse',
+            name: 'Coarse Linen',
+            type: 'linen',
+            intensity: 0.24,
+            scale: 1.6
+        },
+        {
+            id: 'silk-smooth',
+            name: 'Smooth Silk',
+            type: 'silk',
+            intensity: 0.08,
+            scale: 0.5
+        },
+        {
+            id: 'denim-texture',
+            name: 'Denim Texture',
+            type: 'denim',
+            intensity: 0.28,
+            scale: 1.3
+        },
+        {
+            id: 'tweed-pattern',
+            name: 'Tweed Pattern',
+            type: 'tweed',
+            intensity: 0.22,
+            scale: 1.1
+        },
+        {
+            id: 'burlap-rough',
+            name: 'Rough Burlap',
+            type: 'burlap',
+            intensity: 0.32,
+            scale: 1.8
+        },
+        
+        // Modern Digital Textures
+        {
+            id: 'pixel-fine',
+            name: 'Fine Pixels',
+            type: 'pixel',
+            intensity: 0.16,
+            scale: 4
+        },
+        {
+            id: 'pixel-large',
+            name: 'Large Pixels',
+            type: 'pixel',
+            intensity: 0.24,
+            scale: 8
+        },
+        {
+            id: 'scanlines-retro',
+            name: 'Retro Scanlines',
+            type: 'scanlines',
+            intensity: 0.14,
+            scale: 2
+        },
+        {
+            id: 'glitch-mild',
+            name: 'Mild Glitch',
+            type: 'glitch',
+            intensity: 0.18,
+            scale: 1.2
+        },
+        {
+            id: 'glitch-heavy',
+            name: 'Heavy Glitch',
+            type: 'glitch',
+            intensity: 0.35,
+            scale: 2.0
+        },
+        {
+            id: 'matrix-code',
+            name: 'Matrix Code',
+            type: 'matrix',
+            intensity: 0.2,
+            scale: 1.5
+        },
+        {
+            id: 'binary-pattern',
+            name: 'Binary Pattern',
+            type: 'binary',
+            intensity: 0.16,
+            scale: 1.0
+        },
+        
+        // Organic & Natural Textures  
+        {
+            id: 'tree-rings',
+            name: 'Tree Rings',
+            type: 'rings',
+            intensity: 0.2,
+            scale: 1.4
+        },
+        {
+            id: 'sand-dunes',
+            name: 'Sand Dunes',
+            type: 'sand',
+            intensity: 0.16,
+            scale: 1.8
+        },
+        {
+            id: 'water-ripples',
+            name: 'Water Ripples',
+            type: 'ripples',
+            intensity: 0.14,
+            scale: 2.2
+        },
+        {
+            id: 'rock-surface',
+            name: 'Rock Surface',
+            type: 'rock',
+            intensity: 0.26,
+            scale: 1.6
+        },
+        {
+            id: 'crystal-formation',
+            name: 'Crystal Formation',
+            type: 'formation',
+            intensity: 0.22,
+            scale: 1.2
+        },
+        {
+            id: 'ice-crystals',
+            name: 'Ice Crystals',
+            type: 'ice',
+            intensity: 0.18,
+            scale: 0.9
+        },
+        {
+            id: 'lava-flow',
+            name: 'Lava Flow',
+            type: 'lava',
+            intensity: 0.24,
+            scale: 2.0
+        },
+        
+        // Geometric & Abstract Textures
+        {
+            id: 'triangles-small',
+            name: 'Small Triangles',
+            type: 'triangles',
+            intensity: 0.15,
+            scale: 6
+        },
+        {
+            id: 'triangles-large',
+            name: 'Large Triangles',
+            type: 'triangles',
+            intensity: 0.25,
+            scale: 12
+        },
+        {
+            id: 'diamonds-pattern',
+            name: 'Diamond Pattern',
+            type: 'diamonds',
+            intensity: 0.18,
+            scale: 8
+        },
+        {
+            id: 'chevron-subtle',
+            name: 'Subtle Chevron',
+            type: 'chevron',
+            intensity: 0.12,
+            scale: 4
+        },
+        {
+            id: 'chevron-bold',
+            name: 'Bold Chevron',
+            type: 'chevron',
+            intensity: 0.28,
+            scale: 8
+        },
+        {
+            id: 'herringbone-fine',
+            name: 'Fine Herringbone',
+            type: 'herringbone',
+            intensity: 0.16,
+            scale: 3
+        },
+        {
+            id: 'herringbone-large',
+            name: 'Large Herringbone',
+            type: 'herringbone',
+            intensity: 0.24,
+            scale: 6
+        },
+        {
+            id: 'scale-pattern',
+            name: 'Scale Pattern',
+            type: 'scales',
+            intensity: 0.2,
+            scale: 5
+        },
+        {
+            id: 'honeycomb-fine',
+            name: 'Fine Honeycomb',
+            type: 'honeycomb',
+            intensity: 0.14,
+            scale: 4
+        },
+        {
+            id: 'honeycomb-large',
+            name: 'Large Honeycomb',
+            type: 'honeycomb',
+            intensity: 0.22,
+            scale: 8
+        },
+        
+        // Artistic & Creative Textures
+        {
+            id: 'watercolor-light',
+            name: 'Light Watercolor',
+            type: 'watercolor',
+            intensity: 0.12,
+            scale: 2.0
+        },
+        {
+            id: 'watercolor-heavy',
+            name: 'Heavy Watercolor',
+            type: 'watercolor',
+            intensity: 0.28,
+            scale: 3.5
+        },
+        {
+            id: 'oil-paint',
+            name: 'Oil Paint',
+            type: 'oil',
+            intensity: 0.25,
+            scale: 1.8
+        },
+        {
+            id: 'charcoal-sketch',
+            name: 'Charcoal Sketch',
+            type: 'charcoal',
+            intensity: 0.2,
+            scale: 1.2
+        },
+        {
+            id: 'pencil-shading',
+            name: 'Pencil Shading',
+            type: 'pencil',
+            intensity: 0.16,
+            scale: 0.8
+        },
+        {
+            id: 'ink-splatter',
+            name: 'Ink Splatter',
+            type: 'ink',
+            intensity: 0.22,
+            scale: 2.5
+        },
+        {
+            id: 'paint-drips',
+            name: 'Paint Drips',
+            type: 'drips',
+            intensity: 0.18,
+            scale: 1.6
+        },
+        
+        // Futuristic & Sci-Fi Textures
+        {
+            id: 'hologram-effect',
+            name: 'Hologram Effect',
+            type: 'hologram',
+            intensity: 0.15,
+            scale: 1.0
+        },
+        {
+            id: 'neon-glow',
+            name: 'Neon Glow',
+            type: 'neon',
+            intensity: 0.2,
+            scale: 1.5
+        },
+        {
+            id: 'plasma-field',
+            name: 'Plasma Field',
+            type: 'plasma',
+            intensity: 0.25,
+            scale: 2.2
+        },
+        {
+            id: 'energy-waves',
+            name: 'Energy Waves',
+            type: 'energy',
+            intensity: 0.18,
+            scale: 1.8
+        },
+        {
+            id: 'quantum-dots',
+            name: 'Quantum Dots',
+            type: 'quantum',
+            intensity: 0.16,
+            scale: 0.6
+        },
+        {
+            id: 'laser-grid',
+            name: 'Laser Grid',
+            type: 'laser',
+            intensity: 0.2,
+            scale: 2
+        },
+        {
+            id: 'cyberpunk-lines',
+            name: 'Cyberpunk Lines',
+            type: 'cyberpunk',
+            intensity: 0.24,
+            scale: 1.4
+        },
+        
+        // Vintage & Classic Textures
+        {
+            id: 'parchment-old',
+            name: 'Old Parchment',
+            type: 'parchment',
+            intensity: 0.3,
+            scale: 1.5
+        },
+        {
+            id: 'velvet-luxury',
+            name: 'Luxury Velvet',
+            type: 'velvet',
+            intensity: 0.18,
+            scale: 1.1
+        },
+        {
+            id: 'cork-board',
+            name: 'Cork Board',
+            type: 'cork',
+            intensity: 0.26,
+            scale: 1.3
+        },
+        {
+            id: 'wicker-weave',
+            name: 'Wicker Weave',
+            type: 'wicker',
+            intensity: 0.22,
+            scale: 1.4
+        },
+        {
+            id: 'bamboo-texture',
+            name: 'Bamboo Texture',
+            type: 'bamboo',
+            intensity: 0.2,
+            scale: 1.2
+        },
+        {
+            id: 'rattan-pattern',
+            name: 'Rattan Pattern',
+            type: 'rattan',
+            intensity: 0.24,
+            scale: 1.6
+        },
+        
+        // Food & Kitchen Textures
+        {
+            id: 'coffee-beans',
+            name: 'Coffee Beans',
+            type: 'coffee',
+            intensity: 0.28,
+            scale: 2.0
+        },
+        {
+            id: 'rice-paper',
+            name: 'Rice Paper',
+            type: 'rice',
+            intensity: 0.14,
+            scale: 0.9
+        },
+        {
+            id: 'flour-dust',
+            name: 'Flour Dust',
+            type: 'flour',
+            intensity: 0.12,
+            scale: 1.8
+        },
+        {
+            id: 'sugar-crystals',
+            name: 'Sugar Crystals',
+            type: 'sugar',
+            intensity: 0.16,
+            scale: 0.7
+        },
+        {
+            id: 'salt-grains',
+            name: 'Salt Grains',
+            type: 'salt',
+            intensity: 0.18,
+            scale: 0.8
+        },
+        
+        // Architectural & Building Textures
+        {
+            id: 'brick-wall',
+            name: 'Brick Wall',
+            type: 'brick',
+            intensity: 0.32,
+            scale: 2.2
+        },
+        {
+            id: 'stucco-rough',
+            name: 'Rough Stucco',
+            type: 'stucco',
+            intensity: 0.28,
+            scale: 1.7
+        },
+        {
+            id: 'plaster-smooth',
+            name: 'Smooth Plaster',
+            type: 'plaster',
+            intensity: 0.16,
+            scale: 1.0
+        },
+        {
+            id: 'tile-ceramic',
+            name: 'Ceramic Tile',
+            type: 'ceramic',
+            intensity: 0.12,
+            scale: 3.0
+        },
+        {
+            id: 'granite-polished',
+            name: 'Polished Granite',
+            type: 'granite',
+            intensity: 0.24,
+            scale: 1.8
+        },
+        {
+            id: 'limestone-natural',
+            name: 'Natural Limestone',
+            type: 'limestone',
+            intensity: 0.22,
+            scale: 1.6
+        },
+        {
+            id: 'slate-dark',
+            name: 'Dark Slate',
+            type: 'slate',
+            intensity: 0.26,
+            scale: 1.4
+        },
+        
+        // Weather & Environmental Textures
+        {
+            id: 'rain-drops',
+            name: 'Rain Drops',
+            type: 'rain',
+            intensity: 0.15,
+            scale: 2.5
+        },
+        {
+            id: 'snow-flakes',
+            name: 'Snow Flakes',
+            type: 'snowflakes',
+            intensity: 0.18,
+            scale: 1.8
+        },
+        {
+            id: 'wind-swept',
+            name: 'Wind Swept',
+            type: 'wind',
+            intensity: 0.14,
+            scale: 3.0
+        },
+        {
+            id: 'frost-pattern',
+            name: 'Frost Pattern',
+            type: 'frostpattern',
+            intensity: 0.2,
+            scale: 1.2
+        },
+        {
+            id: 'dew-drops',
+            name: 'Dew Drops',
+            type: 'dew',
+            intensity: 0.16,
+            scale: 0.9
+        },
+        
+        // Cosmic & Space Textures
+        {
+            id: 'nebula-dust',
+            name: 'Nebula Dust',
+            type: 'nebula',
+            intensity: 0.22,
+            scale: 2.8
+        },
+        {
+            id: 'star-field',
+            name: 'Star Field',
+            type: 'stars',
+            intensity: 0.25,
+            scale: 1.0
+        },
+        {
+            id: 'cosmic-dust',
+            name: 'Cosmic Dust',
+            type: 'cosmic',
+            intensity: 0.18,
+            scale: 2.0
+        },
+        {
+            id: 'galaxy-spiral',
+            name: 'Galaxy Spiral',
+            type: 'spiral',
+            intensity: 0.24,
+            scale: 3.5
+        },
+        {
+            id: 'asteroid-field',
+            name: 'Asteroid Field',
+            type: 'asteroid',
+            intensity: 0.28,
+            scale: 1.6
+        },
+        
+        // Animal & Nature Inspired Textures
+        {
+            id: 'snake-skin',
+            name: 'Snake Skin',
+            type: 'snake',
+            intensity: 0.26,
+            scale: 1.5
+        },
+        {
+            id: 'leopard-spots',
+            name: 'Leopard Spots',
+            type: 'leopard',
+            intensity: 0.3,
+            scale: 2.0
+        },
+        {
+            id: 'zebra-stripes',
+            name: 'Zebra Stripes',
+            type: 'zebra',
+            intensity: 0.32,
+            scale: 1.8
+        },
+        {
+            id: 'turtle-shell',
+            name: 'Turtle Shell',
+            type: 'turtle',
+            intensity: 0.24,
+            scale: 1.3
+        },
+        {
+            id: 'fish-scales',
+            name: 'Fish Scales',
+            type: 'fishscales',
+            intensity: 0.22,
+            scale: 0.8
+        },
+        {
+            id: 'bird-feathers',
+            name: 'Bird Feathers',
+            type: 'feathers',
+            intensity: 0.2,
+            scale: 1.4
+        },
+        
+        // Ocean & Water Textures
+        {
+            id: 'ocean-foam',
+            name: 'Ocean Foam',
+            type: 'foam',
+            intensity: 0.18,
+            scale: 2.2
+        },
+        {
+            id: 'tide-pools',
+            name: 'Tide Pools',
+            type: 'pools',
+            intensity: 0.2,
+            scale: 1.9
+        },
+        {
+            id: 'coral-texture',
+            name: 'Coral Texture',
+            type: 'coraltexture',
+            intensity: 0.24,
+            scale: 1.4
+        },
+        {
+            id: 'seaweed-flow',
+            name: 'Seaweed Flow',
+            type: 'seaweed',
+            intensity: 0.16,
+            scale: 2.6
+        },
+        {
+            id: 'beach-sand',
+            name: 'Beach Sand',
+            type: 'beach',
+            intensity: 0.14,
+            scale: 1.1
+        },
+        
+        // Crystal & Mineral Textures
+        {
+            id: 'quartz-crystal',
+            name: 'Quartz Crystal',
+            type: 'quartz',
+            intensity: 0.2,
+            scale: 1.3
+        },
+        {
+            id: 'amethyst-cluster',
+            name: 'Amethyst Cluster',
+            type: 'amethyst',
+            intensity: 0.26,
+            scale: 1.7
+        },
+        {
+            id: 'geode-pattern',
+            name: 'Geode Pattern',
+            type: 'geode',
+            intensity: 0.28,
+            scale: 2.1
+        },
+        {
+            id: 'mineral-veins',
+            name: 'Mineral Veins',
+            type: 'veins',
+            intensity: 0.22,
+            scale: 1.5
+        },
+        {
+            id: 'mica-sparkle',
+            name: 'Mica Sparkle',
+            type: 'mica',
+            intensity: 0.15,
+            scale: 0.6
         }
     ],
     
-    // Background image categories - restored original structure
+    // Background image categories with actual images
     backgroundCategories: [
-        // We can add actual background images here if needed
-        // For now, keeping it empty as we focus on colors/gradients with noise overlay
+        {
+            id: 'abstract',
+            name: 'Abstract',
+            images: [
+                {
+                    id: 'abstract-waves',
+                    name: 'Abstract Waves',
+                    url: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'geometric-shapes',
+                    name: 'Geometric Shapes',
+                    url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'fluid-art',
+                    name: 'Fluid Art',
+                    url: 'https://images.unsplash.com/photo-1544306094-e2dcfceba53c?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1544306094-e2dcfceba53c?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'color-explosion',
+                    name: 'Color Explosion',
+                    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'paint-strokes',
+                    name: 'Paint Strokes',
+                    url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=200&h=150&fit=crop&crop=edges'
+                }
+            ]
+        },
+        {
+            id: 'nature',
+            name: 'Nature',
+            images: [
+                {
+                    id: 'forest-trees',
+                    name: 'Forest Trees',
+                    url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'ocean-waves',
+                    name: 'Ocean Waves',
+                    url: 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'mountain-peaks',
+                    name: 'Mountain Peaks',
+                    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'sunset-sky',
+                    name: 'Sunset Sky',
+                    url: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'desert-landscape',
+                    name: 'Desert Landscape',
+                    url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=200&h=150&fit=crop&crop=edges'
+                }
+            ]
+        },
+        {
+            id: 'urban',
+            name: 'Urban',
+            images: [
+                {
+                    id: 'city-skyline',
+                    name: 'City Skyline',
+                    url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'brick-wall',
+                    name: 'Brick Wall',
+                    url: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'concrete-texture',
+                    name: 'Concrete Texture',
+                    url: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'metal-surface',
+                    name: 'Metal Surface',
+                    url: 'https://images.unsplash.com/photo-1551803091-e20673f15770?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1551803091-e20673f15770?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'neon-lights',
+                    name: 'Neon Lights',
+                    url: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=200&h=150&fit=crop&crop=edges'
+                }
+            ]
+        },
+        {
+            id: 'minimal',
+            name: 'Minimal',
+            images: [
+                {
+                    id: 'clean-white',
+                    name: 'Clean White',
+                    url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'soft-shadow',
+                    name: 'Soft Shadow',
+                    url: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'paper-texture',
+                    name: 'Paper Texture',
+                    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop&crop=edges'
+                },
+                {
+                    id: 'marble-surface',
+                    name: 'Marble Surface',
+                    url: 'https://images.unsplash.com/photo-1615876063886-96b0ac5d6ff6?w=1200&h=800&fit=crop&crop=edges',
+                    thumbnail: 'https://images.unsplash.com/photo-1615876063886-96b0ac5d6ff6?w=200&h=150&fit=crop&crop=edges'
+                }
+            ]
+        }
     ],
     
     // Watermark position options

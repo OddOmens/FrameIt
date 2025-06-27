@@ -65,8 +65,8 @@ window.App = {
         undoManager: new Models.UndoManager(),
         canvasWidth: 1080,
         canvasHeight: 1350,
-        watermarkText: '',
-        watermarkFontSize: 16,
+        watermarkText: 'Made with FrameIt.Social',
+        watermarkFontSize: 32,
         watermarkColor: '#000000'
     },
     
@@ -330,7 +330,8 @@ window.App = {
         UI.setupResolutionOptions();
         
         // Enable export from start (can create designs without images)
-        document.getElementById('export-btn').disabled = false;
+                        document.getElementById('export-btn').disabled = false;
+        
         
         // Completely hide upload prompt - start with clean canvas
         const dropZone = document.getElementById('image-drop-zone');
@@ -1145,7 +1146,7 @@ window.App = {
         this.state.watermarkScale = settings.watermarkScale || 1.0;
         this.state.watermarkPosition = settings.watermarkPosition || 'bottom-right';
         this.state.watermarkText = settings.watermarkText || '';
-        this.state.watermarkFontSize = settings.watermarkFontSize || 16;
+                    this.state.watermarkFontSize = settings.watermarkFontSize || 32;
         this.state.watermarkColor = settings.watermarkColor || '#000000';
         
         // Apply multi-image layout data
@@ -1935,76 +1936,6 @@ window.App = {
                                  window.location.hostname.includes('frameit.social');
         
         try {
-            // Show loading state
-            const exportBtn = document.getElementById('export-btn');
-            if (exportBtn) {
-                exportBtn.disabled = true;
-                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
-            }
-            
-            // Skip server verification completely when running locally OR on frameit.social without proper backend
-            if (isRunningLocally) {
-                console.log('📝 Skipping server verification - running locally or no backend available');
-            } else {
-                // Check if user is authenticated
-                const currentUser = window.Auth?.getCurrentUser();
-                const currentSession = window.Auth?.getCurrentSession();
-                
-                if (!currentUser || !currentSession) {
-                    window.Auth?.showAuthModal('login');
-                    return;
-                }
-                
-                // Update loading message
-                if (exportBtn) {
-                    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-                }
-                
-                // Only do server verification if we have a proper backend setup
-                try {
-                    const verificationResponse = await fetch('/api/verify-export-permission', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${currentSession.access_token}`
-                        }
-                    });
-                    
-                    // If the endpoint doesn't exist (404) or server error (500), just proceed with export
-                    if (verificationResponse.status === 404 || verificationResponse.status === 500) {
-                        console.log('📝 Backend verification unavailable - proceeding with export');
-                    } else {
-                        // Handle the response normally
-                        const contentType = verificationResponse.headers.get('content-type');
-                        let verificationResult;
-                        
-                        if (contentType && contentType.includes('application/json')) {
-                            verificationResult = await verificationResponse.json();
-                        } else {
-                            // Server returned HTML or plain text (likely an error page)
-                            console.log('📝 Server returned non-JSON response - proceeding with export');
-                        }
-                        
-                        if (!verificationResponse.ok && verificationResult) {
-                            if (verificationResult.subscription_required) {
-                                this.showUpgradePrompt(verificationResult.usage);
-                                return;
-                            } else {
-                                throw new Error(verificationResult.error || 'Export verification failed');
-                            }
-                        }
-                    }
-                } catch (fetchError) {
-                    // If fetch fails (no server), just proceed with export
-                    console.log('📝 Server not available - proceeding with export:', fetchError.message);
-                }
-            }
-            
-            // Export is approved (or running locally), proceed with actual export
-            if (exportBtn) {
-                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
-            }
-            
             // Get canvas and export settings
             const canvas = document.getElementById('preview-canvas');
             if (!canvas) {
@@ -2058,24 +1989,11 @@ window.App = {
             
             // Track export analytics - ensure this always runs with detailed logging
             try {
-                console.log('📊 Attempting to track export...');
                 if (window.Analytics && window.Analytics.trackExport) {
-                    console.log('📊 Analytics module found, calling trackExport...');
-                    const result = await window.Analytics.trackExport();
-                    console.log('📊 Export tracked successfully:', result);
-                } else {
-                    console.log('📊 Analytics not available:', {
-                        analyticsExists: !!window.Analytics,
-                        trackExportExists: !!(window.Analytics && window.Analytics.trackExport)
-                    });
+                    await window.Analytics.trackExport();
                 }
             } catch (analyticsError) {
                 console.error('📊 Failed to track export:', analyticsError);
-                console.error('📊 Analytics error details:', {
-                    message: analyticsError.message,
-                    stack: analyticsError.stack,
-                    analyticsState: window.Analytics?.state
-                });
             }
             
             console.log('✅ Export completed successfully');
@@ -2083,13 +2001,6 @@ window.App = {
         } catch (error) {
             console.error('Export failed:', error);
             this.showNotification('Export failed. Please try again.', 'error');
-        } finally {
-            // Reset export button
-            const exportBtn = document.getElementById('export-btn');
-            if (exportBtn) {
-                exportBtn.disabled = false;
-                exportBtn.innerHTML = '<i class="fas fa-download"></i> Export';
-            }
         }
     },
     
@@ -2459,17 +2370,22 @@ window.App = {
 
     // Render preview (main rendering function) with throttling for performance
     renderPreview() {
-        // Throttle render calls for better performance
-        if (this._isRendering) {
-            this._pendingRender = true;
-            return;
+        // Skip throttling during animations for 60 FPS
+        const isAnimating = false;
+        
+        if (!isAnimating) {
+            // Use throttling for normal UI interactions
+            if (this._isRendering) {
+                this._pendingRender = true;
+                return;
+            }
+            
+            this._isRendering = true;
+            this._pendingRender = false;
         }
         
-        this._isRendering = true;
-        this._pendingRender = false;
-        
-        // Use requestAnimationFrame for smooth rendering
-        requestAnimationFrame(() => {
+        // Use immediate rendering for animations, requestAnimationFrame for normal UI
+        const renderFn = () => {
             try {
         // Get the selected image if any
         const image = this.state.selectedImage;
@@ -2546,25 +2462,44 @@ window.App = {
                     selectedTextLayerId: this.state.selectedTextLayerId
                 });
                 
-                // Update gallery thumbnail automatically
-                this.addCurrentCanvasToGallery();
-                
-                // Periodically save to localStorage (throttled to avoid excessive saves)
-                if (!this._saveTimeout) {
-                    this._saveTimeout = setTimeout(() => {
-                        this.saveToLocalStorage();
-                        this._saveTimeout = null;
-                    }, 1000); // Save after 1 second of no changes
+                // Only update gallery and save to localStorage when NOT animating
+                // This prevents excessive saves during 60 FPS animation previews
+                if (!isAnimating) {
+                    // Update gallery thumbnail automatically
+                    this.addCurrentCanvasToGallery();
+                    
+                    // Periodically save to localStorage (throttled to avoid excessive saves)
+                    if (!this._saveTimeout) {
+                        this._saveTimeout = setTimeout(() => {
+                            this.saveToLocalStorage();
+                            this._saveTimeout = null;
+                        }, 1000); // Save after 1 second of no changes
+                    }
                 }
             } finally {
-                this._isRendering = false;
-                
-                // If another render was requested while we were rendering, do it now
-                if (this._pendingRender) {
-                    setTimeout(() => this.renderPreview(), 0);
+                if (!isAnimating) {
+                    this._isRendering = false;
+                    
+                    // If another render was requested while we were rendering, do it now
+                    if (this._pendingRender) {
+                        setTimeout(() => this.renderPreview(), 0);
+                    }
                 }
             }
-        });
+        };
+        
+        if (isAnimating) {
+            // Immediate rendering for animations
+            renderFn();
+        } else {
+            // Use requestAnimationFrame for normal UI
+            requestAnimationFrame(renderFn);
+        }
+    },
+
+    // Alias for renderPreview for animation system compatibility
+    renderCanvas() {
+        this.renderPreview();
     },
 
     // Capture a screenshot
@@ -3228,6 +3163,7 @@ window.App = {
     // Save app state to localStorage
     saveToLocalStorage() {
         try {
+            
             const dataToSave = {
                 canvases: this.state.canvases,
                 currentCanvasId: this.state.currentCanvasId,
@@ -3239,7 +3175,7 @@ window.App = {
             };
             
             localStorage.setItem('frameit_persistent_data', JSON.stringify(dataToSave));
-            console.log('Data saved to localStorage');
+            console.log('💾 Data saved to localStorage');
         } catch (error) {
             console.error('Failed to save to localStorage:', error);
         }
@@ -3483,13 +3419,13 @@ window.App = {
             resolution: { width: 1080, height: 1080, name: 'Square (1:1)', id: 'square' },
             watermarkImage: null,
             watermarkFilename: null,
-            watermarkOpacity: 0.7,
+            watermarkOpacity: 1.0,
             watermarkScale: 1.0,
             watermarkPosition: 'bottom-right',
             watermarkText: '',
             watermarkType: 'text',
             watermarkTextFont: "'Inter', sans-serif",
-            watermarkTextSize: 16,
+            watermarkTextSize: 32,
             watermarkTextColor: '#FFFFFF',
             watermarkTextBold: false,
             watermarkTextItalic: false,

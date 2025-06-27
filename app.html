@@ -1311,6 +1311,7 @@
                         <i class="fas fa-file-export"></i>
                         <span>Export All</span>
                     </button>
+
                     <button id="export-btn" class="btn primary-btn" disabled>
                         <i class="fas fa-download"></i>
                         <span>Export Mockup</span>
@@ -1729,6 +1730,8 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
+
                                 </div>
                             </div>
                             
@@ -1746,15 +1749,15 @@
                                     </div>
                                 </div>
                                 <div class="section-content">
-                                    <div class="noise-controls">
-                                        <div class="form-group">
-                                            <label for="noise-overlay-select">Noise Type:</label>
-                                            <select id="noise-overlay-select" class="select-control">
-                                                <!-- Options will be populated by JavaScript -->
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="noise-options" id="noise-options" style="display: none;">
+                                                        <div class="noise-controls">
+                        <div class="form-group">
+                            <label for="noise-overlay-select">Noise Type:</label>
+                            <select id="noise-overlay-select" class="select-control">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="noise-options" id="noise-options" style="display: none;">
                                             <div class="adjustment-row">
                                                 <label>Noise Intensity</label>
                                                 <span class="value-display" id="noise-intensity-value">100%</span>
@@ -2040,7 +2043,7 @@
                                 <div class="section-content">
                                     <div class="form-group">
                                         <label for="watermark-text">Watermark Text</label>
-                                        <input type="text" id="watermark-text" class="select-control" placeholder="Enter watermark text" maxlength="50">
+                                        <input type="text" id="watermark-text" class="select-control" placeholder="Made with FrameIt.Social" maxlength="50">
                                         <small class="form-help">Add your watermark text (e.g., your name, website, or logo text)</small>
                                     </div>
                                     
@@ -2064,10 +2067,10 @@
                                     
                                     <div class="adjustment-row">
                                         <label>Opacity</label>
-                                        <span class="value-display" id="watermark-opacity-value">70%</span>
+                                        <span class="value-display" id="watermark-opacity-value">100%</span>
                                     </div>
                                     <div class="slider-container">
-                                        <input type="range" id="watermark-opacity-slider" min="0" max="1" value="0.7" step="0.01">
+                                        <input type="range" id="watermark-opacity-slider" min="0" max="1" value="1.0" step="0.01">
                                         <button id="reset-watermark-opacity-btn" class="reset-btn">
                                             <i class="fas fa-undo"></i>
                                         </button>
@@ -2075,10 +2078,10 @@
                                     
                                     <div class="adjustment-row">
                                         <label>Font Size</label>
-                                        <span class="value-display" id="watermark-font-size-value">16px</span>
+                                        <span class="value-display" id="watermark-font-size-value">32px</span>
                                     </div>
                                     <div class="slider-container">
-                                        <input type="range" id="watermark-font-size-slider" min="10" max="48" value="16" step="1">
+                                        <input type="range" id="watermark-font-size-slider" min="10" max="48" value="32" step="1">
                                         <button id="reset-watermark-font-size-btn" class="reset-btn">
                                             <i class="fas fa-undo"></i>
                                         </button>
@@ -2127,6 +2130,8 @@
         </div>
     </div>
     
+
+
     <!-- Export Settings Modal -->
     <div class="modal" id="export-settings-modal">
         <div class="modal-content">
@@ -2400,7 +2405,7 @@
                     <button id="donation-decline-btn" class="btn donation-decline-btn">
                         <span>No thanks</span>
                     </button>
-                    <a href="https://buy.stripe.com/fZuaEX1cCbCecyBfkIfbq02" target="_blank" id="donation-support-btn" class="btn primary-btn donation-support-btn">
+                    <a href="https://ko-fi.com/kadynmade" target="_blank" id="donation-support-btn" class="btn primary-btn donation-support-btn">
                         <i class="fas fa-heart"></i>
                         <span>Support FrameIt</span>
                     </a>
