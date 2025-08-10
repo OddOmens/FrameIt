@@ -333,10 +333,15 @@ window.App = {
                         document.getElementById('export-btn').disabled = false;
         
         
-        // Completely hide upload prompt - start with clean canvas
+        // Show upload prompt if no canvases exist, otherwise hide it
         const dropZone = document.getElementById('image-drop-zone');
         if (dropZone) {
-            dropZone.style.display = 'none';
+            if (this.state.canvases.length === 0 && !this.state.selectedImage) {
+                dropZone.classList.remove('hidden');
+                dropZone.style.display = '';
+            } else {
+                dropZone.style.display = 'none';
+            }
         }
         
         // Initialize multi-image system
@@ -680,7 +685,7 @@ window.App = {
                     this.state.selectedImageIndex = targetSlot;
                     this.state.selectedImage = images[0];
                     
-                            } else {
+                } else {
                     // Multiple images - determine best layout and distribute
                     let bestLayout = this.getCurrentLayout();
                     
@@ -1681,7 +1686,7 @@ window.App = {
         console.log('🎨 Creating new canvas...');
         
         // Save current canvas first (if it exists and has content)
-        if (this.state.selectedImage || this.state.textLayers.length > 0) {
+        if ((this.state.selectedImage || this.state.textLayers.length > 0) && this.state.currentCanvasId) {
             this.addCurrentCanvasToGallery();
         }
         
@@ -3191,6 +3196,13 @@ window.App = {
         this.state.cornerRadius = Config.defaultCornerRadius;
         this.state.padding = Config.defaultPadding;
         
+        // Initialize empty canvases array
+        this.state.canvases = [];
+        
+        // Create a default canvas ID
+        this.state.currentCanvasId = `canvas_${Date.now()}`;
+        this.state.selectedCanvasId = this.state.currentCanvasId;
+        
         // Initialize Analytics
         if (window.Analytics) {
             window.Analytics.init();
@@ -3216,8 +3228,7 @@ window.App = {
         // Load uploaded images for gallery
         this.loadGalleryImages();
         
-        // Add current canvas to gallery
-        this.addCurrentCanvasToGallery();
+        console.log('✅ Default state initialized with empty canvas ready for content');
         
         // Add help button click handler
         const helpBtn = document.getElementById('help-btn');

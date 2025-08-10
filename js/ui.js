@@ -1110,6 +1110,11 @@ window.UI = {
         
         // Add Image button
         document.getElementById('add-image-btn')?.addEventListener('click', () => {
+            // Ensure we have a current canvas ID for image upload
+            if (!window.App.state.currentCanvasId) {
+                window.App.state.currentCanvasId = `canvas_${Date.now()}`;
+                window.App.state.selectedCanvasId = window.App.state.currentCanvasId;
+            }
             document.getElementById('file-input').click();
         });
         
