@@ -820,40 +820,7 @@ window.App = {
                     window.UI.renderGallery(this.state.canvases, this.state.currentCanvasId);
                 }
                 
-                // Track image upload analytics for each successfully loaded file
-                console.log(`📊 Tracking ${files.length} successfully uploaded images`);
-                
-                for (let index = 0; index < files.length; index++) {
-                    try {
-                        console.log(`📊 === STARTING UPLOAD TRACKING ${index + 1} ===`);
-                        
-                        if (window.Analytics && window.Analytics.trackImageUpload) {
-                            console.log(`📊 Calling Analytics.trackImageUpload()...`);
-                            const result = await window.Analytics.trackImageUpload();
-                            console.log(`📊 Analytics result:`, result);
-                            if (result && result.success) {
-                                console.log(`📊 ✅ Upload ${index + 1} tracked successfully via Analytics`);
-                            } else {
-                                console.log(`📊 ⚠️ Upload ${index + 1} tracking failed via Analytics:`, result);
-                            }
-                        } else {
-                            console.log(`📊 No analytics tracking needed - simplified mode`);
-                            const result = { success: true };
-                            if (result && result.success) {
-                                console.log(`📊 ✅ Upload ${index + 1} tracked via Auth module`);
-                            } else {
-                                console.log(`📊 ⚠️ Upload ${index + 1} tracking failed via Auth:`, result);
-                            }
-                        } else {
-                            console.log(`📊 ❌ No upload tracking available - neither Analytics nor Auth has trackImageUpload`);
-                        }
-                        
-                        console.log(`📊 === FINISHED UPLOAD TRACKING ${index + 1} ===`);
-                        
-                    } catch (error) {
-                        console.error(`📊 ❌ Failed to track upload ${index + 1}:`, error);
-                    }
-                }
+                // Analytics tracking is handled in the UI event handlers, not here
                 
                 // Show clear button and hide upload prompt
                 document.getElementById('image-drop-zone').classList.add('hidden');
@@ -1735,19 +1702,6 @@ window.App = {
         // Reset all settings to defaults
         this.resetUIToDefaults();
         
-        // Create and add the new empty canvas to the gallery immediately
-        const newCanvas = {
-            id: newCanvasId,
-            date: new Date().toISOString(),
-            image: null,
-            settings: this.getCurrentSettings(),
-            textLayers: [],
-            isCurrentCanvas: true
-        };
-        
-        // Add to canvases array at the beginning
-        this.state.canvases.unshift(newCanvas);
-        
         // Show upload prompt
         const dropZone = document.getElementById('image-drop-zone');
         if (dropZone) {
@@ -1768,7 +1722,8 @@ window.App = {
             console.error('❌ Failed to apply random background/noise to new canvas:', error);
         }
         
-        // Update gallery immediately to show the new canvas
+        // The new canvas will be added to gallery when content is added via addCurrentCanvasToGallery()
+        // Update gallery to reflect current selection
         if (window.UI && window.UI.renderGallery) {
             window.UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
         }

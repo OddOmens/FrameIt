@@ -485,40 +485,13 @@ window.UI = {
         // File input change
         this.elements.fileInput.addEventListener('change', async (e) => {
             if (e.target.files.length > 0) {
-                // Track image upload for each selected file
-                console.log(`📊 Tracking ${e.target.files.length} selected files for upload`);
-                
-                for (let i = 0; i < e.target.files.length; i++) {
-                    try {
-                        console.log(`📊 === TRACKING FILE SELECTION ${i + 1} ===`);
-                        
-                        if (window.Analytics && window.Analytics.trackImageUpload) {
-                            console.log(`📊 Calling Analytics.trackImageUpload()...`);
-                            const result = await window.Analytics.trackImageUpload();
-                            console.log(`📊 Analytics result:`, result);
-                            if (result && result.success) {
-                                console.log(`📊 ✅ File ${i + 1} upload tracked via Analytics`);
-                            } else {
-                                console.log(`📊 ⚠️ File ${i + 1} upload tracking failed via Analytics:`, result);
-                            }
-                        } else if (window.Auth && window.Auth.trackImageUpload) {
-                            console.log(`📊 Calling Auth.trackImageUpload()...`);
-                            const result = await window.Auth.trackImageUpload();
-                            console.log(`📊 Auth result:`, result);
-                            if (result && result.success) {
-                                console.log(`📊 ✅ File ${i + 1} upload tracked via Auth module`);
-                            } else {
-                                console.log(`📊 ⚠️ File ${i + 1} upload tracking failed via Auth:`, result);
-                            }
-                        } else {
-                            console.log(`📊 ❌ No upload tracking available`);
-                        }
-                        
-                        console.log(`📊 === FINISHED TRACKING FILE SELECTION ${i + 1} ===`);
-                        
-                    } catch (error) {
-                        console.error(`📊 ❌ Failed to track file ${i + 1} selection:`, error);
+                // Simple analytics tracking without loops
+                try {
+                    if (window.Analytics && window.Analytics.trackImageUpload) {
+                        await window.Analytics.trackImageUpload();
                     }
+                } catch (error) {
+                    console.error('Analytics tracking failed:', error);
                 }
                 
                 // Check if this is a targeted slot upload
@@ -548,7 +521,7 @@ window.UI = {
                     delete e.target.dataset.replaceMode;
                 } else {
                     // Normal multi-file handling
-                window.App.handleFileSelect(e.target.files);
+                    window.App.handleFileSelect(e.target.files);
                 }
                 
                 // Reset the file input value to allow uploading the same file again
@@ -599,7 +572,12 @@ window.UI = {
         this.elements.imageDropZone.addEventListener('drop', (e) => this.handleDrop(e));
         
         // Click to browse files
-        this.elements.imageDropZone.addEventListener('click', () => this.elements.fileInput.click());
+        this.elements.imageDropZone.addEventListener('click', (e) => {
+            // Only trigger file input if not clicking on buttons inside
+            if (!e.target.closest('.upload-btn') && !e.target.closest('.close-upload-zone')) {
+                this.elements.fileInput.click();
+            }
+        });
         
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
@@ -1135,6 +1113,12 @@ window.UI = {
             document.getElementById('file-input').click();
         });
         
+        // Upload button inside drop zone
+        document.querySelector('.image-drop-zone .upload-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling to drop zone
+            document.getElementById('file-input').click();
+        });
+        
         // Watermark controls
         this.setupWatermarkControls();
         
@@ -1507,43 +1491,16 @@ window.UI = {
         this.elements.imageDropZone.classList.remove('drag-over');
         
         if (e.dataTransfer.files.length > 0) {
-            // Track image upload for each dropped file
-            console.log(`📊 Tracking ${e.dataTransfer.files.length} dropped files for upload`);
-            
-            for (let i = 0; i < e.dataTransfer.files.length; i++) {
-                try {
-                    console.log(`📊 === TRACKING DROPPED FILE ${i + 1} ===`);
-                    
-                    if (window.Analytics && window.Analytics.trackImageUpload) {
-                        console.log(`📊 Calling Analytics.trackImageUpload()...`);
-                        const result = await window.Analytics.trackImageUpload();
-                        console.log(`📊 Analytics result:`, result);
-                        if (result && result.success) {
-                            console.log(`📊 ✅ Dropped file ${i + 1} upload tracked via Analytics`);
-                        } else {
-                            console.log(`📊 ⚠️ Dropped file ${i + 1} upload tracking failed via Analytics:`, result);
-                        }
-                    } else if (window.Auth && window.Auth.trackImageUpload) {
-                        console.log(`📊 Calling Auth.trackImageUpload()...`);
-                        const result = await window.Auth.trackImageUpload();
-                        console.log(`📊 Auth result:`, result);
-                        if (result && result.success) {
-                            console.log(`📊 ✅ Dropped file ${i + 1} upload tracked via Auth module`);
-                        } else {
-                            console.log(`📊 ⚠️ Dropped file ${i + 1} upload tracking failed via Auth:`, result);
-                        }
-                    } else {
-                        console.log(`📊 ❌ No upload tracking available`);
-                    }
-                    
-                    console.log(`📊 === FINISHED TRACKING DROPPED FILE ${i + 1} ===`);
-                    
-                } catch (error) {
-                    console.error(`📊 ❌ Failed to track dropped file ${i + 1}:`, error);
+            // Simple analytics tracking
+            try {
+                if (window.Analytics && window.Analytics.trackImageUpload) {
+                    await window.Analytics.trackImageUpload();
                 }
+            } catch (error) {
+                console.error('Analytics tracking failed:', error);
             }
             
-            // Now proceed with the normal file handling
+            // Proceed with file handling
             window.App.handleFileSelect(e.dataTransfer.files);
         }
     },
