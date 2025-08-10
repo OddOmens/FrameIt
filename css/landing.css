@@ -331,7 +331,7 @@ body.loaded {
 }
 
 .hero-title {
-    font-size: clamp(2.2rem, 5.5vw, 4rem);
+    font-size: clamp(1.8rem, 4.5vw, 3.2rem);
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: var(--space-6);
@@ -1290,7 +1290,7 @@ body.loaded {
     }
     
     .hero-title {
-        font-size: clamp(1.8rem, 7vw, 2.8rem);
+        font-size: clamp(1.5rem, 6vw, 2.4rem);
     }
     
     .hero-description {
@@ -1374,7 +1374,7 @@ body.loaded {
 
 @media (max-width: 480px) {
     .hero-title {
-        font-size: clamp(1.6rem, 8vw, 2.2rem);
+        font-size: clamp(1.4rem, 7vw, 2rem);
     }
     
     .hero-description {
