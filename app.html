@@ -19,60 +19,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Lora:wght@400;700&family=PT+Serif:wght@400;700&family=Crimson+Text:wght@400;600;700&family=Fira+Sans:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script defer data-domain="frameit.social" src="https://plausible.io/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase removed - no authentication needed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
+    <!-- Stripe removed - no payments needed -->
 
     <style>
-        /* Prevent app flicker on unauthorized access */
+        /* App container - always visible, no auth needed */
         .app-container {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .app-container.auth-verified {
             opacity: 1;
-        }
-        
-        /* Loading overlay for auth check */
-        .auth-loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-        
-        .auth-loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .auth-loading-content {
-            text-align: center;
-            color: #fff;
-        }
-        
-        .auth-loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #333;
-            border-top: 3px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
         
         .platform-icons {
@@ -1207,13 +1161,7 @@
     </style>
 </head>
 <body>
-    <!-- Auth Loading Overlay -->
-    <div class="auth-loading-overlay" id="auth-loading-overlay">
-        <div class="auth-loading-content">
-            <div class="auth-loading-spinner"></div>
-            <p>Checking authentication...</p>
-        </div>
-    </div>
+    <!-- Auth loading overlay removed - no authentication needed -->
     
     <div class="app-container">
         <!-- Toolbar and Content Wrapper -->
@@ -1225,34 +1173,7 @@
                         <span class="logo-text">FrameIt</span>
                     </div>
                     
-                    <!-- Authentication UI (moved here to be next to logo) -->
-                    <div id="auth-section" class="auth-section">
-                        <button id="account-btn" class="btn">
-                            <i class="fas fa-user-circle"></i>
-                            <span>Account</span>
-                        </button>
-                        
-                        <!-- Hidden elements for auth state management -->
-                        <div id="auth-buttons" class="auth-buttons hidden">
-                            <button id="login-btn" class="btn">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span>Login</span>
-                            </button>
-                            <button id="signup-btn" class="btn primary-btn">
-                                <i class="fas fa-user-plus"></i>
-                                <span>Sign Up</span>
-                            </button>
-                        </div>
-                        
-                        <div id="user-menu" class="user-menu hidden">
-                            <div class="user-info">
-                                <span id="user-email"></span>
-                                <button id="user-settings-btn" class="btn icon-btn">
-                                    <i class="fas fa-user-circle"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Authentication UI removed - no account needed -->
                     
                     <button id="help-btn" class="btn">
                         <i class="fas fa-question-circle"></i>
@@ -1264,10 +1185,7 @@
                         <span>Donate</span>
                     </button>
                     
-                    <button id="logout-btn" class="btn" style="display: none;">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
+                    <!-- Logout button removed - no authentication needed -->
                 </div>
                 
                 <div class="toolbar-right">
@@ -2262,95 +2180,7 @@
         </div>
     </div>
     
-    <!-- Authentication Modal -->
-    <div class="modal" id="auth-modal">
-        <div class="modal-content auth-modal-content">
-            <div class="modal-header auth-modal-header">
-                <h3 id="auth-modal-title">Welcome to FrameIt</h3>
-                <button class="modal-close-btn" id="auth-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body auth-modal-body">
-                <!-- Login Form -->
-                <div id="login-form" class="auth-form">
-                    <h4>Login to Your Account</h4>
-                    <p class="auth-subtitle">Continue creating beautiful mockups</p>
-                    
-                    <form id="login-form-element">
-                        <div class="form-group">
-                            <label for="login-email">Email</label>
-                            <input type="email" id="login-email" required placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password">Password</label>
-                            <input type="password" id="login-password" required placeholder="Enter your password">
-                        </div>
-                        <div id="login-error" class="auth-error hidden"></div>
-                        <button type="submit" class="btn primary-btn auth-submit-btn" id="login-submit">
-                            <span class="btn-text">Login</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-forgot-password">
-                        <button id="forgot-password-btn" class="forgot-password-link">
-                            Forgot your password?
-                        </button>
-                    </div>
-                    
-                    <div class="auth-divider">
-                        <span>Don't have an account?</span>
-                    </div>
-                    
-                    <button id="show-signup" class="btn auth-switch-btn">
-                        <span>Sign up for free</span>
-                    </button>
-                </div>
-                
-                <!-- Signup Form -->
-                <div id="signup-form" class="auth-form hidden">
-                    <h4>Create Your Account</h4>
-                    <p class="auth-subtitle">Join FrameIt and start creating amazing mockups</p>
-                    
-                    <form id="signup-form-element">
-                        <div class="form-group">
-                            <label for="signup-email">Email</label>
-                            <input type="email" id="signup-email" required placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password">Password</label>
-                            <input type="password" id="signup-password" required placeholder="Create a password (min 6 characters)" minlength="6">
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-confirm-password">Confirm Password</label>
-                            <input type="password" id="signup-confirm-password" required placeholder="Confirm your password">
-                        </div>
-                        <div id="signup-error" class="auth-error hidden"></div>
-                        <div id="signup-success" class="auth-success hidden">
-                            Account created successfully! Please check your email to verify your account.
-                        </div>
-                        <button type="submit" class="btn primary-btn auth-submit-btn" id="signup-submit">
-                            <span class="btn-text">Create Account</span>
-                            <span class="btn-spinner hidden">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-divider">
-                        <span>Already have an account?</span>
-                    </div>
-                    
-                    <button id="show-login" class="btn auth-switch-btn">
-                        <span>Login instead</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Authentication Modal removed - no authentication needed -->
 
 
 
@@ -2683,16 +2513,16 @@
     
     <!-- Scripts -->
     <script src="js/config.js"></script>
-    <script src="js/frameit-config.js"></script>
+    <!-- frameit-config.js removed - no Supabase needed -->
     <script src="js/noise.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/models/export.js"></script>
     <script src="js/models/image.js"></script>
     <script src="js/models/text.js"></script>
     <script src="js/models.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/analytics.js"></script>
-    <script src="js/payments.js"></script>
+    <script src="js/auth-bypass.js"></script>
+    <script src="js/analytics-simple.js"></script>
+    <!-- payments.js removed - no payments needed -->
     <script src="js/stripe-integration.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/canvas.js"></script>
@@ -2700,28 +2530,14 @@
     <script>
         // Initialize authentication when page loads
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('DOM loaded, initializing Auth...');
-            
-            // Set a timeout to hide loading overlay if auth takes too long
-            const authTimeout = setTimeout(() => {
-                console.warn('⚠️ Auth initialization taking too long, hiding loading overlay');
-                const authLoadingOverlay = document.getElementById('auth-loading-overlay');
-                if (authLoadingOverlay) {
-                    authLoadingOverlay.classList.add('hidden');
-                }
-            }, 5000); // 5 second timeout
+            console.log('DOM loaded, initializing App directly...');
             
             try {
-                await Auth.init();
-                clearTimeout(authTimeout); // Clear timeout if auth completes normally
+                // Initialize the main app directly - no authentication needed
+                await App.init();
+                console.log('✅ App initialized successfully');
             } catch (error) {
-                console.error('❌ Auth initialization failed:', error);
-                clearTimeout(authTimeout);
-                // Hide loading overlay on error
-                const authLoadingOverlay = document.getElementById('auth-loading-overlay');
-                if (authLoadingOverlay) {
-                    authLoadingOverlay.classList.add('hidden');
-                }
+                console.error('❌ App initialization failed:', error);
             }
             
             // Ensure backgrounds are rendered after everything is loaded

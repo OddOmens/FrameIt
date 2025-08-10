@@ -29,11 +29,9 @@ class StripeIntegration {
      */
     async initializeSubscriptionCheck() {
         try {
-            // Wait for auth to be ready
-            if (window.Auth) {
-                window.Auth.onAuthStateChanged((user) => {
-                    this.currentUser = user;
-                    if (user) {
+            // No auth needed - simplified mode
+            this.currentUser = { id: 'local-user', email: 'user@frameit.local' };
+            if (this.currentUser) {
                         this.checkAndUpdateSubscriptionStatus();
                     }
                 });
@@ -295,10 +293,8 @@ class StripeIntegration {
      * Get authentication token
      */
     async getAuthToken() {
-        if (window.Auth && this.currentUser) {
-            return await window.Auth.getIdToken();
-        }
-        throw new Error('User not authenticated');
+        // No auth needed - return mock token
+        return 'mock-token-no-auth-needed';
     }
 
     /**

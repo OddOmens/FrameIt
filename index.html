@@ -41,7 +41,6 @@
     <script defer data-domain="frameit.social" src="https://plausible.io/js/script.js"></script>
     
     <!-- Scripts -->
-    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -77,8 +76,7 @@
             </div>
             
             <div class="nav-actions">
-                <button class="btn btn-ghost" id="signin-btn">Sign In</button>
-                <button class="btn btn-primary" id="get-started-btn">Get Started</button>
+                <button class="btn btn-primary" id="get-started-btn">Start Creating</button>
             </div>
         </div>
     </nav>
@@ -276,92 +274,11 @@
         </div>
     </footer>
 
-    <!-- Auth Modal -->
-    <div class="modal" id="auth-modal">
-        <div class="modal-backdrop" id="modal-backdrop"></div>
-        <div class="modal-content">
-            <button class="modal-close" id="modal-close">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <!-- Sign In Form -->
-            <div class="auth-form" id="signin-form">
-                <div class="auth-header">
-                    <h2>Welcome back</h2>
-                    <p>Sign in to continue creating amazing mockups</p>
-                </div>
-                
-                <form id="signin-form-element">
-                    <div class="form-group">
-                        <label for="signin-email">Email</label>
-                        <input type="email" id="signin-email" name="email" required placeholder="Enter your email">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signin-password">Password</label>
-                        <input type="password" id="signin-password" name="password" required placeholder="Enter your password">
-                    </div>
-                    
-                    <div class="auth-error hidden" id="signin-error"></div>
-                    
-                    <button type="submit" class="btn btn-primary btn-full">
-                        <span class="btn-text">Sign In</span>
-                        <div class="btn-spinner hidden"></div>
-                    </button>
-                </form>
-                
-                <div class="auth-footer">
-                    <button class="forgot-password" id="forgot-password">Forgot password?</button>
-                    <p>Don't have an account? <button class="auth-switch" id="show-signup">Sign up</button></p>
-                </div>
-            </div>
-            
-            <!-- Sign Up Form -->
-            <div class="auth-form hidden" id="signup-form">
-                <div class="auth-header">
-                    <h2>Create your account</h2>
-                    <p>Start creating professional mockups in minutes</p>
-                </div>
-                
-                <form id="signup-form-element">
-                    <div class="form-group">
-                        <label for="signup-email">Email</label>
-                        <input type="email" id="signup-email" name="email" required placeholder="Enter your email">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-password">Password</label>
-                        <input type="password" id="signup-password" name="password" required placeholder="Create a password (min 6 characters)" minlength="6">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-confirm">Confirm Password</label>
-                        <input type="password" id="signup-confirm" name="confirm" required placeholder="Confirm your password">
-                    </div>
-                    
-                    <div class="auth-error hidden" id="signup-error"></div>
-                    <div class="auth-success hidden" id="signup-success">
-                        Account created! Please check your email to verify your account.
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-full">
-                        <span class="btn-text">Create Account</span>
-                        <div class="btn-spinner hidden"></div>
-                    </button>
-                </form>
-                
-                <div class="auth-footer">
-                    <p>Already have an account? <button class="auth-switch" id="show-signin">Sign in</button></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Auth modal removed - no authentication needed -->
 
     <!-- Scripts -->
     <script src="js/config.js"></script>
-    <script src="js/frameit-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/analytics.js"></script>
+    <script src="js/analytics-simple.js"></script>
     <script>
         // Modern landing page functionality
         class LandingPage {
@@ -420,24 +337,14 @@
                 };
 
                 // Event listeners
-                document.getElementById('signin-btn').addEventListener('click', () => {
-                    showSignin();
-                    showModal();
-                });
+                // Removed signin button functionality
 
                 ['get-started-btn', 'hero-cta', 'final-cta'].forEach(id => {
                     const element = document.getElementById(id);
                     if (element) {
                         element.addEventListener('click', () => {
-                            // Check if user is already authenticated
-                            if (typeof Auth !== 'undefined' && Auth.isAuthenticated && Auth.isAuthenticated()) {
-                                // User is already logged in, go directly to app
-                                window.location.href = 'app.html';
-                            } else {
-                                // User needs to sign up/in
-                                showSignup();
-                                showModal();
-                            }
+                            // Go directly to app - no authentication needed
+                            window.location.href = 'app.html';
                         });
                     }
                 });
@@ -454,15 +361,8 @@
             }
 
             setupAuth() {
-                // Initialize auth system
-                console.log('🔍 LandingPage setupAuth called');
-                console.log('🔍 Auth object available:', typeof Auth !== 'undefined');
-                if (typeof Auth !== 'undefined') {
-                    console.log('🔍 Calling Auth.init()...');
-                    Auth.init();
-                } else {
-                    console.error('❌ Auth object not found!');
-                }
+                // No authentication needed - removed
+                console.log('✅ Authentication bypassed - direct access enabled');
             }
 
             async loadStats() {

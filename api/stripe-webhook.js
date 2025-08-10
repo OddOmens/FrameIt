@@ -1,5 +1,8 @@
+const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+
+const router = express.Router();
 
 // Initialize Supabase client with service role key
 const supabase = createClient(
@@ -7,28 +10,10 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Disable body parsing to access raw body for signature verification
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Use raw body parser for Stripe webhook signature verification
+router.use(express.raw({ type: 'application/json' }));
 
-// Helper function to get raw body
-async function getRawBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      resolve(body);
-    });
-    req.on('error', reject);
-  });
-}
-
-export default async function handler(req, res) {
+router.post('/', async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -37,12 +22,9 @@ export default async function handler(req, res) {
   let event;
 
   try {
-    // Get raw body for signature verification
-    const body = await getRawBody(req);
-    
-    // Verify webhook signature
+    // Verify webhook signature using raw body
     event = stripe.webhooks.constructEvent(
-      body,
+      req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -312,4 +294,8 @@ function getPlanFromPriceId(priceId) {
   };
   
   return priceMapping[priceId] || 'pro'; // Default to pro if unknown
-} 
+}
+
+});
+
+module.exports = router;

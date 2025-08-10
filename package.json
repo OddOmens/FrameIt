@@ -4,15 +4,16 @@
   "description": "FrameIt - Beautiful screenshot mockup tool",
   "main": "index.html",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Static site - no build needed'",
-    "start": "echo 'Static site - use vercel dev for local development'"
+    "dev": "nodemon server.js",
+    "build": "echo 'Static site - copying files'",
+    "start": "node server.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.0"
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
-    "vercel": "^42.3.0"
+    "nodemon": "^3.0.2"
   },
   "engines": {
     "node": "22.x"

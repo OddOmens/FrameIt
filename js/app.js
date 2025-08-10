@@ -836,10 +836,9 @@ window.App = {
                             } else {
                                 console.log(`📊 ⚠️ Upload ${index + 1} tracking failed via Analytics:`, result);
                             }
-                        } else if (window.Auth && window.Auth.trackImageUpload) {
-                            console.log(`📊 Calling Auth.trackImageUpload()...`);
-                            const result = await window.Auth.trackImageUpload();
-                            console.log(`📊 Auth result:`, result);
+                        } else {
+                            console.log(`📊 No analytics tracking needed - simplified mode`);
+                            const result = { success: true };
                             if (result && result.success) {
                                 console.log(`📊 ✅ Upload ${index + 1} tracked via Auth module`);
                             } else {
@@ -1780,10 +1779,10 @@ window.App = {
                 if (window.Analytics && window.Analytics.trackCanvasCreated) {
                     const result = await window.Analytics.trackCanvasCreated();
                     console.log('📊 Manual canvas creation tracked successfully:', result);
-                } else if (window.Auth && window.Auth.trackCanvasCreated) {
-                    console.log('📊 Using Auth module fallback for manual canvas creation');
-                    const result = await window.Auth.trackCanvasCreated();
-                    console.log('📊 Manual canvas creation tracked via Auth module:', result);
+                } else {
+                    console.log('📊 No analytics tracking needed - simplified mode');
+                    const result = { success: true };
+                    console.log('📊 Canvas creation tracking (simplified mode):', result);
                 }
             } catch (analyticsError) {
                 console.error('📊 Failed to track manual canvas creation:', analyticsError);

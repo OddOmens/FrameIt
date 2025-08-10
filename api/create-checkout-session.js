@@ -1,5 +1,8 @@
+const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+
+const router = express.Router();
 
 // Initialize Supabase client with service role key
 const supabase = createClient(
@@ -7,7 +10,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+router.post('/', async (req, res) => {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -110,4 +113,6 @@ export default async function handler(req, res) {
       res.status(500).json({ error: 'Failed to create checkout session' });
     }
   }
-} 
+});
+
+module.exports = router;

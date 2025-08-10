@@ -1,6 +1,9 @@
+const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-export default async function handler(req, res) {
+const router = express.Router();
+
+router.post('/', async (req, res) => {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -38,4 +41,6 @@ export default async function handler(req, res) {
       res.status(500).json({ error: 'Failed to create portal session' });
     }
   }
-} 
+});
+
+module.exports = router;
