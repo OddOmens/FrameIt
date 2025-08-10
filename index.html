@@ -33,7 +33,7 @@
 
     <!-- Preload critical resources -->
     <link rel="preload" href="css/landing.css" as="style">
-    <link rel="preload" href="img/landing/hero_image.png" as="image">
+    <!-- Hero image preload removed since we're not using it -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         as="style">
 
@@ -519,29 +519,9 @@
             }
 
             setupParallax() {
-                let ticking = false;
-
-                const updateParallax = () => {
-                    const scrolled = window.pageYOffset;
-                    const parallaxElements = document.querySelectorAll('.hero::before');
-
-                    parallaxElements.forEach(element => {
-                        const speed = 0.5;
-                        const yPos = -(scrolled * speed);
-                        element.style.transform = `translateY(${yPos}px)`;
-                    });
-
-                    ticking = false;
-                };
-
-                const requestTick = () => {
-                    if (!ticking) {
-                        requestAnimationFrame(updateParallax);
-                        ticking = true;
-                    }
-                };
-
-                window.addEventListener('scroll', requestTick);
+                // Parallax disabled for now - pseudo-elements can't be selected with JS
+                // The CSS animations provide enough visual interest
+                console.log('✨ Parallax effects handled by CSS animations');
             }
 
             setupNavbar() {
@@ -557,38 +537,7 @@
             }
 
             setupModals() {
-                const modal = document.getElementById('auth-modal');
-                const backdrop = document.getElementById('modal-backdrop');
-                const closeBtn = document.getElementById('modal-close');
-                const signinForm = document.getElementById('signin-form');
-                const signupForm = document.getElementById('signup-form');
-
-                // Show modal
-                const showModal = () => {
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                };
-
-                // Hide modal
-                const hideModal = () => {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = '';
-                };
-
-                // Switch forms
-                const showSignin = () => {
-                    signinForm.classList.remove('hidden');
-                    signupForm.classList.add('hidden');
-                };
-
-                const showSignup = () => {
-                    signupForm.classList.remove('hidden');
-                    signinForm.classList.add('hidden');
-                };
-
-                // Event listeners
-                // Removed signin button functionality
-
+                // Set up CTA buttons to go to app when clicked
                 ['get-started-btn', 'hero-cta', 'final-cta'].forEach(id => {
                     const element = document.getElementById(id);
                     if (element) {
@@ -599,15 +548,14 @@
                     }
                 });
 
-                document.getElementById('show-signup').addEventListener('click', showSignup);
-                document.getElementById('show-signin').addEventListener('click', showSignin);
-
-                closeBtn.addEventListener('click', hideModal);
-                backdrop.addEventListener('click', hideModal);
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') hideModal();
-                });
+                // Set up app link in footer
+                const appLink = document.getElementById('app-link');
+                if (appLink) {
+                    appLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = 'app.html';
+                    });
+                }
             }
 
             setupAuth() {
@@ -616,47 +564,59 @@
             }
 
             setupStatsAnimation() {
-                const observerOptions = {
-                    threshold: 0.5,
-                    rootMargin: '0px 0px -100px 0px'
-                };
+                try {
+                    const observerOptions = {
+                        threshold: 0.5,
+                        rootMargin: '0px 0px -100px 0px'
+                    };
 
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            this.animateStats();
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, observerOptions);
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                this.animateStats();
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, observerOptions);
 
-                const statsSection = document.querySelector('.stats');
-                if (statsSection) {
-                    observer.observe(statsSection);
+                    const statsSection = document.querySelector('.stats');
+                    if (statsSection) {
+                        observer.observe(statsSection);
+                    }
+                } catch (error) {
+                    console.log('Stats animation setup failed:', error);
+                    // Fallback: animate stats immediately
+                    setTimeout(() => this.animateStats(), 1000);
                 }
             }
 
             animateStats() {
-                const statNumbers = document.querySelectorAll('.stat-number');
+                try {
+                    const statNumbers = document.querySelectorAll('.stat-number');
 
-                statNumbers.forEach(stat => {
-                    const target = parseInt(stat.getAttribute('data-target'));
-                    const duration = 2000;
-                    const increment = target / (duration / 16);
-                    let current = 0;
+                    statNumbers.forEach(stat => {
+                        const target = parseInt(stat.getAttribute('data-target'));
+                        if (isNaN(target)) return;
 
-                    const updateNumber = () => {
-                        current += increment;
-                        if (current >= target) {
-                            stat.textContent = this.formatStatNumber(target);
-                            return;
-                        }
-                        stat.textContent = this.formatStatNumber(Math.floor(current));
-                        requestAnimationFrame(updateNumber);
-                    };
+                        const duration = 2000;
+                        const increment = target / (duration / 16);
+                        let current = 0;
 
-                    updateNumber();
-                });
+                        const updateNumber = () => {
+                            current += increment;
+                            if (current >= target) {
+                                stat.textContent = this.formatStatNumber(target);
+                                return;
+                            }
+                            stat.textContent = this.formatStatNumber(Math.floor(current));
+                            requestAnimationFrame(updateNumber);
+                        };
+
+                        updateNumber();
+                    });
+                } catch (error) {
+                    console.log('Stats animation failed:', error);
+                }
             }
 
             formatStatNumber(num) {
