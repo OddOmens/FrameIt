@@ -111,10 +111,7 @@
                         <i class="fas fa-rocket"></i>
                         Start Creating Free
                     </button>
-                    <div class="hero-stats">
-                        <span><strong id="stat-users">0</strong> happy users</span>
-                        <span><strong id="stat-exports">0</strong> mockups created</span>
-                    </div>
+                    <!-- Stats removed - being honest about early stage -->
                 </div>
 
                 <div class="scroll-indicator">
@@ -189,54 +186,9 @@
         </div>
     </section>
 
-    <!-- Trusted By Section -->
-    <section class="trusted-by">
-        <div class="container">
-            <p class="trusted-label">Trusted by teams at</p>
-            <div class="trusted-logos">
-                <div class="trusted-logo">
-                    <span>App Studios</span>
-                </div>
-                <div class="trusted-logo">
-                    <span>Design Agencies</span>
-                </div>
-                <div class="trusted-logo">
-                    <span>Tech Startups</span>
-                </div>
-                <div class="trusted-logo">
-                    <span>Marketing Teams</span>
-                </div>
-                <div class="trusted-logo">
-                    <span>Freelancers</span>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Trusted by section removed - being honest about early stage -->
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number" data-target="1247">0</div>
-                    <div class="stat-label">Happy Users</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-target="15634">0</div>
-                    <div class="stat-label">Screenshots Enhanced</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-target="8721">0</div>
-                    <div class="stat-label">Mockups Created</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-target="99">0</div>
-                    <div class="stat-label">Satisfaction Rate</div>
-                    <div class="stat-suffix">%</div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Stats section removed - being honest about early stage -->
 
     <!-- How It Works Section -->
     <section class="how-it-works">
@@ -334,65 +286,7 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Loved by Creators Worldwide</h2>
-                <p class="section-subtitle">See what our community has to say</p>
-            </div>
-
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"FrameIt has completely transformed how I present my designs. The mockups look so
-                            professional and it saves me hours of work."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="author-info">
-                            <h5>Sarah Chen</h5>
-                            <span>UI/UX Designer</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"As a developer, I need to showcase my work quickly. FrameIt makes it effortless to create
-                            professional mockups for presentations."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="author-info">
-                            <h5>Marcus Rodriguez</h5>
-                            <span>Full Stack Developer</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"The unlimited exports and professional mockup quality make this a must-have tool for our
-                            marketing campaigns."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="author-info">
-                            <h5>Emily Johnson</h5>
-                            <span>Marketing Manager</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Testimonials section removed - being honest about early stage -->
 
     <!-- FAQ Section -->
     <section class="faq">
@@ -450,7 +344,7 @@
         <div class="container">
             <div class="cta-content">
                 <h2 class="cta-title">Ready to Create Stunning Mockups?</h2>
-                <p class="cta-subtitle">Join thousands of developers, designers, and marketers who trust FrameIt</p>
+                <p class="cta-subtitle">Start creating professional mockups in seconds</p>
                 <button class="btn btn-primary btn-large" id="final-cta">
                     <i class="fas fa-rocket"></i>
                     Get Started Free
@@ -521,7 +415,7 @@
                 this.setupAuth();
                 this.loadStats();
                 this.setupSmoothScroll();
-                this.setupStatsAnimation();
+                // Stats animation removed - no stats to animate
                 this.setupParallax();
             }
 
@@ -570,67 +464,7 @@
                 console.log('✅ Authentication bypassed - direct access enabled');
             }
 
-            setupStatsAnimation() {
-                try {
-                    const observerOptions = {
-                        threshold: 0.5,
-                        rootMargin: '0px 0px -100px 0px'
-                    };
-
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                this.animateStats();
-                                observer.unobserve(entry.target);
-                            }
-                        });
-                    }, observerOptions);
-
-                    const statsSection = document.querySelector('.stats');
-                    if (statsSection) {
-                        observer.observe(statsSection);
-                    }
-                } catch (error) {
-                    console.log('Stats animation setup failed:', error);
-                    // Fallback: animate stats immediately
-                    setTimeout(() => this.animateStats(), 1000);
-                }
-            }
-
-            animateStats() {
-                try {
-                    const statNumbers = document.querySelectorAll('.stat-number');
-
-                    statNumbers.forEach(stat => {
-                        const target = parseInt(stat.getAttribute('data-target'));
-                        if (isNaN(target)) return;
-
-                        const duration = 2000;
-                        const increment = target / (duration / 16);
-                        let current = 0;
-
-                        const updateNumber = () => {
-                            current += increment;
-                            if (current >= target) {
-                                stat.textContent = this.formatStatNumber(target);
-                                return;
-                            }
-                            stat.textContent = this.formatStatNumber(Math.floor(current));
-                            requestAnimationFrame(updateNumber);
-                        };
-
-                        updateNumber();
-                    });
-                } catch (error) {
-                    console.log('Stats animation failed:', error);
-                }
-            }
-
-            formatStatNumber(num) {
-                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-                return num.toLocaleString();
-            }
+            // Stats animation functions removed - no fake stats
 
             async loadStats() {
                 try {
