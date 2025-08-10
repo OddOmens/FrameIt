@@ -32,9 +32,7 @@ class StripeIntegration {
             // No auth needed - simplified mode
             this.currentUser = { id: 'local-user', email: 'user@frameit.local' };
             if (this.currentUser) {
-                        this.checkAndUpdateSubscriptionStatus();
-                    }
-                });
+                this.checkAndUpdateSubscriptionStatus();
             }
         } catch (error) {
             console.error('Failed to initialize subscription checking:', error);
