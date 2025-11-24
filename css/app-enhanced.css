@@ -391,59 +391,61 @@ option {
     overflow: visible !important;
 }
 
-.dropdown-menu {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    right: 0;
+/* Dropdown Menu - Force visibility */
+#actions-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 0.5rem) !important;
+    right: 0 !important;
+    left: auto !important;
     z-index: 99999 !important;
-    display: none;
-    min-width: 240px;
-    padding: 0.5rem 0;
-    margin: 0;
-    background-color: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 0.75rem;
-    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.2);
+    display: none !important;
+    min-width: 240px !important;
+    max-width: 300px !important;
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+    background-color: #1e1e1e !important;
+    border: 2px solid #4a4a4a !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.8),
+        0 10px 20px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    pointer-events: auto !important;
 }
 
-.dropdown-menu.show {
+#actions-dropdown-menu.show {
     display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
-    animation: none !important;
-    /* Remove animation to rule out issues */
-    transform: none !important;
 }
 
 .dropdown-item {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    clear: both;
-    font-weight: 400;
-    color: #ffffff;
-    text-align: inherit;
-    white-space: nowrap;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-    gap: 0.75rem;
-    transition: background-color 0.15s ease;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0.75rem 1rem !important;
+    font-weight: 400 !important;
+    color: #ffffff !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    gap: 0.75rem !important;
+    transition: background-color 0.15s ease !important;
 }
 
 .dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .dropdown-item i {
-    width: 1.25rem;
-    text-align: center;
-    color: #a1a1aa;
+    width: 1.25rem !important;
+    text-align: center !important;
+    color: #a1a1aa !important;
 }
 
 .dropdown-btn.active {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.16) !important;
 }
 
 @keyframes fadeIn {
