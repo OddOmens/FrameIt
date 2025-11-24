@@ -450,6 +450,15 @@ window.UI = {
                 console.log('🔘 Dropdown classes:', this.elements.actionsDropdownMenu.className);
             });
 
+            // Close dropdown when clicking on any dropdown item
+            const dropdownItems = this.elements.actionsDropdownMenu.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    this.elements.actionsDropdownMenu.classList.remove('show');
+                    this.elements.actionsDropdownBtn.classList.remove('active');
+                });
+            });
+
             // Close dropdown when clicking outside (attach only once)
             document.addEventListener('click', (e) => {
                 // Don't close if clicking on the button or menu
