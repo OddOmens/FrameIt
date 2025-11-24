@@ -391,13 +391,10 @@ option {
     overflow: visible !important;
 }
 
-/* Dropdown Menu - Force visibility */
+/* Dropdown Menu - Force visibility with fixed positioning */
 #actions-dropdown-menu {
-    position: absolute !important;
-    top: calc(100% + 0.5rem) !important;
-    right: 0 !important;
-    left: auto !important;
-    z-index: 100000 !important;
+    position: fixed !important;
+    z-index: 2147483647 !important;
     display: none !important;
     min-width: 240px !important;
     max-width: 300px !important;

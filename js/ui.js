@@ -443,6 +443,11 @@ window.UI = {
                     this.elements.actionsDropdownMenu.classList.remove('show');
                     this.elements.actionsDropdownBtn.classList.remove('active');
                 } else {
+                    // Calculate button position for fixed positioning
+                    const btnRect = this.elements.actionsDropdownBtn.getBoundingClientRect();
+                    this.elements.actionsDropdownMenu.style.top = `${btnRect.bottom + 8}px`;
+                    this.elements.actionsDropdownMenu.style.right = `${window.innerWidth - btnRect.right}px`;
+
                     this.elements.actionsDropdownMenu.classList.add('show');
                     this.elements.actionsDropdownBtn.classList.add('active');
                 }
