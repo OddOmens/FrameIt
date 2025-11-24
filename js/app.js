@@ -835,6 +835,11 @@ window.App = {
         this.saveSettings();
         this.saveToLocalStorage();
 
+        // Update Add Image button text based on whether this canvas has an image
+        if (window.UI && window.UI.updateAddImageButtonText) {
+            window.UI.updateAddImageButtonText();
+        }
+
         console.log('Canvas selected:', id);
     },
 
@@ -1659,6 +1664,11 @@ window.App = {
         // Update gallery to reflect current selection
         if (window.UI && window.UI.renderGallery) {
             window.UI.renderGallery(this.state.canvases, this.state.selectedCanvasId);
+        }
+
+        // Update Add Image button text (should say "Add Image" for empty canvas)
+        if (window.UI && window.UI.updateAddImageButtonText) {
+            window.UI.updateAddImageButtonText();
         }
 
         // Track canvas creation analytics with a small delay to ensure everything is set up
