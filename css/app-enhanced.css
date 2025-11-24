@@ -443,6 +443,18 @@ option {
 
 .dropdown-btn.active {
     background-color: rgba(255, 255, 255, 0.16) !important;
+    color: #a1a1aa !important;
+}
+
+/* Ensure dropdown appears above sidebar */
+.customize-panel,
+.settings-panel,
+body>div:not(#actions-dropdown-menu) {
+    z-index: 1000 !important;
+}
+
+#actions-dropdown-menu {
+    z-index: 2147483647 !important;
 }
 
 @keyframes fadeIn {
