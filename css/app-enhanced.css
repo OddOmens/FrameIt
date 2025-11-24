@@ -329,3 +329,51 @@ body {
     background-color: #0a0a0a;
     border-color: #ffffff;
 }
+
+/* Fix for white text on white background in primary buttons */
+.primary-btn,
+.primary-btn i,
+.primary-btn span {
+    color: #0a0a0a !important;
+}
+
+.primary-btn:hover:not(:disabled),
+.primary-btn:hover:not(:disabled) i,
+.primary-btn:hover:not(:disabled) span {
+    color: #0a0a0a !important;
+}
+
+/* Ensure sidebar panels are clickable */
+.control-panels {
+    position: relative;
+    z-index: 10;
+}
+
+.settings-section .section-header {
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    /* Ensure clicks are captured */
+}
+
+.settings-section .section-header .header-buttons {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+/* Fix for any potential white-on-white inputs */
+input:not([type="color"]):not([type="range"]),
+select,
+textarea {
+    color: #ffffff !important;
+    background-color: #0a0a0a !important;
+}
+
+/* Ensure dropdown options are visible */
+option {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+}
