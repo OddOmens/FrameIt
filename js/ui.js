@@ -356,7 +356,22 @@ window.UI = {
     setupEventListeners() {
         // Button events
         // Button events
-        // this.elements.uploadBtn.addEventListener('click', () => window.App.createNewCanvas()); // Removed as it conflicts with upload behavior
+        // New Canvas button (formerly uploadBtn)
+        if (this.elements.uploadBtn) {
+            this.elements.uploadBtn.addEventListener('click', () => window.App.createNewCanvas());
+        }
+
+        // Add Image button (Toolbar)
+        if (this.elements.addImageBtn) {
+            this.elements.addImageBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Use setTimeout to ensure the click happens after any other event handling
+                setTimeout(() => {
+                    this.elements.fileInput.click();
+                }, 10);
+            });
+        }
+
         this.elements.exportBtn.addEventListener('click', () => this.showExportSettingsModal());
         console.log('✅ Export button event listener attached');
 
@@ -485,7 +500,7 @@ window.UI = {
 
         // File input change
         this.elements.fileInput.addEventListener('change', async (e) => {
-            if (e.target.files.length > 0) {
+            if (e.target.files && e.target.files.length > 0) {
                 // Simple analytics tracking without loops
                 try {
                     if (window.Analytics && window.Analytics.trackImageUpload) {
