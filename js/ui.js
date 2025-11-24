@@ -375,9 +375,11 @@ window.UI = {
         // Actions Dropdown
         if (this.elements.actionsDropdownBtn) {
             this.elements.actionsDropdownBtn.addEventListener('click', (e) => {
+                console.log('🔘 Actions dropdown clicked');
                 e.stopPropagation();
                 this.elements.actionsDropdownMenu.classList.toggle('show');
                 this.elements.actionsDropdownBtn.classList.toggle('active');
+                console.log('🔘 Dropdown classes:', this.elements.actionsDropdownMenu.className);
             });
 
             // Close dropdown when clicking outside
@@ -518,10 +520,11 @@ window.UI = {
 
         // File input change
         this.elements.fileInput.addEventListener('change', async (e) => {
+            console.log('📂 File input change event triggered', e.target.files);
             if (e.target.files && e.target.files.length > 0) {
                 // Simple analytics tracking without loops
                 try {
-                    if (window.Analytics && window.Analytics.trackImageUpload) {
+                    if (window.Analytics && typeof window.Analytics.trackImageUpload === 'function') {
                         await window.Analytics.trackImageUpload();
                     }
                 } catch (error) {
@@ -533,6 +536,7 @@ window.UI = {
                 const replaceMode = e.target.dataset.replaceMode;
 
                 if (targetSlot !== undefined && e.target.files.length === 1) {
+                    console.log('📂 Targeted slot upload detected', targetSlot);
                     // Load the image and add/replace it in the specific slot
                     const file = e.target.files[0];
                     try {
@@ -555,11 +559,15 @@ window.UI = {
                     delete e.target.dataset.replaceMode;
                 } else {
                     // Normal multi-file handling
+                    console.log('📂 Calling handleFileSelect with', e.target.files.length, 'files');
                     window.App.handleFileSelect(e.target.files);
                 }
 
                 // Reset the file input value to allow uploading the same file again
-                e.target.value = '';
+                // NOTE: We do this inside handleFileSelect now to ensure it happens after processing
+                // e.target.value = ''; 
+            } else {
+                console.warn('📂 File input change event fired but no files selected');
             }
         });
 
@@ -4195,14 +4203,19 @@ window.UI = {
 
     // Show what's new modal
     showWhatsNewModal() {
-        const whatsNewModal = document.getElementById('whats-new-modal');
-        if (whatsNewModal) {
-            whatsNewModal.classList.add('visible');
-            // Track analytics
-            if (window.Analytics) {
-                window.Analytics.trackEvent('whats_new_modal_opened', {
-                    source: 'manual'
-                });
+        const modal = document.getElementById('whats-new-modal');
+        if (modal) {
+            modal.classList.add('visible');
+
+            // Track event
+            try {
+                if (window.Analytics && typeof window.Analytics.trackEvent === 'function') {
+                    window.Analytics.trackEvent('whats_new_modal_opened', {
+                        source: 'manual'
+                    });
+                }
+            } catch (e) {
+                console.warn('Analytics tracking failed', e);
             }
         }
     },
