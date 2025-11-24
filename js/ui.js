@@ -165,6 +165,9 @@ window.UI = {
         // Force enable export buttons after all setup is complete
         this.forceEnableExportButtons();
 
+        // Update Add Image button text based on initial state
+        this.updateAddImageButtonText();
+
         console.log('✅ UI initialized successfully');
 
         // Initialize zoom state
@@ -350,6 +353,18 @@ window.UI = {
                 btn.classList.remove('disabled');
             }
         });
+    },
+
+    // Update Add Image button text based on state
+    updateAddImageButtonText() {
+        if (!this.elements.addImageBtn) return;
+
+        const span = this.elements.addImageBtn.querySelector('span');
+        if (!span) return;
+
+        // Check if there's a selected image
+        const hasImage = window.App && window.App.state && window.App.state.selectedImage;
+        span.textContent = hasImage ? 'Replace Image' : 'Add Image';
     },
 
     // Setup event listeners
