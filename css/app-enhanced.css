@@ -231,9 +231,7 @@ body {
     /* Ensure pointer cursor */
 }
 
-.settings-section .section-header:hover {
-    background-color: #121212;
-}
+
 
 .settings-section .section-header h5 {
     font-weight: 600;
