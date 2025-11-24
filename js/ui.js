@@ -429,7 +429,9 @@ window.UI = {
         }
 
         // Actions Dropdown
-        if (this.elements.actionsDropdownBtn) {
+        if (this.elements.actionsDropdownBtn && !this._actionsDropdownListenerAttached) {
+            this._actionsDropdownListenerAttached = true;
+
             this.elements.actionsDropdownBtn.addEventListener('click', (e) => {
                 console.log('🔘 Actions dropdown clicked');
                 e.preventDefault();
@@ -448,7 +450,7 @@ window.UI = {
                 console.log('🔘 Dropdown classes:', this.elements.actionsDropdownMenu.className);
             });
 
-            // Close dropdown when clicking outside (use a slight delay to prevent immediate closure)
+            // Close dropdown when clicking outside (attach only once)
             document.addEventListener('click', (e) => {
                 // Don't close if clicking on the button or menu
                 if (this.elements.actionsDropdownBtn && this.elements.actionsDropdownBtn.contains(e.target)) {
@@ -459,7 +461,7 @@ window.UI = {
                 }
 
                 // Close the dropdown
-                if (this.elements.actionsDropdownMenu.classList.contains('show')) {
+                if (this.elements.actionsDropdownMenu && this.elements.actionsDropdownMenu.classList.contains('show')) {
                     this.elements.actionsDropdownMenu.classList.remove('show');
                     this.elements.actionsDropdownBtn.classList.remove('active');
                 }
