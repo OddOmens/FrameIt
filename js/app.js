@@ -686,8 +686,8 @@ window.App = {
         this.state.textLayers = [];
         this.state.selectedTextLayerId = null;
 
-        // Apply default settings or provided options
-        this.resetSettings();
+        // Inherit current settings (do not reset)
+        // We only apply overrides if provided
 
         if (options.backgroundColor) this.state.backgroundColor = options.backgroundColor;
         if (options.backgroundGradientId) this.state.backgroundGradientId = options.backgroundGradientId;
@@ -2425,6 +2425,47 @@ window.App = {
     // Capture a screenshot
     captureScreenshot() {
         UI.showError('Screenshot capture is only available in desktop applications');
+    },
+
+    // Reset all settings to defaults
+    resetSettings() {
+        this.state.backgroundColor = Config.defaultBackgroundColor || '#000000';
+        this.state.backgroundGradientId = null;
+        this.state.backgroundImageId = null;
+        this.state.backgroundBlurRadius = 0;
+        this.state.cornerRadius = Config.defaultCornerRadius || 20;
+        this.state.padding = Config.defaultPadding || 60;
+        this.state.shadowOpacity = Config.defaultShadowOpacity || 0.5;
+        this.state.shadowRadius = Config.defaultShadowRadius || 30;
+        this.state.shadowOffsetX = Config.defaultShadowOffsetX || 0;
+        this.state.shadowOffsetY = Config.defaultShadowOffsetY || 20;
+        this.state.shadowColor = Config.defaultShadowColor || '#000000';
+        this.state.rotation = 0;
+        this.state.isFlippedHorizontally = false;
+        this.state.isFlippedVertically = false;
+
+        // Noise defaults
+        this.state.noiseOverlayId = null;
+        this.state.noiseOverlayIntensity = 0.5;
+        this.state.noiseOpacity = 0.05;
+        this.state.noiseBlendMode = 'overlay';
+        this.state.noiseScale = 1;
+        this.state.noiseInvert = false;
+
+        // Watermark defaults
+        this.state.watermarkImage = null;
+        this.state.watermarkFilename = null;
+        this.state.watermarkOpacity = 1;
+        this.state.watermarkScale = 1;
+        this.state.watermarkPosition = 'bottom-right';
+        this.state.watermarkText = '';
+        this.state.watermarkFontSize = 24;
+        this.state.watermarkColor = '#ffffff';
+
+        // Update UI controls if they exist
+        if (window.UI) {
+            window.UI.updateControls(this.state);
+        }
     },
 
     // Reset background blur to default
