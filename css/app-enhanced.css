@@ -408,7 +408,11 @@ option {
 
 .dropdown-menu.show {
     display: block !important;
-    animation: fadeIn 0.15s ease-out;
+    opacity: 1 !important;
+    visibility: visible !important;
+    animation: none !important;
+    /* Remove animation to rule out issues */
+    transform: none !important;
 }
 
 .dropdown-item {

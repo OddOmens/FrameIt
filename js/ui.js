@@ -364,15 +364,19 @@ window.UI = {
         // Add Image button (Toolbar)
         if (this.elements.addImageBtn) {
             this.elements.addImageBtn.addEventListener('click', (e) => {
-                console.log('🖼️ Add Image button clicked');
+                console.log('🖼️ Add Image button clicked - Creating dynamic input');
                 e.preventDefault();
 
-                const fileInput = this.elements.fileInput;
-                console.log('🖼️ File input connected?', fileInput.isConnected);
+                // Create a dynamic input element
+                const dynamicInput = document.createElement('input');
+                dynamicInput.type = 'file';
+                dynamicInput.accept = 'image/*';
+                dynamicInput.multiple = true;
+                dynamicInput.style.display = 'none';
+                document.body.appendChild(dynamicInput);
 
-                // DIRECTLY assign onchange to ensure it works
-                fileInput.onchange = async (event) => {
-                    console.log('📂 DIRECT onchange triggered', event.target.files);
+                dynamicInput.onchange = async (event) => {
+                    console.log('📂 Dynamic input onchange triggered', event.target.files);
                     if (event.target.files && event.target.files.length > 0) {
                         try {
                             if (window.Analytics && typeof window.Analytics.trackImageUpload === 'function') {
@@ -380,19 +384,30 @@ window.UI = {
                             }
                         } catch (err) { console.error(err); }
 
-                        console.log('📂 Calling handleFileSelect from direct handler');
+                        console.log('📂 Calling handleFileSelect from dynamic input');
                         window.App.handleFileSelect(event.target.files);
-
-                        // Reset value to allow re-selection
-                        event.target.value = '';
                     }
+                    // Cleanup
+                    document.body.removeChild(dynamicInput);
                 };
 
-                // Use setTimeout to ensure the click happens after any other event handling
+                // Trigger click
+                // Small timeout to ensure DOM insertion is registered
                 setTimeout(() => {
-                    console.log('🖼️ Triggering file input click');
-                    fileInput.click();
+                    console.log('🖼️ Triggering dynamic input click');
+                    dynamicInput.click();
                 }, 10);
+
+                // Safety cleanup in case user cancels
+                // (Optional: standard file inputs don't detect cancel easily, but we can remove it after a timeout or on focus return)
+                // For now, we leave it or remove it on change. 
+                // To be safe against DOM clutter, we can remove it after a minute? 
+                // Or just rely on the fact that it's hidden and harmless.
+                setTimeout(() => {
+                    if (document.body.contains(dynamicInput)) {
+                        document.body.removeChild(dynamicInput);
+                    }
+                }, 60000); // 1 minute timeout
             });
         } else {
             console.error('❌ Add Image button not found!');
