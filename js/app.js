@@ -643,6 +643,68 @@ window.App = {
         CanvasRenderer.resizeCanvas(width, height);
     },
 
+    // Add the current canvas state to the gallery
+    addCurrentCanvasToGallery() {
+        if (!this.state.selectedImage) return;
+
+        // Check if current canvas is already in gallery
+        const existingIndex = this.state.canvases.findIndex(c => c.id === this.state.currentCanvasId);
+
+        const canvasData = {
+            id: this.state.currentCanvasId || Date.now().toString(),
+            image: this.state.selectedImage,
+            images: [...this.state.images],
+            settings: this.getCurrentSettings(),
+            textLayers: JSON.parse(JSON.stringify(this.state.textLayers)),
+            currentLayout: this.state.currentLayout,
+            selectedImageIndex: this.state.selectedImageIndex,
+            thumbnail: document.getElementById('preview-canvas').toDataURL('image/jpeg', 0.5)
+        };
+
+        if (existingIndex >= 0) {
+            this.state.canvases[existingIndex] = canvasData;
+        } else {
+            this.state.canvases.push(canvasData);
+        }
+
+        this.saveToLocalStorage();
+    },
+
+    // Add a new canvas with an image
+    addCanvas(image, options = {}) {
+        // Save current first
+        this.addCurrentCanvasToGallery();
+
+        // Create new canvas state
+        const newCanvasId = Date.now().toString();
+        this.state.currentCanvasId = newCanvasId;
+        this.state.selectedCanvasId = newCanvasId;
+        this.state.selectedImage = image;
+        this.state.images = [image];
+        this.state.selectedImageIndex = 0;
+        this.state.currentLayout = 'single';
+        this.state.textLayers = [];
+        this.state.selectedTextLayerId = null;
+
+        // Apply default settings or provided options
+        this.resetSettings();
+
+        if (options.backgroundColor) this.state.backgroundColor = options.backgroundColor;
+        if (options.backgroundGradientId) this.state.backgroundGradientId = options.backgroundGradientId;
+        if (options.noiseOpacity) this.state.noiseOpacity = options.noiseOpacity;
+
+        // Render
+        this.renderPreview();
+        UI.renderGallery(this.state.canvases, this.state.currentCanvasId);
+        UI.updateImageSlots(this.state.images, 0);
+
+        // Hide drop zone
+        const dropZone = document.getElementById('image-drop-zone');
+        if (dropZone) dropZone.style.display = 'none';
+
+        console.log('✅ New canvas added:', newCanvasId);
+    },
+
     // Handle file selection
     handleFileSelect(files) {
         console.log('📂 handleFileSelect called with', files ? files.length : 0, 'files');
