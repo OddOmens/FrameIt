@@ -18,7 +18,7 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/app-enhanced.css?v=9">
+    <link rel="stylesheet" href="css/app-enhanced.css?v=10">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1224,24 +1224,6 @@
                             <span>Actions</span>
                             <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </button>
-                        <div class="dropdown-menu" id="actions-dropdown-menu">
-                            <button class="dropdown-item" id="reset-all-settings-btn">
-                                <i class="fas fa-undo-alt"></i>
-                                <span>Reset Image Settings</span>
-                            </button>
-                            <button class="dropdown-item" id="reset-bg-effects-btn">
-                                <i class="fas fa-undo-alt"></i>
-                                <span>Reset Background Effects</span>
-                            </button>
-                            <button class="dropdown-item" id="clear-all-canvases-btn">
-                                <i class="fas fa-trash-alt"></i>
-                                <span>Clear All Canvases</span>
-                            </button>
-                            <button class="dropdown-item" id="clear-all-watermarks-btn">
-                                <i class="fas fa-stamp"></i>
-                                <span>Clear All Watermarks</span>
-                            </button>
-                        </div>
                     </div>
 
                     <button id="export-all-btn" class="btn">
@@ -2594,6 +2576,26 @@
     <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
 
     <!-- Scripts -->
+    <!-- Actions Dropdown Menu (Moved to root to avoid z-index issues) -->
+    <div class="dropdown-menu" id="actions-dropdown-menu">
+        <button class="dropdown-item" id="reset-all-settings-btn">
+            <i class="fas fa-undo-alt"></i>
+            <span>Reset Image Settings</span>
+        </button>
+        <button class="dropdown-item" id="reset-bg-effects-btn">
+            <i class="fas fa-undo-alt"></i>
+            <span>Reset Background Effects</span>
+        </button>
+        <button class="dropdown-item" id="clear-all-canvases-btn">
+            <i class="fas fa-trash-alt"></i>
+            <span>Clear All Canvases</span>
+        </button>
+        <button class="dropdown-item" id="clear-all-watermarks-btn">
+            <i class="fas fa-stamp"></i>
+            <span>Clear All Watermarks</span>
+        </button>
+    </div>
+
     <script src="js/config.js"></script>
     <!-- frameit-config.js removed - no Supabase needed -->
     <script src="js/noise.js"></script>
