@@ -365,12 +365,33 @@ window.UI = {
         if (this.elements.addImageBtn) {
             this.elements.addImageBtn.addEventListener('click', (e) => {
                 console.log('🖼️ Add Image button clicked');
-                console.log('🖼️ File input element:', this.elements.fileInput);
                 e.preventDefault();
+
+                const fileInput = this.elements.fileInput;
+                console.log('🖼️ File input connected?', fileInput.isConnected);
+
+                // DIRECTLY assign onchange to ensure it works
+                fileInput.onchange = async (event) => {
+                    console.log('📂 DIRECT onchange triggered', event.target.files);
+                    if (event.target.files && event.target.files.length > 0) {
+                        try {
+                            if (window.Analytics && typeof window.Analytics.trackImageUpload === 'function') {
+                                await window.Analytics.trackImageUpload();
+                            }
+                        } catch (err) { console.error(err); }
+
+                        console.log('📂 Calling handleFileSelect from direct handler');
+                        window.App.handleFileSelect(event.target.files);
+
+                        // Reset value to allow re-selection
+                        event.target.value = '';
+                    }
+                };
+
                 // Use setTimeout to ensure the click happens after any other event handling
                 setTimeout(() => {
                     console.log('🖼️ Triggering file input click');
-                    this.elements.fileInput.click();
+                    fileInput.click();
                 }, 10);
             });
         } else {
