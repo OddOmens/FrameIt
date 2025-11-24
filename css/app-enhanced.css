@@ -386,22 +386,22 @@ option {
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 0.25rem);
     right: 0;
-    z-index: 1000;
+    z-index: 10000 !important;
     display: none;
-    min-width: 200px;
+    min-width: 220px;
     padding: 0.5rem 0;
-    margin-top: 0.5rem;
+    margin: 0;
     background-color: #1e1e1e;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
 }
 
 .dropdown-menu.show {
-    display: block;
-    animation: fadeIn 0.1s ease-out;
+    display: block !important;
+    animation: fadeIn 0.15s ease-out;
 }
 
 .dropdown-item {
@@ -418,10 +418,11 @@ option {
     border: 0;
     cursor: pointer;
     gap: 0.75rem;
+    transition: background-color 0.15s ease;
 }
 
 .dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .dropdown-item i {
@@ -437,7 +438,7 @@ option {
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-5px);
+        transform: translateY(-8px);
     }
 
     to {

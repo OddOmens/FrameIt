@@ -364,12 +364,17 @@ window.UI = {
         // Add Image button (Toolbar)
         if (this.elements.addImageBtn) {
             this.elements.addImageBtn.addEventListener('click', (e) => {
+                console.log('🖼️ Add Image button clicked');
+                console.log('🖼️ File input element:', this.elements.fileInput);
                 e.preventDefault();
                 // Use setTimeout to ensure the click happens after any other event handling
                 setTimeout(() => {
+                    console.log('🖼️ Triggering file input click');
                     this.elements.fileInput.click();
                 }, 10);
             });
+        } else {
+            console.error('❌ Add Image button not found!');
         }
 
         // Actions Dropdown
@@ -570,6 +575,7 @@ window.UI = {
                 console.warn('📂 File input change event fired but no files selected');
             }
         });
+        console.log('✅ File input change listener attached to:', this.elements.fileInput);
 
         // Category header clicks
         this.elements.categoryHeaders.forEach(header => {
