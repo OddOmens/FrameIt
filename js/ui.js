@@ -432,16 +432,34 @@ window.UI = {
         if (this.elements.actionsDropdownBtn) {
             this.elements.actionsDropdownBtn.addEventListener('click', (e) => {
                 console.log('🔘 Actions dropdown clicked');
+                e.preventDefault();
                 e.stopPropagation();
-                this.elements.actionsDropdownMenu.classList.toggle('show');
-                this.elements.actionsDropdownBtn.classList.toggle('active');
+
+                const isCurrentlyOpen = this.elements.actionsDropdownMenu.classList.contains('show');
+
+                if (isCurrentlyOpen) {
+                    this.elements.actionsDropdownMenu.classList.remove('show');
+                    this.elements.actionsDropdownBtn.classList.remove('active');
+                } else {
+                    this.elements.actionsDropdownMenu.classList.add('show');
+                    this.elements.actionsDropdownBtn.classList.add('active');
+                }
+
                 console.log('🔘 Dropdown classes:', this.elements.actionsDropdownMenu.className);
             });
 
-            // Close dropdown when clicking outside
+            // Close dropdown when clicking outside (use a slight delay to prevent immediate closure)
             document.addEventListener('click', (e) => {
-                if (!this.elements.actionsDropdownBtn.contains(e.target) &&
-                    !this.elements.actionsDropdownMenu.contains(e.target)) {
+                // Don't close if clicking on the button or menu
+                if (this.elements.actionsDropdownBtn && this.elements.actionsDropdownBtn.contains(e.target)) {
+                    return;
+                }
+                if (this.elements.actionsDropdownMenu && this.elements.actionsDropdownMenu.contains(e.target)) {
+                    return;
+                }
+
+                // Close the dropdown
+                if (this.elements.actionsDropdownMenu.classList.contains('show')) {
                     this.elements.actionsDropdownMenu.classList.remove('show');
                     this.elements.actionsDropdownBtn.classList.remove('active');
                 }
