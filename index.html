@@ -32,13 +32,13 @@
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
 
     <!-- Preload critical resources -->
-    <link rel="preload" href="css/landing.css" as="style">
+    <link rel="preload" href="css/landing-enhanced.css" as="style">
     <!-- Hero image preload removed since we're not using it -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         as="style">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/landing-enhanced.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,7 +121,38 @@
                 </div>
             </div>
 
-            <!-- Hero visual removed for cleaner, more modern centered design -->
+            <div class="hero-visual">
+                <div class="app-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="window-bar"></div>
+                    </div>
+                    <div class="window-content">
+                        <div class="sidebar">
+                            <div class="sidebar-item active"></div>
+                            <div class="sidebar-item"></div>
+                            <div class="sidebar-item"></div>
+                        </div>
+                        <div class="main-area">
+                            <div class="canvas-placeholder">
+                                <div class="mockup-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="properties-panel">
+                            <div class="panel-item"></div>
+                            <div class="panel-item"></div>
+                            <div class="panel-item"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glow-effect"></div>
+            </div>
         </div>
     </section>
 

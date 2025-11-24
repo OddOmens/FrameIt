@@ -575,7 +575,13 @@ window.UI = {
         this.elements.imageDropZone.addEventListener('click', (e) => {
             // Only trigger file input if not clicking on buttons inside
             if (!e.target.closest('.upload-btn') && !e.target.closest('.close-upload-zone')) {
-                this.elements.fileInput.click();
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Use setTimeout to ensure the click happens after any other event handling
+                setTimeout(() => {
+                    this.elements.fileInput.click();
+                }, 10);
             }
         });
         
@@ -1109,19 +1115,31 @@ window.UI = {
         });
         
         // Add Image button
-        document.getElementById('add-image-btn')?.addEventListener('click', () => {
+        document.getElementById('add-image-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
             // Ensure we have a current canvas ID for image upload
             if (!window.App.state.currentCanvasId) {
                 window.App.state.currentCanvasId = `canvas_${Date.now()}`;
                 window.App.state.selectedCanvasId = window.App.state.currentCanvasId;
             }
-            document.getElementById('file-input').click();
+            
+            // Use setTimeout to ensure the click happens after any other event handling
+            setTimeout(() => {
+                document.getElementById('file-input').click();
+            }, 10);
         });
         
         // Upload button inside drop zone
         document.querySelector('.image-drop-zone .upload-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation(); // Prevent event bubbling to drop zone
-            document.getElementById('file-input').click();
+            
+            // Use setTimeout to ensure the click happens after any other event handling
+            setTimeout(() => {
+                document.getElementById('file-input').click();
+            }, 10);
         });
         
         // Watermark controls
@@ -2096,14 +2114,22 @@ window.UI = {
     addImageToSlot(slotIndex) {
         const fileInput = document.getElementById('file-input');
         fileInput.dataset.targetSlot = slotIndex;
-        fileInput.click();
+        
+        // Use setTimeout to ensure the click happens after any other event handling
+        setTimeout(() => {
+            fileInput.click();
+        }, 10);
     },
     
     replaceImageInSlot(slotIndex) {
         const fileInput = document.getElementById('file-input');
         fileInput.dataset.targetSlot = slotIndex;
         fileInput.dataset.replaceMode = 'true';
-        fileInput.click();
+        
+        // Use setTimeout to ensure the click happens after any other event handling
+        setTimeout(() => {
+            fileInput.click();
+        }, 10);
     },
     
     // Recalculate collapsible section heights
