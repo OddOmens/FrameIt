@@ -374,7 +374,13 @@ window.UI = {
         // Button events
         // New Canvas button (formerly uploadBtn)
         if (this.elements.uploadBtn) {
-            this.elements.uploadBtn.addEventListener('click', () => window.App.createNewCanvas());
+            this.elements.uploadBtn.addEventListener('click', () => {
+                // Track with Umami
+                if (typeof umami !== 'undefined') {
+                    umami.track('canvas-created');
+                }
+                window.App.createNewCanvas();
+            });
         }
 
         // Add Image button (Toolbar)
@@ -394,10 +400,7 @@ window.UI = {
                 dynamicInput.onchange = async (event) => {
                     console.log('📂 Dynamic input onchange triggered', event.target.files);
                     if (event.target.files && event.target.files.length > 0) {
-                        // Track with Umami
-                        if (typeof umami !== 'undefined') {
-                            umami.track('image-added', { count: event.target.files.length });
-                        }
+                        // Note: Umami tracking happens in file input change handler to avoid duplicates
 
                         // Legacy tracking
                         try {
