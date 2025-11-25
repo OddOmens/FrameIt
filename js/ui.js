@@ -394,6 +394,12 @@ window.UI = {
                 dynamicInput.onchange = async (event) => {
                     console.log('📂 Dynamic input onchange triggered', event.target.files);
                     if (event.target.files && event.target.files.length > 0) {
+                        // Track with Umami
+                        if (typeof umami !== 'undefined') {
+                            umami.track('image-added', { count: event.target.files.length });
+                        }
+
+                        // Legacy tracking
                         try {
                             if (window.Analytics && typeof window.Analytics.trackImageUpload === 'function') {
                                 await window.Analytics.trackImageUpload();
@@ -505,6 +511,12 @@ window.UI = {
             helpBtn.addEventListener('click', () => this.showHelpModal());
         }
 
+        // Welcome button
+        const welcomeBtn = document.getElementById('welcome-btn');
+        if (welcomeBtn) {
+            welcomeBtn.addEventListener('click', () => this.showWhatsNewModal());
+        }
+
         // Gallery buttons
         const applyToAllBtn = document.getElementById('apply-to-all-btn');
         if (applyToAllBtn) {
@@ -613,7 +625,17 @@ window.UI = {
         this.elements.fileInput.addEventListener('change', async (e) => {
             console.log('📂 File input change event triggered', e.target.files);
             if (e.target.files && e.target.files.length > 0) {
-                // Simple analytics tracking without loops
+                // Track with Umami
+                if (typeof umami !== 'undefined') {
+                    const replaceMode = e.target.dataset.replaceMode;
+                    if (replaceMode === 'true') {
+                        umami.track('image-replaced');
+                    } else {
+                        umami.track('image-added', { count: e.target.files.length });
+                    }
+                }
+
+                // Legacy analytics tracking
                 try {
                     if (window.Analytics && typeof window.Analytics.trackImageUpload === 'function') {
                         await window.Analytics.trackImageUpload();
@@ -1714,7 +1736,12 @@ window.UI = {
         this.elements.imageDropZone.classList.remove('drag-over');
 
         if (e.dataTransfer.files.length > 0) {
-            // Simple analytics tracking
+            // Track with Umami
+            if (typeof umami !== 'undefined') {
+                umami.track('image-added', { count: e.dataTransfer.files.length, method: 'drag-drop' });
+            }
+
+            // Legacy analytics tracking
             try {
                 if (window.Analytics && window.Analytics.trackImageUpload) {
                     await window.Analytics.trackImageUpload();
@@ -2875,8 +2902,8 @@ window.UI = {
                 ];
                 fallbackFormats.forEach(format => {
                     const option = document.createElement('option');
-                    option.value = format.id;
-                    option.textContent = format.name;
+                    option.value = preset.id;
+                    option.textContent = preset.name;
                     this.elements.exportFormatSelect.appendChild(option);
                 });
             }
@@ -3022,6 +3049,14 @@ window.UI = {
         this.hideExportSettingsModal();
 
         const isBatchExport = this.elements.exportSettingsModal.dataset.batchExport === 'true';
+
+        // Track export with Umami
+        if (typeof umami !== 'undefined') {
+            umami.track(isBatchExport ? 'export-batch' : 'export-single', {
+                format: format,
+                dimension: dimensionOption
+            });
+        }
 
         if (isBatchExport) {
             // Execute batch export with the selected settings
@@ -4202,6 +4237,10 @@ window.UI = {
         const helpModal = document.getElementById('help-modal');
         if (helpModal) {
             helpModal.classList.add('visible');
+            // Track event with Umami
+            if (typeof umami !== 'undefined') {
+                umami.track('help-opened');
+            }
         }
     },
 
@@ -4218,11 +4257,21 @@ window.UI = {
         const donationModal = document.getElementById('donation-modal');
         if (donationModal) {
             donationModal.classList.add('visible');
-            // Track analytics
-            if (window.Analytics) {
-                window.Analytics.trackEvent('donation_modal_opened', {
-                    source: 'donate_button'
-                });
+
+            // Track event with Umami
+            if (typeof umami !== 'undefined') {
+                umami.track('donate-opened');
+            }
+
+            // Track event (legacy)
+            try {
+                if (window.Analytics && typeof window.Analytics.trackEvent === 'function') {
+                    window.Analytics.trackEvent('donation_modal_opened', {
+                        source: 'donate_button'
+                    });
+                }
+            } catch (e) {
+                console.warn('Analytics tracking failed:', e);
             }
         }
     },
@@ -4241,7 +4290,12 @@ window.UI = {
         if (modal) {
             modal.classList.add('visible');
 
-            // Track event
+            // Track event with Umami
+            if (typeof umami !== 'undefined') {
+                umami.track('about-opened');
+            }
+
+            // Track event (legacy)
             try {
                 if (window.Analytics && typeof window.Analytics.trackEvent === 'function') {
                     window.Analytics.trackEvent('whats_new_modal_opened', {
