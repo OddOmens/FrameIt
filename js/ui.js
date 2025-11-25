@@ -1618,8 +1618,13 @@ window.UI = {
 
     // Handle keyboard shortcuts
     handleKeyDown(e) {
+        // Ignore shortcuts when typing in input fields
+        const isTyping = e.target.tagName === 'INPUT' ||
+            e.target.tagName === 'TEXTAREA' ||
+            e.target.isContentEditable;
+
         // Use Ctrl+Z/Cmd+Z for undo
-        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !isTyping) {
             if (!e.shiftKey) {
                 window.App.undo();
             } else {
@@ -1629,25 +1634,54 @@ window.UI = {
         }
 
         // Use Ctrl+Y/Cmd+Y for redo
-        if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'y' && !isTyping) {
             window.App.redo();
             e.preventDefault();
         }
 
+        // Use Ctrl+E/Cmd+E for export
+        if ((e.ctrlKey || e.metaKey) && e.key === 'e' && !isTyping) {
+            const exportBtn = document.getElementById('export-btn');
+            if (exportBtn && !exportBtn.disabled) {
+                this.showExportSettingsModal(false);
+            }
+            e.preventDefault();
+        }
+
+        // Use Escape to close modals
+        if (e.key === 'Escape') {
+            // Close export settings modal if open
+            const exportModal = document.getElementById('export-settings-modal');
+            if (exportModal && exportModal.classList.contains('visible')) {
+                this.hideExportSettingsModal();
+                e.preventDefault();
+                return;
+            }
+
+            // Close any other visible modals
+            const modals = document.querySelectorAll('.modal.visible');
+            modals.forEach(modal => {
+                modal.classList.remove('visible');
+            });
+            if (modals.length > 0) {
+                e.preventDefault();
+            }
+        }
+
         // Zoom controls with keyboard
-        if ((e.ctrlKey || e.metaKey) && e.key === '=') {
+        if ((e.ctrlKey || e.metaKey) && e.key === '=' && !isTyping) {
             // Zoom in with Ctrl/Cmd + Plus
             this.zoomIn();
             e.preventDefault();
         }
 
-        if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+        if ((e.ctrlKey || e.metaKey) && e.key === '-' && !isTyping) {
             // Zoom out with Ctrl/Cmd + Minus
             this.zoomOut();
             e.preventDefault();
         }
 
-        if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+        if ((e.ctrlKey || e.metaKey) && e.key === '0' && !isTyping) {
             // Reset zoom with Ctrl/Cmd + 0
             this.resetZoom();
             e.preventDefault();
@@ -2716,7 +2750,7 @@ window.UI = {
     showLoading() {
         const loader = document.createElement('div');
         loader.className = 'canvas-loader';
-        loader.innerHTML = '<div class="spinner"></div><span>Loading...</span>';
+        loader.innerHTML = '<div class="spinner"></div>';
 
         this.elements.canvasPreview.appendChild(loader);
     },

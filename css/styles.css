@@ -16,13 +16,13 @@
     --accent-color: #2b7de9;
     --danger-color: #e53935;
     --success-color: #43a047;
-    
+
     /* UI Elements */
     --btn-bg: #3a3a3a;
     --btn-hover: #4a4a4a;
     --slider-bg: #3a3a3a;
     --slider-thumb: var(--accent-color);
-    
+
     /* Spacing */
     --space-xs: 4px;
     --space-s: 8px;
@@ -61,20 +61,27 @@ body {
 
 /* Toolbar */
 .toolbar {
-    background-color: #1a1a1a; /* Match sidebar background */
+    background-color: #1a1a1a;
+    /* Match sidebar background */
     padding: var(--space-m);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: none; /* Remove shadow */
-    z-index: 10; 
+    box-shadow: none;
+    /* Remove shadow */
+    z-index: 10;
     margin: 0;
-    border-radius: 12px 12px 0 0; /* Round top corners to match panels */
-    border: 1px solid #2a2a2a; /* Add border around all sides */
-    border-bottom: none; /* Remove bottom border */
+    border-radius: 12px 12px 0 0;
+    /* Round top corners to match panels */
+    border: 1px solid #2a2a2a;
+    /* Add border around all sides */
+    border-bottom: none;
+    /* Remove bottom border */
 }
 
-.toolbar-left, .toolbar-center, .toolbar-right {
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
     display: flex;
     align-items: center;
     gap: var(--space-m);
@@ -178,11 +185,13 @@ body {
 
 /* All buttons use same dark styling */
 .success-btn {
-    background-color: #3a3a3a; /* Dark theme grey */
+    background-color: #3a3a3a;
+    /* Dark theme grey */
 }
 
 .success-btn:hover:not(:disabled) {
-    background-color: #4a4a4a; /* Darker for hover */
+    background-color: #4a4a4a;
+    /* Darker for hover */
 }
 
 /* Donate button is now a proper button element, no special styling needed */
@@ -191,16 +200,21 @@ body {
 .main-content {
     display: flex;
     flex: 1;
-    height: calc(100vh - 120px); /* Adjusted for toolbar and margins */
+    height: calc(100vh - 120px);
+    /* Adjusted for toolbar and margins */
     min-height: 0;
     overflow: hidden;
     padding: var(--space-m);
     gap: var(--space-m);
     position: relative;
-    margin: 0; /* Remove side margins since they're on the wrapper now */
-    border-radius: 0 0 12px 12px; /* Round bottom corners */
-    border: 1px solid #2a2a2a; /* Match toolbar border */
-    border-top: none; /* Remove top border to connect with toolbar */
+    margin: 0;
+    /* Remove side margins since they're on the wrapper now */
+    border-radius: 0 0 12px 12px;
+    /* Round bottom corners */
+    border: 1px solid #2a2a2a;
+    /* Match toolbar border */
+    border-top: none;
+    /* Remove top border to connect with toolbar */
     background-color: var(--primary-bg);
 }
 
@@ -210,28 +224,34 @@ body {
     flex-direction: column;
     flex: 1;
     min-width: 0;
-    max-width: calc(100% - 680px); /* Account for right panel + gallery */
+    max-width: calc(100% - 680px);
+    /* Account for right panel + gallery */
     overflow: hidden;
 }
 
 /* Gallery Bar (vertical left side) */
 .gallery-bar {
-    display: flex; /* Always show gallery */
+    display: flex;
+    /* Always show gallery */
     flex-direction: column;
-    background-color: #1a1a1a; /* Match control panel background */
+    background-color: #1a1a1a;
+    /* Match control panel background */
     width: 280px;
     height: 100%;
-    min-height: calc(100vh - 90px) !important; /* Ensure minimum height like customize panel */
+    min-height: calc(100vh - 90px) !important;
+    /* Ensure minimum height like customize panel */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     margin-right: var(--space-m);
-    border: 1px solid #2a2a2a; /* Match control panel border */
+    border: 1px solid #2a2a2a;
+    /* Match control panel border */
 }
 
 /* Remove .hidden class override since gallery should always show */
 .gallery-bar.hidden {
-    display: flex; /* Always show gallery */
+    display: flex;
+    /* Always show gallery */
 }
 
 .gallery-content-wrapper {
@@ -239,7 +259,8 @@ body {
     flex-direction: column;
     padding: var(--space-m);
     overflow: hidden;
-    background-color: #1a1a1a; /* Match control panel background */
+    background-color: #1a1a1a;
+    /* Match control panel background */
 }
 
 .gallery-content {
@@ -309,7 +330,8 @@ body {
     background-color: var(--panel-bg);
     display: flex;
     align-items: center;
-    justify-content: center; /* Center content horizontally */
+    justify-content: center;
+    /* Center content horizontally */
 }
 
 .gallery-item-image img {
@@ -408,7 +430,8 @@ body {
 }
 
 /* Gallery Bar (left side) */
-.gallery-header, .gallery-header h3 {
+.gallery-header,
+.gallery-header h3 {
     display: none;
 }
 
@@ -630,18 +653,21 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 10000; /* Increased z-index */
+    z-index: 10000;
+    /* Increased z-index */
     backdrop-filter: blur(4px);
 }
 
 .modal.visible {
-    display: flex !important; /* Added !important */
+    display: flex !important;
+    /* Added !important */
 }
 
 .modal-content {
     background-color: var(--secondary-bg);
     border-radius: 12px;
-    width: 500px; /* Reduced width for better proportions */
+    width: 500px;
+    /* Reduced width for better proportions */
     max-width: 90%;
     max-height: 90vh;
     overflow: hidden;
@@ -1067,7 +1093,8 @@ body {
     font-style: italic;
 }
 
-textarea, select {
+textarea,
+select {
     width: 100%;
     background-color: var(--secondary-bg);
     border: 1px solid var(--border-color);
@@ -1078,17 +1105,20 @@ textarea, select {
     resize: vertical;
 }
 
-.text-align-buttons, .text-style-buttons {
+.text-align-buttons,
+.text-style-buttons {
     display: flex;
     gap: var(--space-xs);
 }
 
-.text-align-buttons .btn, .text-style-buttons .btn {
+.text-align-buttons .btn,
+.text-style-buttons .btn {
     flex: 1;
     justify-content: center;
 }
 
-.text-align-buttons .btn.active, .text-style-buttons .btn.active {
+.text-align-buttons .btn.active,
+.text-style-buttons .btn.active {
     background-color: var(--accent-color);
 }
 
@@ -1145,21 +1175,27 @@ textarea, select {
     display: flex;
     flex-direction: column;
     width: 380px;
-    height: 100% !important; /* Ensure height is maintained */
-    margin-left: auto; /* Push to the right */
-    max-height: calc(100vh - 80px); /* Prevent overflow */
+    height: 100% !important;
+    /* Ensure height is maintained */
+    margin-left: auto;
+    /* Push to the right */
+    max-height: calc(100vh - 80px);
+    /* Prevent overflow */
 }
 
 .control-panel {
-    background-color: #1a1a1a; /* Darker background */
+    background-color: #1a1a1a;
+    /* Darker background */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border: 1px solid #2a2a2a;
     overflow: hidden;
-    flex: 1 1 auto !important; /* Don't allow shrinking */
+    flex: 1 1 auto !important;
+    /* Don't allow shrinking */
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 90px) !important; /* Ensure minimum height */
+    min-height: calc(100vh - 90px) !important;
+    /* Ensure minimum height */
     max-height: 100%;
 }
 
@@ -1190,8 +1226,10 @@ textarea, select {
     flex: 1 1 auto !important;
     min-height: calc(100vh - 150px) !important;
     height: auto !important;
-    padding-bottom: 40px; /* More bottom padding to ensure visibility */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding-bottom: 80px;
+    /* Increased bottom padding to ensure all content is visible */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
 }
 
 /* Settings sections - remove grey background */
@@ -1357,12 +1395,14 @@ textarea, select {
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 10000; /* Increased z-index */
+    z-index: 10000;
+    /* Increased z-index */
     backdrop-filter: blur(4px);
 }
 
 .modal.visible {
-    display: flex !important; /* Added !important */
+    display: flex !important;
+    /* Added !important */
 }
 
 .modal-content {
@@ -1505,7 +1545,7 @@ textarea, select {
 
 /* Notification fix to ensure it doesn't affect layout */
 .notification {
-    position: fixed !important; 
+    position: fixed !important;
     z-index: 10000 !important;
     box-sizing: border-box !important;
     top: 20px !important;
@@ -1528,7 +1568,8 @@ textarea, select {
 /* Quick position grid styles moved to app.html embedded styles */
 
 /* Existing styles for shadow options */
-.shadow-options, .background-options {
+.shadow-options,
+.background-options {
     padding: var(--space-s);
     margin-bottom: var(--space-m);
     border-radius: 6px;
@@ -1714,24 +1755,25 @@ textarea, select {
         padding: var(--space-s);
         gap: var(--space-s);
     }
-    
+
     .left-column {
         max-width: calc(100% - 620px);
     }
-    
+
     .gallery-bar {
         width: 240px;
     }
-    
+
     .control-panels {
         width: 360px;
-        max-height: calc(100vh - 70px); /* Adjusted for smaller screens */
+        max-height: calc(100vh - 70px);
+        /* Adjusted for smaller screens */
     }
-    
+
     .background-content {
         max-height: 350px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
@@ -1742,39 +1784,41 @@ textarea, select {
         flex-direction: column;
         height: auto;
         max-height: calc(100vh - 52px);
-        overflow-y: auto; /* Make the main content scrollable on mobile */
+        overflow-y: auto;
+        /* Make the main content scrollable on mobile */
     }
-    
+
     .left-column {
         max-width: 100%;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-bar {
         width: 100%;
         height: 200px;
         margin-right: 0;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-content {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
-    
+
     .control-panels {
         width: 100%;
         height: auto;
-        max-height: 60vh; /* Increased for better mobile view */
+        max-height: 60vh;
+        /* Increased for better mobile view */
     }
-    
+
     .background-content {
         max-height: 300px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
-    
+
     /* Fix for mobile safari bottom bar issues */
     .panel-content {
         padding-bottom: 80px;
@@ -1804,17 +1848,20 @@ textarea, select {
     margin: 0;
 }
 
-.color-grid, .gradient-grid {
+.color-grid,
+.gradient-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
     padding: 0 var(--space-m);
     margin-bottom: 15px;
     max-width: 100%;
-    overflow: hidden; /* Contain hover effects */
+    overflow: hidden;
+    /* Contain hover effects */
 }
 
-.color-swatch, .gradient-swatch {
+.color-swatch,
+.gradient-swatch {
     width: 30px;
     height: 30px;
     border-radius: 4px;
@@ -1823,13 +1870,17 @@ textarea, select {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.color-swatch:hover, .gradient-swatch:hover {
+.color-swatch:hover,
+.gradient-swatch:hover {
     transform: scale(1.05);
-    z-index: 1; /* Add z-index to keep it above neighboring swatches */
-    position: relative; /* Ensure z-index works */
+    z-index: 1;
+    /* Add z-index to keep it above neighboring swatches */
+    position: relative;
+    /* Ensure z-index works */
 }
 
-.color-swatch.selected, .gradient-swatch.selected {
+.color-swatch.selected,
+.gradient-swatch.selected {
     border-color: white;
     border-width: 2px;
 }
@@ -2011,10 +2062,25 @@ textarea, select {
     cursor: nw-resize;
 }
 
-.text-element-handle.top-left { top: -4px; left: -4px; }
-.text-element-handle.top-right { top: -4px; right: -4px; }
-.text-element-handle.bottom-left { bottom: -4px; left: -4px; }
-.text-element-handle.bottom-right { bottom: -4px; right: -4px; }
+.text-element-handle.top-left {
+    top: -4px;
+    left: -4px;
+}
+
+.text-element-handle.top-right {
+    top: -4px;
+    right: -4px;
+}
+
+.text-element-handle.bottom-left {
+    bottom: -4px;
+    left: -4px;
+}
+
+.text-element-handle.bottom-right {
+    bottom: -4px;
+    right: -4px;
+}
 
 /* Text Layer List */
 .text-layer-item {
@@ -2183,13 +2249,15 @@ textarea, select {
 .background-content {
     scroll-behavior: smooth;
     scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
-    will-change: scroll-position; /* Optimize scrolling */
+    will-change: scroll-position;
+    /* Optimize scrolling */
 }
 
 /* Fixing the backgrounds section */
 .settings-section[data-section="background"] .section-content,
 .settings-section:nth-child(4) .section-content {
-    padding-bottom: 0; /* Remove extra padding since we have the scrollable container */
+    padding-bottom: 0;
+    /* Remove extra padding since we have the scrollable container */
 }
 
 /* Last settings section needs more padding */
@@ -2201,7 +2269,8 @@ textarea, select {
 .background-content {
     max-height: 400px;
     overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* Prevent horizontal scrollbar */
     scrollbar-width: thin;
     padding-right: 8px;
     padding-left: 8px;
@@ -2224,7 +2293,7 @@ textarea, select {
     .background-content {
         max-height: 350px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -2235,7 +2304,7 @@ textarea, select {
     .background-content {
         max-height: 300px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -2291,7 +2360,8 @@ textarea, select {
     text-align: center;
     height: 100%;
     min-height: 250px;
-    grid-column: 1 / -1; /* Span all columns in grid */
+    grid-column: 1 / -1;
+    /* Span all columns in grid */
     width: 100%;
 }
 
@@ -2300,7 +2370,8 @@ textarea, select {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: auto; /* Center in available space */
+    margin: auto;
+    /* Center in available space */
 }
 
 .empty-gallery i {
@@ -2321,7 +2392,7 @@ textarea, select {
 
 /* Notification fix to ensure it doesn't affect layout */
 .notification {
-    position: fixed !important; 
+    position: fixed !important;
     z-index: 10000 !important;
     box-sizing: border-box !important;
     top: 20px !important;
@@ -2344,7 +2415,8 @@ textarea, select {
 /* Quick position grid styles moved to app.html embedded styles */
 
 /* Existing styles for shadow options */
-.shadow-options, .background-options {
+.shadow-options,
+.background-options {
     padding: var(--space-s);
     margin-bottom: var(--space-m);
     border-radius: 6px;
@@ -2530,24 +2602,25 @@ textarea, select {
         padding: var(--space-s);
         gap: var(--space-s);
     }
-    
+
     .left-column {
         max-width: calc(100% - 620px);
     }
-    
+
     .gallery-bar {
         width: 240px;
     }
-    
+
     .control-panels {
         width: 360px;
-        max-height: calc(100vh - 70px); /* Adjusted for smaller screens */
+        max-height: calc(100vh - 70px);
+        /* Adjusted for smaller screens */
     }
-    
+
     .background-content {
         max-height: 350px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
@@ -2558,39 +2631,41 @@ textarea, select {
         flex-direction: column;
         height: auto;
         max-height: calc(100vh - 52px);
-        overflow-y: auto; /* Make the main content scrollable on mobile */
+        overflow-y: auto;
+        /* Make the main content scrollable on mobile */
     }
-    
+
     .left-column {
         max-width: 100%;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-bar {
         width: 100%;
         height: 200px;
         margin-right: 0;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-content {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
-    
+
     .control-panels {
         width: 100%;
         height: auto;
-        max-height: 60vh; /* Increased for better mobile view */
+        max-height: 60vh;
+        /* Increased for better mobile view */
     }
-    
+
     .background-content {
         max-height: 300px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
-    
+
     /* Fix for mobile safari bottom bar issues */
     .panel-content {
         padding-bottom: 80px;
@@ -2620,17 +2695,20 @@ textarea, select {
     margin: 0;
 }
 
-.color-grid, .gradient-grid {
+.color-grid,
+.gradient-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
     padding: 0 var(--space-m);
     margin-bottom: 15px;
     max-width: 100%;
-    overflow: hidden; /* Contain hover effects */
+    overflow: hidden;
+    /* Contain hover effects */
 }
 
-.color-swatch, .gradient-swatch {
+.color-swatch,
+.gradient-swatch {
     width: 30px;
     height: 30px;
     border-radius: 4px;
@@ -2639,13 +2717,17 @@ textarea, select {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.color-swatch:hover, .gradient-swatch:hover {
+.color-swatch:hover,
+.gradient-swatch:hover {
     transform: scale(1.05);
-    z-index: 1; /* Add z-index to keep it above neighboring swatches */
-    position: relative; /* Ensure z-index works */
+    z-index: 1;
+    /* Add z-index to keep it above neighboring swatches */
+    position: relative;
+    /* Ensure z-index works */
 }
 
-.color-swatch.selected, .gradient-swatch.selected {
+.color-swatch.selected,
+.gradient-swatch.selected {
     border-color: white;
     border-width: 2px;
 }
@@ -2827,10 +2909,25 @@ textarea, select {
     cursor: nw-resize;
 }
 
-.text-element-handle.top-left { top: -4px; left: -4px; }
-.text-element-handle.top-right { top: -4px; right: -4px; }
-.text-element-handle.bottom-left { bottom: -4px; left: -4px; }
-.text-element-handle.bottom-right { bottom: -4px; right: -4px; }
+.text-element-handle.top-left {
+    top: -4px;
+    left: -4px;
+}
+
+.text-element-handle.top-right {
+    top: -4px;
+    right: -4px;
+}
+
+.text-element-handle.bottom-left {
+    bottom: -4px;
+    left: -4px;
+}
+
+.text-element-handle.bottom-right {
+    bottom: -4px;
+    right: -4px;
+}
 
 /* Text Layer List */
 .text-layer-item {
@@ -2999,13 +3096,15 @@ textarea, select {
 .background-content {
     scroll-behavior: smooth;
     scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
-    will-change: scroll-position; /* Optimize scrolling */
+    will-change: scroll-position;
+    /* Optimize scrolling */
 }
 
 /* Fixing the backgrounds section */
 .settings-section[data-section="background"] .section-content,
 .settings-section:nth-child(4) .section-content {
-    padding-bottom: 0; /* Remove extra padding since we have the scrollable container */
+    padding-bottom: 0;
+    /* Remove extra padding since we have the scrollable container */
 }
 
 /* Last settings section needs more padding */
@@ -3017,7 +3116,8 @@ textarea, select {
 .background-content {
     max-height: 400px;
     overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* Prevent horizontal scrollbar */
     scrollbar-width: thin;
     padding-right: 8px;
     padding-left: 8px;
@@ -3040,7 +3140,7 @@ textarea, select {
     .background-content {
         max-height: 350px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -3051,7 +3151,7 @@ textarea, select {
     .background-content {
         max-height: 300px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -3107,7 +3207,8 @@ textarea, select {
     text-align: center;
     height: 100%;
     min-height: 250px;
-    grid-column: 1 / -1; /* Span all columns in grid */
+    grid-column: 1 / -1;
+    /* Span all columns in grid */
     width: 100%;
 }
 
@@ -3116,7 +3217,8 @@ textarea, select {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: auto; /* Center in available space */
+    margin: auto;
+    /* Center in available space */
 }
 
 .empty-gallery i {
@@ -3137,7 +3239,7 @@ textarea, select {
 
 /* Notification fix to ensure it doesn't affect layout */
 .notification {
-    position: fixed !important; 
+    position: fixed !important;
     z-index: 10000 !important;
     box-sizing: border-box !important;
     top: 20px !important;
@@ -3159,7 +3261,8 @@ textarea, select {
 /* Quick position grid styles moved to app.html embedded styles */
 
 /* Existing styles for shadow options */
-.shadow-options, .background-options {
+.shadow-options,
+.background-options {
     padding: var(--space-s);
     margin-bottom: var(--space-m);
     border-radius: 6px;
@@ -3345,24 +3448,25 @@ textarea, select {
         padding: var(--space-s);
         gap: var(--space-s);
     }
-    
+
     .left-column {
         max-width: calc(100% - 620px);
     }
-    
+
     .gallery-bar {
         width: 240px;
     }
-    
+
     .control-panels {
         width: 360px;
-        max-height: calc(100vh - 70px); /* Adjusted for smaller screens */
+        max-height: calc(100vh - 70px);
+        /* Adjusted for smaller screens */
     }
-    
+
     .background-content {
         max-height: 350px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
@@ -3373,39 +3477,41 @@ textarea, select {
         flex-direction: column;
         height: auto;
         max-height: calc(100vh - 52px);
-        overflow-y: auto; /* Make the main content scrollable on mobile */
+        overflow-y: auto;
+        /* Make the main content scrollable on mobile */
     }
-    
+
     .left-column {
         max-width: 100%;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-bar {
         width: 100%;
         height: 200px;
         margin-right: 0;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-content {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
-    
+
     .control-panels {
         width: 100%;
         height: auto;
-        max-height: 60vh; /* Increased for better mobile view */
+        max-height: 60vh;
+        /* Increased for better mobile view */
     }
-    
+
     .background-content {
         max-height: 300px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
-    
+
     /* Fix for mobile safari bottom bar issues */
     .panel-content {
         padding-bottom: 80px;
@@ -3435,17 +3541,20 @@ textarea, select {
     margin: 0;
 }
 
-.color-grid, .gradient-grid {
+.color-grid,
+.gradient-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
     padding: 0 var(--space-m);
     margin-bottom: 15px;
     max-width: 100%;
-    overflow: hidden; /* Contain hover effects */
+    overflow: hidden;
+    /* Contain hover effects */
 }
 
-.color-swatch, .gradient-swatch {
+.color-swatch,
+.gradient-swatch {
     width: 30px;
     height: 30px;
     border-radius: 4px;
@@ -3454,13 +3563,17 @@ textarea, select {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.color-swatch:hover, .gradient-swatch:hover {
+.color-swatch:hover,
+.gradient-swatch:hover {
     transform: scale(1.05);
-    z-index: 1; /* Add z-index to keep it above neighboring swatches */
-    position: relative; /* Ensure z-index works */
+    z-index: 1;
+    /* Add z-index to keep it above neighboring swatches */
+    position: relative;
+    /* Ensure z-index works */
 }
 
-.color-swatch.selected, .gradient-swatch.selected {
+.color-swatch.selected,
+.gradient-swatch.selected {
     border-color: white;
     border-width: 2px;
 }
@@ -3642,10 +3755,25 @@ textarea, select {
     cursor: nw-resize;
 }
 
-.text-element-handle.top-left { top: -4px; left: -4px; }
-.text-element-handle.top-right { top: -4px; right: -4px; }
-.text-element-handle.bottom-left { bottom: -4px; left: -4px; }
-.text-element-handle.bottom-right { bottom: -4px; right: -4px; }
+.text-element-handle.top-left {
+    top: -4px;
+    left: -4px;
+}
+
+.text-element-handle.top-right {
+    top: -4px;
+    right: -4px;
+}
+
+.text-element-handle.bottom-left {
+    bottom: -4px;
+    left: -4px;
+}
+
+.text-element-handle.bottom-right {
+    bottom: -4px;
+    right: -4px;
+}
 
 /* Text Layer List */
 .text-layer-item {
@@ -3814,13 +3942,15 @@ textarea, select {
 .background-content {
     scroll-behavior: smooth;
     scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
-    will-change: scroll-position; /* Optimize scrolling */
+    will-change: scroll-position;
+    /* Optimize scrolling */
 }
 
 /* Fixing the backgrounds section */
 .settings-section[data-section="background"] .section-content,
 .settings-section:nth-child(4) .section-content {
-    padding-bottom: 0; /* Remove extra padding since we have the scrollable container */
+    padding-bottom: 0;
+    /* Remove extra padding since we have the scrollable container */
 }
 
 /* Last settings section needs more padding */
@@ -3832,7 +3962,8 @@ textarea, select {
 .background-content {
     max-height: 400px;
     overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* Prevent horizontal scrollbar */
     scrollbar-width: thin;
     padding-right: 8px;
     padding-left: 8px;
@@ -3855,7 +3986,7 @@ textarea, select {
     .background-content {
         max-height: 350px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -3866,7 +3997,7 @@ textarea, select {
     .background-content {
         max-height: 300px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -3922,7 +4053,8 @@ textarea, select {
     text-align: center;
     height: 100%;
     min-height: 250px;
-    grid-column: 1 / -1; /* Span all columns in grid */
+    grid-column: 1 / -1;
+    /* Span all columns in grid */
     width: 100%;
 }
 
@@ -3931,7 +4063,8 @@ textarea, select {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: auto; /* Center in available space */
+    margin: auto;
+    /* Center in available space */
 }
 
 .empty-gallery i {
@@ -3952,7 +4085,7 @@ textarea, select {
 
 /* Notification fix to ensure it doesn't affect layout */
 .notification {
-    position: fixed !important; 
+    position: fixed !important;
     z-index: 10000 !important;
     box-sizing: border-box !important;
     top: 20px !important;
@@ -3975,7 +4108,8 @@ textarea, select {
 /* Quick position grid styles moved to app.html embedded styles */
 
 /* Existing styles for shadow options */
-.shadow-options, .background-options {
+.shadow-options,
+.background-options {
     padding: var(--space-s);
     margin-bottom: var(--space-m);
     border-radius: 6px;
@@ -4161,24 +4295,25 @@ textarea, select {
         padding: var(--space-s);
         gap: var(--space-s);
     }
-    
+
     .left-column {
         max-width: calc(100% - 620px);
     }
-    
+
     .gallery-bar {
         width: 240px;
     }
-    
+
     .control-panels {
         width: 360px;
-        max-height: calc(100vh - 70px); /* Adjusted for smaller screens */
+        max-height: calc(100vh - 70px);
+        /* Adjusted for smaller screens */
     }
-    
+
     .background-content {
         max-height: 350px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
@@ -4189,39 +4324,41 @@ textarea, select {
         flex-direction: column;
         height: auto;
         max-height: calc(100vh - 52px);
-        overflow-y: auto; /* Make the main content scrollable on mobile */
+        overflow-y: auto;
+        /* Make the main content scrollable on mobile */
     }
-    
+
     .left-column {
         max-width: 100%;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-bar {
         width: 100%;
         height: 200px;
         margin-right: 0;
         margin-bottom: var(--space-m);
     }
-    
+
     .gallery-content {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
-    
+
     .control-panels {
         width: 100%;
         height: auto;
-        max-height: 60vh; /* Increased for better mobile view */
+        max-height: 60vh;
+        /* Increased for better mobile view */
     }
-    
+
     .background-content {
         max-height: 300px;
     }
-    
+
     .background-categories {
         max-height: none;
     }
-    
+
     /* Fix for mobile safari bottom bar issues */
     .panel-content {
         padding-bottom: 80px;
@@ -4251,17 +4388,20 @@ textarea, select {
     margin: 0;
 }
 
-.color-grid, .gradient-grid {
+.color-grid,
+.gradient-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
     padding: 0 var(--space-m);
     margin-bottom: 15px;
     max-width: 100%;
-    overflow: hidden; /* Contain hover effects */
+    overflow: hidden;
+    /* Contain hover effects */
 }
 
-.color-swatch, .gradient-swatch {
+.color-swatch,
+.gradient-swatch {
     width: 30px;
     height: 30px;
     border-radius: 4px;
@@ -4270,13 +4410,17 @@ textarea, select {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.color-swatch:hover, .gradient-swatch:hover {
+.color-swatch:hover,
+.gradient-swatch:hover {
     transform: scale(1.05);
-    z-index: 1; /* Add z-index to keep it above neighboring swatches */
-    position: relative; /* Ensure z-index works */
+    z-index: 1;
+    /* Add z-index to keep it above neighboring swatches */
+    position: relative;
+    /* Ensure z-index works */
 }
 
-.color-swatch.selected, .gradient-swatch.selected {
+.color-swatch.selected,
+.gradient-swatch.selected {
     border-color: white;
     border-width: 2px;
 }
@@ -4458,10 +4602,25 @@ textarea, select {
     cursor: nw-resize;
 }
 
-.text-element-handle.top-left { top: -4px; left: -4px; }
-.text-element-handle.top-right { top: -4px; right: -4px; }
-.text-element-handle.bottom-left { bottom: -4px; left: -4px; }
-.text-element-handle.bottom-right { bottom: -4px; right: -4px; }
+.text-element-handle.top-left {
+    top: -4px;
+    left: -4px;
+}
+
+.text-element-handle.top-right {
+    top: -4px;
+    right: -4px;
+}
+
+.text-element-handle.bottom-left {
+    bottom: -4px;
+    left: -4px;
+}
+
+.text-element-handle.bottom-right {
+    bottom: -4px;
+    right: -4px;
+}
 
 /* Text Layer List */
 .text-layer-item {
@@ -4630,13 +4789,15 @@ textarea, select {
 .background-content {
     scroll-behavior: smooth;
     scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
-    will-change: scroll-position; /* Optimize scrolling */
+    will-change: scroll-position;
+    /* Optimize scrolling */
 }
 
 /* Fixing the backgrounds section */
 .settings-section[data-section="background"] .section-content,
 .settings-section:nth-child(4) .section-content {
-    padding-bottom: 0; /* Remove extra padding since we have the scrollable container */
+    padding-bottom: 0;
+    /* Remove extra padding since we have the scrollable container */
 }
 
 /* Last settings section needs more padding */
@@ -4648,7 +4809,8 @@ textarea, select {
 .background-content {
     max-height: 400px;
     overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* Prevent horizontal scrollbar */
     scrollbar-width: thin;
     padding-right: 8px;
     padding-left: 8px;
@@ -4671,7 +4833,7 @@ textarea, select {
     .background-content {
         max-height: 350px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -4682,7 +4844,7 @@ textarea, select {
     .background-content {
         max-height: 300px;
     }
-    
+
     /* Remove background categories max-height since it's no longer scrollable independently */
     .background-categories {
         max-height: none;
@@ -4738,7 +4900,8 @@ textarea, select {
     text-align: center;
     height: 100%;
     min-height: 250px;
-    grid-column: 1 / -1; /* Span all columns in grid */
+    grid-column: 1 / -1;
+    /* Span all columns in grid */
     width: 100%;
 }
 
@@ -4747,7 +4910,8 @@ textarea, select {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: auto; /* Center in available space */
+    margin: auto;
+    /* Center in available space */
 }
 
 .empty-gallery i {
@@ -4768,7 +4932,7 @@ textarea, select {
 
 /* Notification fix to ensure it doesn't affect layout */
 .notification {
-    position: fixed !important; 
+    position: fixed !important;
     z-index: 10000 !important;
     box-sizing: border-box !important;
     top: 20px !important;
@@ -4791,7 +4955,8 @@ textarea, select {
 /* Quick position grid styles moved to app.html embedded styles */
 
 /* Existing styles for shadow options */
-.shadow-options, .background-options {
+.shadow-options,
+.background-options {
     padding: var(--space-s);
     margin-bottom: var(--space-m);
     border-radius: 6px;
@@ -5302,6 +5467,7 @@ textarea, select {
         opacity: 0;
         transform: translateX(-40px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -5313,6 +5479,7 @@ textarea, select {
         opacity: 0;
         transform: translateX(40px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -5324,6 +5491,7 @@ textarea, select {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -5335,25 +5503,25 @@ textarea, select {
     .landing-container {
         flex-direction: column;
     }
-    
+
     .landing-left {
         flex: 0 0 50%;
         padding: 40px;
     }
-    
+
     .landing-right {
         flex: 0 0 50%;
         padding: 40px;
     }
-    
+
     .landing-title {
         font-size: 36px;
     }
-    
+
     .landing-subtitle {
         font-size: 18px;
     }
-    
+
     .feature-item {
         padding: 16px;
         margin-bottom: 24px;
@@ -5366,67 +5534,68 @@ textarea, select {
         height: auto;
         min-height: 100vh;
     }
-    
+
     .landing-left {
         flex: none;
         padding: 40px 20px;
     }
-    
+
     .landing-right {
         flex: none;
         padding: 40px 20px;
     }
-    
+
     .landing-title {
         font-size: 32px;
     }
-    
+
     .landing-subtitle {
         font-size: 16px;
         margin-bottom: 40px;
     }
-    
+
     .landing-features {
         margin-bottom: 40px;
     }
-    
+
     .feature-item {
         padding: 16px;
         margin-bottom: 20px;
     }
-    
+
     .feature-item:hover {
         transform: none;
     }
-    
+
     .landing-testimonial {
         padding: 24px;
     }
-    
+
     .auth-container {
         max-width: 100%;
     }
 }
 
 @media (max-width: 480px) {
+
     .landing-left,
     .landing-right {
         padding: 20px;
     }
-    
+
     .landing-title {
         font-size: 28px;
     }
-    
+
     .landing-logo .logo-text {
         font-size: 28px;
     }
-    
+
     .feature-item {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .feature-icon {
         margin-right: 0;
         margin-bottom: 16px;
@@ -5801,15 +5970,15 @@ textarea, select {
         gap: var(--space-l);
         padding: var(--space-l);
     }
-    
+
     .pricing-card {
         padding: var(--space-l);
     }
-    
+
     .price {
         font-size: 36px;
     }
-    
+
     .pricing-content {
         width: 95vw;
         max-width: none;
@@ -5828,8 +5997,13 @@ textarea, select {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .btn.loading {
@@ -6359,7 +6533,8 @@ textarea, select {
 }
 
 /* Error and Success Messages */
-.auth-error, .auth-success {
+.auth-error,
+.auth-success {
     padding: 12px 16px;
     border-radius: 8px;
     font-size: 14px;
@@ -6383,7 +6558,8 @@ textarea, select {
     color: #0369a1;
 }
 
-.auth-error.hidden, .auth-success.hidden {
+.auth-error.hidden,
+.auth-success.hidden {
     display: none;
 }
 
@@ -6447,42 +6623,42 @@ textarea, select {
         min-height: auto;
         max-height: 90vh;
     }
-    
+
     .user-settings-content .modal-header,
     .user-settings-content .modal-body {
         padding: 20px;
     }
-    
+
     .user-settings-section {
         padding: 24px 20px;
     }
-    
+
     .user-settings-actions {
         padding: 20px;
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .user-settings-actions .btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .delete-actions {
         flex-direction: column;
     }
-    
+
     .delete-actions .btn {
         width: 100%;
     }
-    
+
     .info-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
         padding: 16px 20px;
     }
-    
+
     .info-item span {
         width: 100%;
         text-align: left;
@@ -6860,20 +7036,20 @@ textarea, select {
         width: 95vw;
         min-height: 90vh;
     }
-    
+
     .analytics-dashboard-content .modal-body {
         padding: 20px;
         max-height: 80vh;
     }
-    
+
     .analytics-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .analytics-table {
         font-size: 12px;
     }
-    
+
     .analytics-table th,
     .analytics-table td {
         padding: 8px 12px;
@@ -6945,11 +7121,11 @@ textarea, select {
         grid-template-columns: 1fr;
         gap: 12px;
     }
-    
+
     .stat-item {
         padding: 16px;
     }
-    
+
     .stat-value {
         font-size: 24px;
     }
@@ -7015,7 +7191,7 @@ textarea, select {
         margin-top: 20px;
         padding-top: 20px;
     }
-    
+
     .global-stats-section .btn {
         padding: 10px 16px;
         font-size: 14px;
@@ -7216,19 +7392,19 @@ textarea, select {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 12px;
     }
-    
+
     .analytics-card {
         padding: 16px;
     }
-    
+
     .analytics-card-value {
         font-size: 24px;
     }
-    
+
     .analytics-dashboard-content .modal-header {
         padding: 16px;
     }
-    
+
     .analytics-dashboard-content .modal-header h3 {
         font-size: 20px;
     }
@@ -7708,40 +7884,41 @@ textarea, select {
 
 /* Responsive design for new modals */
 @media (max-width: 768px) {
+
     .donation-modal-content,
     .whats-new-modal-content {
         width: 95vw;
         max-width: none;
         margin: 10px;
     }
-    
+
     .donation-modal-header,
     .whats-new-modal-header,
     .donation-modal-body,
     .whats-new-modal-body {
         padding: 20px;
     }
-    
+
     .donation-actions {
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .donation-actions .btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .cost-breakdown,
     .support-benefits {
         max-width: none;
     }
-    
+
     .feature-update {
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .update-badge {
         align-self: flex-start;
     }
@@ -7749,58 +7926,75 @@ textarea, select {
 
 /* Animated Mockup Styles */
 @keyframes float {
-    0%, 100% { 
+
+    0%,
+    100% {
         transform: translateY(0px) rotate(0deg);
     }
-    50% { 
+
+    50% {
         transform: translateY(var(--float-y, -15px)) rotate(var(--float-rotation, 1deg));
     }
 }
 
 @keyframes pulse {
-    0%, 100% { 
+
+    0%,
+    100% {
         transform: scale(1);
     }
-    50% { 
+
+    50% {
         transform: scale(var(--pulse-scale, 1.05));
     }
 }
 
 @keyframes rotate {
-    0% { 
+    0% {
         transform: rotate(0deg);
     }
-    100% { 
+
+    100% {
         transform: rotate(360deg);
     }
 }
 
 @keyframes sway {
-    0%, 100% { 
+
+    0%,
+    100% {
         transform: rotate(0deg);
     }
-    25% { 
+
+    25% {
         transform: rotate(var(--sway-rotation, 2deg));
     }
-    75% { 
+
+    75% {
         transform: rotate(calc(-1 * var(--sway-rotation, 2deg)));
     }
 }
 
 @keyframes bounce {
-    0%, 100% { 
+
+    0%,
+    100% {
         transform: translateY(0px) scale(1);
     }
-    50% { 
+
+    50% {
         transform: translateY(var(--bounce-y, -10px)) scale(var(--bounce-scale, 1.02));
     }
 }
 
 @keyframes fade {
-    0%, 100% { 
+
+    0%,
+    100% {
         opacity: 1;
     }
-    50% { 
+
+    50% {
         opacity: var(--fade-opacity, 0.7);
     }
 }
@@ -8184,4 +8378,3 @@ textarea, select {
     font-size: 14px;
     padding: 8px;
 }
-

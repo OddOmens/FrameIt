@@ -447,6 +447,11 @@ window.App = {
 
             // Render preview with new state
             this.renderPreview();
+
+            // Show visual feedback
+            UI.showNotification('Undo applied', 'success', 1500);
+        } else {
+            UI.showNotification('Nothing to undo', 'info', 1500);
         }
     },
 
@@ -462,6 +467,11 @@ window.App = {
 
             // Render preview with new state
             this.renderPreview();
+
+            // Show visual feedback
+            UI.showNotification('Redo applied', 'success', 1500);
+        } else {
+            UI.showNotification('Nothing to redo', 'info', 1500);
         }
     },
 
@@ -1833,6 +1843,9 @@ window.App = {
             window.location.hostname.includes('frameit.social');
 
         try {
+            // Show loading indicator
+            UI.showNotification('Preparing export...', 'info', 3000);
+
             // Get canvas and export settings
             const canvas = document.getElementById('preview-canvas');
             if (!canvas) {
@@ -1848,6 +1861,12 @@ window.App = {
             const exportQuality = parseFloat(document.getElementById('export-quality')?.value || this.state.exportSettings?.quality || '0.9');
             const exportSize = document.getElementById('export-size')?.value || this.state.exportSettings?.dimensionOption || 'original';
 
+            // Get custom filename or use default
+            let filename = document.getElementById('export-filename')?.value || 'frameit-export';
+            // Sanitize filename - remove invalid characters
+            filename = filename.replace(/[^a-z0-9_\-]/gi, '_').replace(/_{2,}/g, '_');
+            if (!filename) filename = 'frameit-export';
+
             // Calculate export dimensions
             let exportWidth = canvas.width;
             let exportHeight = canvas.height;
@@ -1862,8 +1881,14 @@ window.App = {
             exportCanvas.width = exportWidth;
             exportCanvas.height = exportHeight;
 
+            // Update progress
+            UI.showNotification('Rendering image...', 'info', 3000);
+
             // Scale and draw the original canvas
             ctx.drawImage(canvas, 0, 0, exportWidth, exportHeight);
+
+            // Update progress
+            UI.showNotification('Converting to file...', 'info', 3000);
 
             // Convert to blob
             const blob = await new Promise(resolve => {
@@ -1878,11 +1903,14 @@ window.App = {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `frameit-export-${Date.now()}.${exportFormat}`;
+            a.download = `${filename}.${exportFormat}`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+
+            // Show success message
+            UI.showNotification(`✅ Exported as ${filename}.${exportFormat}`, 'success', 3000);
 
             // Track export analytics - ensure this always runs with detailed logging
             try {

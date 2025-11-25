@@ -44,11 +44,13 @@
             <!-- Top Toolbar -->
             <div class="toolbar">
                 <div class="toolbar-left">
-                    <div class="app-logo" id="app-logo" style="cursor: pointer;" title="Go to Home Page">
+                    <a href="index.html" class="app-logo" id="app-logo"
+                        style="cursor: pointer; text-decoration: none; display: flex; align-items: center;"
+                        title="Go to Home Page">
                         <img src="img/logo.png" alt="FrameIt"
                             style="height: 24px; margin-right: 8px; vertical-align: middle;">
                         <span class="logo-text">FrameIt</span>
-                    </div>
+                    </a>
 
                     <!-- Authentication UI removed - no account needed -->
 
@@ -992,6 +994,11 @@
 
                 <div class="settings-section">
                     <h4>Export Format</h4>
+                    <div class="setting-row">
+                        <label for="export-filename">Filename:</label>
+                        <input type="text" id="export-filename" class="select-control" placeholder="frameit-export"
+                            style="flex: 1;">
+                    </div>
                     <div class="setting-row">
                         <label for="export-format-select">Format:</label>
                         <select id="export-format-select" class="select-control">
