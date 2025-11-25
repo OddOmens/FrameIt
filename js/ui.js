@@ -7,7 +7,8 @@ window.UI = {
     state: {
         expandedCategories: new Set(['standard']),
         isHistoryModalVisible: false,
-        isDraggingOver: false
+        isDraggingOver: false,
+        isFileInputOpen: false
     },
 
     // DOM Elements
@@ -1260,16 +1261,28 @@ window.UI = {
             e.preventDefault();
             e.stopPropagation();
 
+            // Prevent multiple clicks
+            if (this.state.isFileInputOpen) {
+                console.log('File input already open, ignoring click');
+                return;
+            }
+
             // Ensure we have a current canvas ID for image upload
             if (!window.App.state.currentCanvasId) {
                 window.App.state.currentCanvasId = `canvas_${Date.now()}`;
                 window.App.state.selectedCanvasId = window.App.state.currentCanvasId;
             }
 
-            // Use setTimeout to ensure the click happens after any other event handling
-            setTimeout(() => {
-                document.getElementById('file-input').click();
-            }, 10);
+            // Set flag and open file input
+            this.state.isFileInputOpen = true;
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.click();
+                // Reset flag after a short delay
+                setTimeout(() => {
+                    this.state.isFileInputOpen = false;
+                }, 500);
+            }
         });
 
         // Upload button inside drop zone
@@ -1277,10 +1290,22 @@ window.UI = {
             e.preventDefault();
             e.stopPropagation(); // Prevent event bubbling to drop zone
 
-            // Use setTimeout to ensure the click happens after any other event handling
-            setTimeout(() => {
-                document.getElementById('file-input').click();
-            }, 10);
+            // Prevent multiple clicks
+            if (this.state.isFileInputOpen) {
+                console.log('File input already open, ignoring click');
+                return;
+            }
+
+            // Set flag and open file input
+            this.state.isFileInputOpen = true;
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.click();
+                // Reset flag after a short delay
+                setTimeout(() => {
+                    this.state.isFileInputOpen = false;
+                }, 500);
+            }
         });
 
         // Watermark controls
@@ -2253,24 +2278,42 @@ window.UI = {
 
     // Helper functions for context menu actions
     addImageToSlot(slotIndex) {
+        // Prevent multiple clicks
+        if (this.state.isFileInputOpen) {
+            console.log('File input already open, ignoring click');
+            return;
+        }
+
         const fileInput = document.getElementById('file-input');
         fileInput.dataset.targetSlot = slotIndex;
 
-        // Use setTimeout to ensure the click happens after any other event handling
+        // Set flag and open file input
+        this.state.isFileInputOpen = true;
+        fileInput.click();
+        // Reset flag after a short delay
         setTimeout(() => {
-            fileInput.click();
-        }, 10);
+            this.state.isFileInputOpen = false;
+        }, 500);
     },
 
     replaceImageInSlot(slotIndex) {
+        // Prevent multiple clicks
+        if (this.state.isFileInputOpen) {
+            console.log('File input already open, ignoring click');
+            return;
+        }
+
         const fileInput = document.getElementById('file-input');
         fileInput.dataset.targetSlot = slotIndex;
         fileInput.dataset.replaceMode = 'true';
 
-        // Use setTimeout to ensure the click happens after any other event handling
+        // Set flag and open file input
+        this.state.isFileInputOpen = true;
+        fileInput.click();
+        // Reset flag after a short delay
         setTimeout(() => {
-            fileInput.click();
-        }, 10);
+            this.state.isFileInputOpen = false;
+        }, 500);
     },
 
     // Recalculate collapsible section heights
@@ -3086,7 +3129,7 @@ window.UI = {
                 style.textContent = `
                     .notification {
                         position: fixed;
-                        top: 50%;
+                        top: 20px;
                         left: 20px;
                         padding: 12px 20px;
                         border-radius: 6px;
@@ -3095,13 +3138,13 @@ window.UI = {
                         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                         z-index: 9999;
                         transition: transform 0.3s ease, opacity 0.3s ease;
-                        transform: translate(-20px, -50%);
+                        transform: translateX(-20px);
                         opacity: 0;
                         font-size: 14px;
                         max-width: 300px;
                     }
                     .notification.visible {
-                        transform: translate(0, -50%);
+                        transform: translateX(0);
                         opacity: 1;
                     }
                     .notification.success {
