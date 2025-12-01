@@ -2094,11 +2094,6 @@ window.App = {
         this.state.backgroundImageId = null; // Clear background image when gradient is set
         this.state.backgroundImage = null;
 
-        // Track background change
-        if (window.Analytics && window.Analytics.trackExport) {
-            console.log('📊 Background changed');
-        }
-
         this.renderPreview();
         this.saveSettings();
 
