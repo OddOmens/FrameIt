@@ -386,8 +386,21 @@ window.UI = {
         // Add Image button (Toolbar)
         if (this.elements.addImageBtn) {
             this.elements.addImageBtn.addEventListener('click', (e) => {
+                // Check if file input is already open
+                if (this.state.isFileInputOpen) {
+                    console.log('📂 File input already open, ignoring click');
+                    return;
+                }
+
                 console.log('🖼️ Add Image button clicked - Creating dynamic input');
                 e.preventDefault();
+
+                this.state.isFileInputOpen = true;
+
+                // Reset flag after delay
+                setTimeout(() => {
+                    this.state.isFileInputOpen = false;
+                }, 1000);
 
                 // Create a dynamic input element
                 const dynamicInput = document.createElement('input');
@@ -732,11 +745,25 @@ window.UI = {
 
         // Click to browse files
         this.elements.imageDropZone.addEventListener('click', (e) => {
+            // Check if file input is already open (prevent multiple opens)
+            if (this.state.isFileInputOpen) {
+                console.log('📂 File input already open, ignoring click');
+                return;
+            }
+
             // Check if we clicked the "Add Image" button specifically
             if (e.target.closest('.upload-btn')) {
                 e.preventDefault();
                 e.stopPropagation();
+
+                this.state.isFileInputOpen = true;
                 this.elements.fileInput.click();
+
+                // Reset flag after a short delay to allow for slow UI
+                setTimeout(() => {
+                    this.state.isFileInputOpen = false;
+                }, 1000);
+
                 return;
             }
 
@@ -745,9 +772,16 @@ window.UI = {
                 e.preventDefault();
                 e.stopPropagation();
 
+                this.state.isFileInputOpen = true;
+
                 // Use setTimeout to ensure the click happens after any other event handling
                 setTimeout(() => {
                     this.elements.fileInput.click();
+
+                    // Reset flag after a short delay to allow for slow UI
+                    setTimeout(() => {
+                        this.state.isFileInputOpen = false;
+                    }, 1000);
                 }, 10);
             }
         });
