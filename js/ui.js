@@ -1155,81 +1155,81 @@ window.UI = {
         document.getElementById('bg-blur-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('blur-value').textContent = `${value}%`;
-            App.setBackgroundBlur(value);
+            window.App.setBackgroundBlur(value);
         });
 
         document.getElementById('reset-blur-btn')?.addEventListener('click', () => {
-            App.resetBlur();
+            window.App.resetBlur();
         });
 
         // Background twirl
         document.getElementById('bg-twirl-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('twirl-value').textContent = `${value}%`;
-            App.setBackgroundTwirl(value);
+            window.App.setBackgroundTwirl(value);
         });
 
         // Background saturation
         document.getElementById('bg-saturation-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('saturation-value').textContent = `${value}%`;
-            App.setBackgroundSaturation(value);
+            window.App.setBackgroundSaturation(value);
         });
 
         // Background hue rotation
         document.getElementById('bg-hue-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('hue-value').textContent = `${value}°`;
-            App.setBackgroundHueRotation(value);
+            window.App.setBackgroundHueRotation(value);
         });
 
         // Background contrast
         document.getElementById('bg-contrast-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('contrast-value').textContent = `${value}%`;
-            App.setBackgroundContrast(value);
+            window.App.setBackgroundContrast(value);
         });
 
         // Background brightness
         document.getElementById('bg-brightness-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('brightness-value').textContent = `${value}%`;
-            App.setBackgroundBrightness(value);
+            window.App.setBackgroundBrightness(value);
         });
 
         // Background wave effect
         document.getElementById('bg-wave-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('wave-value').textContent = `${value}%`;
-            App.setBackgroundWaveAmount(value);
+            window.App.setBackgroundWaveAmount(value);
         });
 
         // Background ripple effect
         document.getElementById('bg-ripple-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('ripple-value').textContent = `${value}%`;
-            App.setBackgroundRippleAmount(value);
+            window.App.setBackgroundRippleAmount(value);
         });
 
         // Background zoom effect
         document.getElementById('bg-zoom-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('zoom-value').textContent = `${value}%`;
-            App.setBackgroundZoomAmount(value);
+            window.App.setBackgroundZoomAmount(value);
         });
 
         // Background shake effect
         document.getElementById('bg-shake-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('shake-value').textContent = `${value}%`;
-            App.setBackgroundShakeAmount(value);
+            window.App.setBackgroundShakeAmount(value);
         });
 
         // Background lens distortion
         document.getElementById('bg-lens-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('lens-value').textContent = `${value}%`;
-            App.setBackgroundLensAmount(value);
+            window.App.setBackgroundLensAmount(value);
         });
 
         // Reset all background effects - moved to Actions dropdown
@@ -1238,11 +1238,11 @@ window.UI = {
         document.getElementById('noise-overlay-select')?.addEventListener('change', (e) => {
             const overlayId = e.target.value;
             if (overlayId === 'none') {
-                App.setNoiseOverlay(null);
+                window.App.setNoiseOverlay(null);
                 // Hide intensity controls
                 document.getElementById('noise-options').style.display = 'none';
             } else {
-                App.setNoiseOverlay(overlayId);
+                window.App.setNoiseOverlay(overlayId);
                 // Show intensity controls
                 document.getElementById('noise-options').style.display = 'block';
             }
@@ -1251,50 +1251,50 @@ window.UI = {
         document.getElementById('noise-intensity-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('noise-intensity-value').textContent = `${Math.round(value * 100)}%`;
-            App.setNoiseOverlayIntensity(value);
+            window.App.setNoiseOverlayIntensity(value);
         });
 
         document.getElementById('reset-noise-intensity-btn')?.addEventListener('click', () => {
             document.getElementById('noise-intensity-slider').value = 1;
             document.getElementById('noise-intensity-value').textContent = '100%';
-            App.setNoiseOverlayIntensity(1);
+            window.App.setNoiseOverlayIntensity(1);
         });
 
         document.getElementById('noise-opacity-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('noise-opacity-value').textContent = `${Math.round(value * 100)}%`;
-            App.setNoiseOpacity(value);
+            window.App.setNoiseOpacity(value);
         });
 
         document.getElementById('reset-noise-opacity-btn')?.addEventListener('click', () => {
             const defaultOpacity = Config.defaultNoiseOpacity;
             document.getElementById('noise-opacity-slider').value = defaultOpacity;
             document.getElementById('noise-opacity-value').textContent = `${Math.round(defaultOpacity * 100)}%`;
-            App.setNoiseOpacity(defaultOpacity);
+            window.App.setNoiseOpacity(defaultOpacity);
         });
 
         document.getElementById('noise-blend-mode')?.addEventListener('change', (e) => {
-            App.setNoiseBlendMode(e.target.value);
+            window.App.setNoiseBlendMode(e.target.value);
         });
 
         document.getElementById('noise-scale-slider')?.addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('noise-scale-value').textContent = `${Math.round(value * 100)}%`;
-            App.setNoiseScale(value);
+            window.App.setNoiseScale(value);
         });
 
         document.getElementById('reset-noise-scale-btn')?.addEventListener('click', () => {
             document.getElementById('noise-scale-slider').value = 1;
             document.getElementById('noise-scale-value').textContent = '100%';
-            App.setNoiseScale(1);
+            window.App.setNoiseScale(1);
         });
 
         document.getElementById('noise-invert-toggle')?.addEventListener('change', () => {
-            App.toggleNoiseInvert();
+            window.App.toggleNoiseInvert();
         });
 
         document.getElementById('random-noise-btn')?.addEventListener('click', () => {
-            App.selectRandomNoise();
+            window.App.selectRandomNoise();
         });
 
         document.getElementById('clear-noise-btn')?.addEventListener('click', () => {
@@ -2769,7 +2769,7 @@ window.UI = {
 
                 if (width && height) {
                     // Update the app state with new dimensions
-                    App.setResolution(width, height);
+                    window.App.setResolution(width, height);
 
                     // Update UI to show selected resolution - use the standardized method
                     this.updateResolutionSelection(`${width}x${height}`);
