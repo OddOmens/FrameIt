@@ -4220,38 +4220,12 @@ window.UI = {
 
     // Toggle settings section visibility
     toggleSettingsSection(section) {
-        const isCollapsed = section.classList.contains('collapsed');
+        section.classList.toggle('collapsed');
+        // Legacy cleanup: ensure no inline styles interfere with CSS
         const content = section.querySelector('.section-content');
-
-        if (isCollapsed) {
-            // Expanding
-            section.classList.remove('collapsed');
-            if (content) {
-                // Set to scrollHeight first for transition
-                content.style.maxHeight = content.scrollHeight + 'px';
-                content.style.overflow = 'hidden';
-
-                // After transition, set to none to allow dynamic content resizing
-                setTimeout(() => {
-                    if (!section.classList.contains('collapsed')) {
-                        content.style.maxHeight = 'none';
-                        content.style.overflow = 'visible';
-                    }
-                }, 300);
-            }
-        } else {
-            // Collapsing
-            // Set explicit height first so transition works
-            if (content) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-                content.style.overflow = 'hidden';
-
-                // Force reflow
-                content.offsetHeight;
-
-                section.classList.add('collapsed');
-                content.style.maxHeight = '0px';
-            }
+        if (content) {
+            content.style.maxHeight = '';
+            content.style.overflow = '';
         }
     },
 
