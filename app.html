@@ -170,13 +170,64 @@
                                     <h5>App Marketing</h5>
                                 </div>
                                 <div class="section-content">
+                                    <!-- Templates -->
                                     <div class="form-group">
-                                        <div style="display: flex; gap: 8px;">
-                                            <input type="text" id="app-search-input" placeholder="Search App Store..." class="input-control" style="flex:1; padding: 8px 12px; border: 1px solid #333; border-radius: 6px; background-color: #1a1a1a; color: #fff;">
-                                            <button id="app-search-btn" class="btn primary-btn"><i class="fas fa-search"></i></button>
+                                        <label class="form-label">Quick Templates</label>
+                                        <div class="button-row" style="margin-bottom: 15px;">
+                                            <button id="mkt-template-modern" class="btn small-btn outline-btn" style="flex: 1;">Modern</button>
+                                            <button id="mkt-template-bold" class="btn small-btn outline-btn" style="flex: 1;">Bold</button>
+                                            <button id="mkt-template-clean" class="btn small-btn outline-btn" style="flex: 1;">Clean</button>
                                         </div>
                                     </div>
-                                    <div id="app-search-results" class="app-search-results hidden"></div>
+
+                                    <!-- Content -->
+                                    <div class="form-group">
+                                        <label class="form-label">App Icon</label>
+                                        <button id="mkt-icon-upload-btn" class="btn primary-btn full-width" style="margin-top: 5px;">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <span>Upload Icon</span>
+                                        </button>
+                                        <input type="file" id="mkt-icon-upload" accept="image/*" style="display: none;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">App Name</label>
+                                        <input type="text" id="mkt-app-name" class="input-control" placeholder="App Name">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Subtitle</label>
+                                        <input type="text" id="mkt-subtitle" class="input-control" placeholder="Subtitle">
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <!-- CTA Controls -->
+                                    <div class="form-group">
+                                        <label class="form-label">CTA Button</label>
+                                        <input type="text" id="mkt-cta-text" class="input-control" value="Download Now" placeholder="Button Text">
+                                    </div>
+
+                                    <div class="adjustment-row">
+                                        <label>Button Color</label>
+                                    </div>
+                                    <div class="color-input-wrapper">
+                                        <input type="color" id="mkt-cta-color" value="#3B82F6">
+                                    </div>
+                                    
+                                    <div class="adjustment-row">
+                                        <label>Button Text Color</label>
+                                    </div>
+                                    <div class="color-input-wrapper">
+                                        <input type="color" id="mkt-cta-text-color" value="#FFFFFF">
+                                    </div>
+
+                                    <div class="form-group" style="margin-top: 15px;">
+                                        <div class="checkbox-container">
+                                            <input type="checkbox" id="mkt-cta-enabled">
+                                            <label for="mkt-cta-enabled">Show CTA Button</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

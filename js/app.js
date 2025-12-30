@@ -67,7 +67,11 @@ window.App = {
         canvasHeight: 1350,
         watermarkText: 'Made with FrameIt.Social',
         watermarkFontSize: 32,
-        watermarkColor: '#000000'
+        watermarkColor: '#000000',
+        marketingCtaText: 'Download Now',
+        marketingCtaColor: '#3B82F6',
+        marketingCtaTextColor: '#FFFFFF',
+        marketingShowCta: false
     },
 
     // Multi-image layout management
@@ -433,7 +437,11 @@ window.App = {
             watermarkPosition: this.state.watermarkPosition,
             smartFillEnabled: this.state.smartFillEnabled,
             panX: this.state.panX,
-            panY: this.state.panY
+            panY: this.state.panY,
+            marketingCtaText: this.state.marketingCtaText,
+            marketingCtaColor: this.state.marketingCtaColor,
+            marketingCtaTextColor: this.state.marketingCtaTextColor,
+            marketingShowCta: this.state.marketingShowCta
         };
 
         this.state.undoManager.saveState(stateToSave);
@@ -565,7 +573,11 @@ window.App = {
                 'resolution',
                 'watermarkOpacity',
                 'watermarkScale',
-                'watermarkPosition'
+                'watermarkPosition',
+                'marketingCtaText',
+                'marketingCtaColor',
+                'marketingCtaTextColor',
+                'marketingShowCta'
             ];
 
             validKeys.forEach(key => {
@@ -646,7 +658,11 @@ window.App = {
             watermarkColor: this.state.watermarkColor,
             smartFillEnabled: this.state.smartFillEnabled,
             panX: this.state.panX,
-            panY: this.state.panY
+            panY: this.state.panY,
+            marketingCtaText: this.state.marketingCtaText,
+            marketingCtaColor: this.state.marketingCtaColor,
+            marketingCtaTextColor: this.state.marketingCtaTextColor,
+            marketingShowCta: this.state.marketingShowCta
         };
 
         Utils.saveToStorage(Config.storageKeys.settings, settingsToSave);
