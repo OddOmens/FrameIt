@@ -485,3 +485,40 @@ body>div:not(#actions-dropdown-menu) {
         transform: translateY(0);
     }
 }
+
+/* 
+   --------------------------------------------------------------------------
+   Robust Collapsible Sections 
+   --------------------------------------------------------------------------
+   Replaces fragile JS height calculation with CSS-only transition.
+   Uses a large max-height for the open state to accommodate dynamic content.
+*/
+
+.settings-section .section-content {
+    /* Use max-height transition for robust animation */
+    /* Set a max-height large enough for any content */
+    max-height: 5000px !important; 
+    opacity: 1 !important;
+    overflow: hidden !important;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.3s ease, margin 0.3s ease !important;
+    padding-bottom: 20px !important; /* Restore padding if needed */
+    display: block !important;
+    visibility: visible !important;
+}
+
+.settings-section.collapsed .section-content {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    pointer-events: none !important;
+    border: none !important;
+    visibility: hidden !important;
+}
+
+/* Ensure consistent spacing between sections */
+.settings-section {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Maintain border */
+}

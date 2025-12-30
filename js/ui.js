@@ -2464,28 +2464,10 @@ window.UI = {
         }, 500);
     },
 
-    // Recalculate collapsible section heights
+    // Recalculate collapsible section heights - DEPRECATED
+    // We now use CSS-only solution for robust handling of dynamic content
     recalculateCollapsibleSections() {
-        // Find all expanded settings sections and recalculate their max-height
-        const sections = document.querySelectorAll('.settings-section:not(.collapsed)');
-        sections.forEach(section => {
-            const content = section.querySelector('.section-content');
-            if (content) {
-                // Temporarily remove max-height to measure actual content height
-                content.style.maxHeight = 'none';
-                const actualHeight = content.scrollHeight;
-
-                // Set max-height to the actual content height with some padding
-                content.style.maxHeight = (actualHeight + 20) + 'px';
-
-                // After a brief delay, set it back to the default high value for smooth transitions
-                setTimeout(() => {
-                    content.style.maxHeight = '2000px';
-                }, 50);
-            }
-        });
-
-        console.log('✅ Recalculated collapsible section heights');
+        return;
     },
 
     // Show duplicate options modal
