@@ -558,6 +558,8 @@
     border-radius: 2px;
     outline: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .text-editor .slider-container input[type="range"]::-webkit-slider-thumb {
@@ -1141,4 +1143,71 @@
 .cancel-duplicate:hover {
     background: rgba(255, 255, 255, 0.1) !important;
     border-color: #888 !important;
+}
+
+/* App Marketing Search Results */
+.app-search-results {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.app-search-results.hidden {
+    display: none;
+}
+
+.app-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.app-result-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.app-result-item .app-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.app-result-item .app-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.app-result-item .app-name {
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-result-item .app-dev {
+    color: #888;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.loading-spinner,
+.error-msg,
+.no-results {
+    padding: 16px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
 }

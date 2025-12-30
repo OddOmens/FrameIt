@@ -319,6 +319,11 @@ window.App = {
         // Initialize UI components first
         UI.init();
 
+        // Initialize Marketing
+        if (window.Marketing) {
+            Marketing.init();
+        }
+
         // Initialize canvas renderer
         CanvasRenderer.init(document.getElementById('preview-canvas'));
 

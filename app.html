@@ -164,6 +164,24 @@
                             </button>
                         </h5>
                         <div class="panel-content">
+                            <!-- App Marketing Section -->
+                            <div class="settings-section">
+                                <div class="section-header">
+                                    <h5>App Marketing</h5>
+                                </div>
+                                <div class="section-content">
+                                    <div class="form-group">
+                                        <div style="display: flex; gap: 8px;">
+                                            <input type="text" id="app-search-input" placeholder="Search App Store..." class="input-control" style="flex:1; padding: 8px 12px; border: 1px solid #333; border-radius: 6px; background-color: #1a1a1a; color: #fff;">
+                                            <button id="app-search-btn" class="btn primary-btn"><i class="fas fa-search"></i></button>
+                                        </div>
+                                    </div>
+                                    <div id="app-search-results" class="app-search-results hidden"></div>
+                                </div>
+                            </div>
+
+                            <div class="divider"></div>
+
                             <!-- Resolution Section -->
                             <div class="settings-section">
                                 <div class="section-header">
@@ -1452,6 +1470,7 @@
     <script src="js/managers/gallery-manager.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/canvas.js"></script>
+    <script src="js/marketing.js"></script>
     <script src="js/app.js"></script>
     <script>
         // Initialize app when page loads

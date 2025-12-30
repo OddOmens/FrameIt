@@ -517,52 +517,102 @@ window.UI = {
             console.error('❌ Export All button not found!');
         }
 
-        this.elements.randomBgBtn.addEventListener('click', () => window.App.selectRandomBackground());
-        this.elements.flipHBtn.addEventListener('click', () => window.App.toggleFlipHorizontal());
-        this.elements.flipVBtn.addEventListener('click', () => window.App.toggleFlipVertical());
+        // Random background
+        if (this.elements.randomBgBtn) {
+            this.elements.randomBgBtn.addEventListener('click', () => window.App.selectRandomBackground());
+        }
+        if (this.elements.randomNoiseBtn) {
+            this.elements.randomNoiseBtn.addEventListener('click', () => window.App.selectRandomNoise());
+        }
+
+        // Flips
+        if (this.elements.flipHBtn) {
+            this.elements.flipHBtn.addEventListener('click', () => window.App.toggleFlipHorizontal());
+        }
+        if (this.elements.flipVBtn) {
+            this.elements.flipVBtn.addEventListener('click', () => window.App.toggleFlipVertical());
+        }
 
         // Help button
         const helpBtn = document.getElementById('help-btn');
-        if (helpBtn) {
-            helpBtn.addEventListener('click', () => this.showHelpModal());
+        const helpModal = document.getElementById('help-modal');
+        if (helpBtn && helpModal) {
+            helpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Toggle help modal
+                if (helpModal.style.display === 'block') {
+                    helpModal.style.display = 'none';
+                    helpBtn.classList.remove('active');
+                } else {
+                    // Hide other modals/dropdowns first
+                    document.querySelectorAll('.modal, .dropdown-menu').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                    helpModal.style.display = 'block';
+                    helpBtn.classList.add('active');
+                }
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (helpModal.style.display === 'block' &&
+                    !helpModal.contains(e.target) &&
+                    e.target !== helpBtn) {
+                    helpModal.style.display = 'none';
+                    helpBtn.classList.remove('active');
+                }
+            });
         }
 
-        // Welcome button
-        const welcomeBtn = document.getElementById('welcome-btn');
-        if (welcomeBtn) {
-            welcomeBtn.addEventListener('click', () => this.showWhatsNewModal());
+        // Welcome modal
+        const welcomeModal = document.getElementById('welcome-modal');
+        const welcomeCloseBtn = document.getElementById('welcome-close-btn');
+        if (welcomeCloseBtn && welcomeModal) {
+            welcomeCloseBtn.addEventListener('click', () => {
+                welcomeModal.classList.add('hidden');
+                setTimeout(() => welcomeModal.style.display = 'none', 300);
+                // Save that user has seen welcome
+                localStorage.setItem('frameit_welcome_seen', 'true');
+            });
         }
 
-        // Gallery buttons
-        const applyToAllBtn = document.getElementById('apply-to-all-btn');
-        if (applyToAllBtn) {
-            applyToAllBtn.addEventListener('click', () => window.App.applySettingsToAll());
+        // Add gallery toggle
+        const galleryToggleBtn = document.getElementById('gallery-toggle-btn');
+        if (galleryToggleBtn) {
+            galleryToggleBtn.addEventListener('click', () => {
+                this.toggleGallery();
+            });
         }
 
-        // Reset button events
-        this.elements.resetBlurBtn.addEventListener('click', () => window.App.resetBlur());
-        this.elements.resetCornerBtn.addEventListener('click', () => window.App.resetCornerRadius());
-        this.elements.resetPaddingBtn.addEventListener('click', () => window.App.resetPadding());
-        this.elements.resetShadowOpacityBtn.addEventListener('click', () => window.App.resetShadowOpacity());
-        this.elements.resetShadowRadiusBtn.addEventListener('click', () => window.App.resetShadowRadius());
-        this.elements.resetShadowOffsetXBtn.addEventListener('click', () => window.App.resetShadowOffsetX());
-        this.elements.resetShadowOffsetYBtn.addEventListener('click', () => window.App.resetShadowOffsetY());
-        this.elements.resetShadowColorBtn.addEventListener('click', () => window.App.resetShadowColor());
-        this.elements.resetRotationBtn.addEventListener('click', () => window.App.resetRotation());
+        // Reset buttons
+        if (this.elements.resetBlurBtn) this.elements.resetBlurBtn.addEventListener('click', () => window.App.resetBlur());
+        if (this.elements.resetCornerBtn) this.elements.resetCornerBtn.addEventListener('click', () => window.App.resetCornerRadius());
+        if (this.elements.resetPaddingBtn) this.elements.resetPaddingBtn.addEventListener('click', () => window.App.resetPadding());
+        if (this.elements.resetShadowOpacityBtn) this.elements.resetShadowOpacityBtn.addEventListener('click', () => window.App.resetShadowOpacity());
+        if (this.elements.resetShadowRadiusBtn) this.elements.resetShadowRadiusBtn.addEventListener('click', () => window.App.resetShadowRadius());
+        if (this.elements.resetShadowOffsetXBtn) this.elements.resetShadowOffsetXBtn.addEventListener('click', () => window.App.resetShadowOffsetX());
+        if (this.elements.resetShadowOffsetYBtn) this.elements.resetShadowOffsetYBtn.addEventListener('click', () => window.App.resetShadowOffsetY());
+        if (this.elements.resetShadowColorBtn) this.elements.resetShadowColorBtn.addEventListener('click', () => window.App.resetShadowColor());
+        if (this.elements.resetRotationBtn) this.elements.resetRotationBtn.addEventListener('click', () => window.App.resetRotation());
 
         // Slider events
-        this.elements.bgBlurSlider.addEventListener('input', (e) => window.App.setBackgroundBlur(e.target.value));
-        this.elements.cornerRadiusSlider.addEventListener('input', (e) => window.App.setCornerRadius(e.target.value));
-        this.elements.paddingSlider.addEventListener('input', (e) => window.App.setPadding(e.target.value));
-        this.elements.shadowOpacitySlider.addEventListener('input', (e) => window.App.setShadowOpacity(e.target.value));
-        this.elements.shadowRadiusSlider.addEventListener('input', (e) => window.App.setShadowRadius(e.target.value));
-        this.elements.shadowOffsetXSlider.addEventListener('input', (e) => window.App.setShadowOffsetX(e.target.value));
-        this.elements.shadowOffsetYSlider.addEventListener('input', (e) => window.App.setShadowOffsetY(e.target.value));
-        this.elements.shadowColorInput.addEventListener('input', (e) => {
-            // Real-time update during color selection
-            window.App.setShadowColor(e.target.value);
-        });
-        this.elements.rotationSlider.addEventListener('input', (e) => window.App.setRotation(e.target.value));
+        if (this.elements.bgBlurSlider) this.elements.bgBlurSlider.addEventListener('input', (e) => window.App.setBackgroundBlur(e.target.value));
+        if (this.elements.cornerRadiusSlider) this.elements.cornerRadiusSlider.addEventListener('input', (e) => window.App.setCornerRadius(e.target.value));
+        if (this.elements.paddingSlider) this.elements.paddingSlider.addEventListener('input', (e) => window.App.setPadding(e.target.value));
+        if (this.elements.shadowOpacitySlider) this.elements.shadowOpacitySlider.addEventListener('input', (e) => window.App.setShadowOpacity(e.target.value));
+        if (this.elements.shadowRadiusSlider) this.elements.shadowRadiusSlider.addEventListener('input', (e) => window.App.setShadowRadius(e.target.value));
+        if (this.elements.shadowOffsetXSlider) this.elements.shadowOffsetXSlider.addEventListener('input', (e) => window.App.setShadowOffsetX(e.target.value));
+        if (this.elements.shadowOffsetYSlider) this.elements.shadowOffsetYSlider.addEventListener('input', (e) => window.App.setShadowOffsetY(e.target.value));
+
+        if (this.elements.shadowColorInput) {
+            this.elements.shadowColorInput.addEventListener('input', (e) => {
+                const valEl = document.getElementById('shadow-color-value');
+                if (valEl) valEl.textContent = e.target.value;
+                window.App.setShadowColor(e.target.value);
+            });
+        }
+
+        if (this.elements.rotationSlider) this.elements.rotationSlider.addEventListener('input', (e) => window.App.setRotation(e.target.value));
 
         // Smart Fill and panning controls
         const smartFillToggle = document.getElementById('smart-fill-toggle');

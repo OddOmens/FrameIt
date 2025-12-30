@@ -22,6 +22,25 @@ app.use(express.static('.'));
 app.use('/api/verify-export-permission', require('./api/verify-export-permission'));
 app.use('/api/global-stats', require('./api/global-stats'));
 
+// Proxy for iTunes Search API
+app.get('/api/search-app', async (req, res) => {
+  try {
+    const { term } = req.query;
+    if (!term) {
+      return res.status(400).json({ error: 'Search term is required' });
+    }
+
+    // Use global fetch (Node 18+)
+    const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=software&limit=10`);
+    const data = await response.json();
+
+    res.json(data);
+  } catch (error) {
+    console.error('iTunes Search Error:', error);
+    res.status(500).json({ error: 'Failed to fetch from iTunes API' });
+  }
+});
+
 // Stub endpoints for compatibility
 app.post('/api/create-checkout-session', (req, res) => {
   res.status(200).json({ message: 'Payments disabled - no checkout needed' });
