@@ -200,9 +200,10 @@ body {
 .main-content {
     display: flex;
     flex: 1;
-    height: calc(100vh - 120px);
-    /* Adjusted for toolbar and margins */
+    height: 100%;
+    /* Ensure it tries to fill */
     min-height: 0;
+    /* Allow shrinking */
     overflow: hidden;
     padding: var(--space-m);
     gap: var(--space-m);
@@ -1170,33 +1171,30 @@ select {
     color: #ff6b6b;
 }
 
-/* Control Panels */
+/* Control Panels - Refactored for Robustness */
 .control-panels {
     display: flex;
     flex-direction: column;
     width: 380px;
-    height: 100% !important;
-    /* Ensure height is maintained */
+    height: 100%;
     margin-left: auto;
-    /* Push to the right */
-    max-height: calc(100vh - 80px);
-    /* Prevent overflow */
+    overflow: hidden;
+    /* Contain inner scrolling */
+    border-left: 1px solid var(--border-color);
+    /* Ensure separation */
 }
 
 .control-panel {
     background-color: #1a1a1a;
-    /* Darker background */
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border: 1px solid #2a2a2a;
-    overflow: hidden;
-    flex: 1 1 auto !important;
-    /* Don't allow shrinking */
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 90px) !important;
-    /* Ensure minimum height */
-    max-height: 100%;
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    overflow: hidden;
+    /* Ensure only content scrolls */
 }
 
 .panel-title {
@@ -1221,15 +1219,15 @@ select {
 }
 
 .panel-content {
-    padding: 0;
+    flex: 1;
     overflow-y: auto;
-    flex: 1 1 auto !important;
-    min-height: calc(100vh - 150px) !important;
-    height: auto !important;
-    padding-bottom: 80px;
-    /* Increased bottom padding to ensure all content is visible */
+    overflow-x: hidden;
+    padding: 0;
+    min-height: 0;
+    /* Critical for nested flex scrolling */
+    padding-bottom: 40px;
+    /* Space for bottom elements */
     -webkit-overflow-scrolling: touch;
-    /* Smooth scrolling on iOS */
 }
 
 /* Settings sections - remove grey background */
