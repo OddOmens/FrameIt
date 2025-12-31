@@ -2587,7 +2587,7 @@ window.UI = {
                 const option = document.createElement('div');
                 option.className = 'resolution-option';
                 option.dataset.id = res.id;
-                option.style.cssText = 'padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 12px;';
+                option.style.cssText = 'padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; gap: 4px;';
 
                 if (App.state.resolution && App.state.resolution.id === res.id) {
                     option.classList.add('selected');
@@ -2595,35 +2595,52 @@ window.UI = {
                     option.style.background = 'rgba(255,255,255,0.1)';
                 }
 
-                // Determine platform icon based on resolution name or dimensions
-                let platformIcon = 'fa-desktop'; // Default
+                // Determine platform name based on resolution name
+                let platformName = 'Desktop';
                 const resName = res.name.toLowerCase();
-                if (resName.includes('instagram') || resName.includes('square')) {
-                    platformIcon = 'fa-instagram';
-                } else if (resName.includes('story') || resName.includes('reel') || (res.width === 1080 && res.height === 1920)) {
-                    platformIcon = 'fa-mobile-alt';
-                } else if (resName.includes('twitter') || resName.includes('x ')) {
-                    platformIcon = 'fa-twitter';
+                if (resName.includes('instagram')) {
+                    if (resName.includes('story') || resName.includes('reel')) {
+                        platformName = 'Instagram Stories';
+                    } else if (resName.includes('square')) {
+                        platformName = 'Instagram Square';
+                    } else {
+                        platformName = 'Instagram';
+                    }
+                } else if (resName.includes('twitter') || resName.includes('x post')) {
+                    platformName = 'Twitter / X';
                 } else if (resName.includes('facebook')) {
-                    platformIcon = 'fa-facebook';
-                } else if (resName.includes('youtube') || resName.includes('video')) {
-                    platformIcon = 'fa-youtube';
+                    if (resName.includes('cover')) {
+                        platformName = 'Facebook Cover';
+                    } else {
+                        platformName = 'Facebook';
+                    }
+                } else if (resName.includes('youtube')) {
+                    if (resName.includes('thumbnail')) {
+                        platformName = 'YouTube Thumbnail';
+                    } else {
+                        platformName = 'YouTube';
+                    }
                 } else if (resName.includes('linkedin')) {
-                    platformIcon = 'fa-linkedin';
+                    if (resName.includes('banner')) {
+                        platformName = 'LinkedIn Banner';
+                    } else {
+                        platformName = 'LinkedIn';
+                    }
                 } else if (resName.includes('pinterest')) {
-                    platformIcon = 'fa-pinterest';
-                } else if (resName.includes('4k') || resName.includes('hd')) {
-                    platformIcon = 'fa-tv';
-                } else if (res.width > res.height) {
-                    platformIcon = 'fa-laptop';
+                    platformName = 'Pinterest';
+                } else if (resName.includes('4k')) {
+                    platformName = '4K Display';
+                } else if (resName.includes('hd') || resName.includes('1080p')) {
+                    platformName = 'HD Display';
+                } else if (resName.includes('mobile') || resName.includes('phone')) {
+                    platformName = 'Mobile';
+                } else if (resName.includes('tablet')) {
+                    platformName = 'Tablet';
                 }
 
                 option.innerHTML = `
-                    <i class="fab ${platformIcon}" style="font-size: 20px; color: #a1a1aa; width: 24px; text-align: center;"></i>
-                    <div style="flex: 1;">
-                        <div class="res-name" style="font-size: 13px; font-weight: 500; color: #fff;">${res.name}</div>
-                        <div class="res-dims" style="font-size: 11px; color: #a1a1aa;">${res.width} × ${res.height}</div>
-                    </div>
+                    <div class="res-name" style="font-size: 14px; font-weight: 600; color: #fff;">${res.width} × ${res.height}</div>
+                    <div class="res-platform" style="font-size: 12px; color: #a1a1aa;">${platformName}</div>
                 `;
 
                 option.addEventListener('click', () => {

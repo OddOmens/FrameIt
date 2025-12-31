@@ -170,7 +170,10 @@
                 <div class="control-panels">
                     <!-- Icon Tab Bar -->
                     <div class="sidebar-tabs">
-                        <button class="tab-btn active" data-tab="tab-image" title="Image">
+                        <button class="tab-btn active" data-tab="tab-resolution" title="Resolution">
+                            <i class="fas fa-desktop"></i>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-image" title="Image">
                             <i class="fas fa-sliders-h"></i>
                         </button>
                         <button class="tab-btn" data-tab="tab-shadow" title="Shadows">
@@ -185,16 +188,25 @@
                         <button class="tab-btn" data-tab="tab-text" title="Text">
                             <i class="fas fa-font"></i>
                         </button>
-                        <button class="tab-btn" data-tab="tab-resolution" title="Resolution">
-                            <i class="fas fa-desktop"></i>
-                        </button>
                     </div>
 
                     <!-- Sidebar Content -->
                     <div class="sidebar-content">
 
+                        <!-- TAB: Resolution -->
+                        <div id="tab-resolution" class="tab-pane active">
+                            <div class="settings-section">
+                                <h5 class="tab-header">Canvas Resolution</h5>
+                                <div class="section-content">
+                                    <div id="resolution-list" class="resolution-categories">
+                                        <!-- Resolution options will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- TAB: Image Manipulation -->
-                        <div id="tab-image" class="tab-pane active">
+                        <div id="tab-image" class="tab-pane">
                             <div class="settings-section">
                                 <h5 class="tab-header">Image Manipulation</h5>
                                 <div class="section-content">
@@ -758,18 +770,6 @@
                                             <i class="fas fa-sync"></i>
                                             <span>Apply to All</span>
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB: Resolution -->
-                        <div id="tab-resolution" class="tab-pane">
-                            <div class="settings-section">
-                                <h5 class="tab-header">Canvas Resolution</h5>
-                                <div class="section-content">
-                                    <div id="resolution-list" class="resolution-categories">
-                                        <!-- Resolution options will be populated by JavaScript -->
                                     </div>
                                 </div>
                             </div>

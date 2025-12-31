@@ -238,14 +238,12 @@ body {
     color: var(--foreground);
 }
 
-/* Resolution Dropdown Styles */
+/* Resolution Panel Styles */
 .resolution-categories {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 4px;
-    max-height: 400px;
-    overflow-y: auto;
+    padding: 0;
 }
 
 .resolution-option {
