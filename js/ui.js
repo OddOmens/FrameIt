@@ -669,13 +669,34 @@ window.UI = {
         if (this.elements.resetRotationBtn) this.elements.resetRotationBtn.addEventListener('click', () => window.App.resetRotation());
 
         // Slider events
-        if (this.elements.bgBlurSlider) this.elements.bgBlurSlider.addEventListener('input', (e) => window.App.setBackgroundBlur(e.target.value));
-        if (this.elements.cornerRadiusSlider) this.elements.cornerRadiusSlider.addEventListener('input', (e) => window.App.setCornerRadius(e.target.value));
-        if (this.elements.paddingSlider) this.elements.paddingSlider.addEventListener('input', (e) => window.App.setPadding(e.target.value));
-        if (this.elements.shadowOpacitySlider) this.elements.shadowOpacitySlider.addEventListener('input', (e) => window.App.setShadowOpacity(e.target.value));
-        if (this.elements.shadowRadiusSlider) this.elements.shadowRadiusSlider.addEventListener('input', (e) => window.App.setShadowRadius(e.target.value));
-        if (this.elements.shadowOffsetXSlider) this.elements.shadowOffsetXSlider.addEventListener('input', (e) => window.App.setShadowOffsetX(e.target.value));
-        if (this.elements.shadowOffsetYSlider) this.elements.shadowOffsetYSlider.addEventListener('input', (e) => window.App.setShadowOffsetY(e.target.value));
+        if (this.elements.bgBlurSlider) this.elements.bgBlurSlider.addEventListener('input', (e) => {
+            console.log('🎚️ Blur slider changed:', e.target.value);
+            if (window.App && window.App.setBackgroundBlur) window.App.setBackgroundBlur(e.target.value);
+        });
+        if (this.elements.cornerRadiusSlider) this.elements.cornerRadiusSlider.addEventListener('input', (e) => {
+            console.log('🎚️ Corner radius slider changed:', e.target.value);
+            if (window.App && window.App.setCornerRadius) window.App.setCornerRadius(e.target.value);
+        });
+        if (this.elements.paddingSlider) this.elements.paddingSlider.addEventListener('input', (e) => {
+            console.log('🎚️ Padding slider changed:', e.target.value);
+            if (window.App && window.App.setPadding) window.App.setPadding(e.target.value);
+        });
+        if (this.elements.shadowOpacitySlider) this.elements.shadowOpacitySlider.addEventListener('input', (e) => {
+            console.log('🎚️ Shadow opacity slider changed:', e.target.value);
+            if (window.App && window.App.setShadowOpacity) window.App.setShadowOpacity(e.target.value);
+        });
+        if (this.elements.shadowRadiusSlider) this.elements.shadowRadiusSlider.addEventListener('input', (e) => {
+            console.log('🎚️ Shadow radius slider changed:', e.target.value);
+            if (window.App && window.App.setShadowRadius) window.App.setShadowRadius(e.target.value);
+        });
+        if (this.elements.shadowOffsetXSlider) this.elements.shadowOffsetXSlider.addEventListener('input', (e) => {
+            console.log('🎚️ Shadow offset X slider changed:', e.target.value);
+            if (window.App && window.App.setShadowOffsetX) window.App.setShadowOffsetX(e.target.value);
+        });
+        if (this.elements.shadowOffsetYSlider) this.elements.shadowOffsetYSlider.addEventListener('input', (e) => {
+            console.log('🎚️ Shadow offset Y slider changed:', e.target.value);
+            if (window.App && window.App.setShadowOffsetY) window.App.setShadowOffsetY(e.target.value);
+        });
 
         if (this.elements.shadowColorInput) {
             this.elements.shadowColorInput.addEventListener('input', (e) => {
@@ -690,7 +711,12 @@ window.UI = {
         // Smart Fill and panning controls
         const smartFillToggle = document.getElementById('smart-fill-toggle');
         if (smartFillToggle) {
-            smartFillToggle.addEventListener('change', () => window.App.toggleSmartFill());
+            smartFillToggle.addEventListener('change', () => {
+                console.log('🔘 Smart fill toggle changed:', smartFillToggle.checked);
+                if (window.App && window.App.toggleSmartFill) window.App.toggleSmartFill();
+            });
+        } else {
+            console.warn('⚠️ Smart fill toggle not found');
         }
 
         // Subscription buttons
