@@ -1985,8 +1985,8 @@ window.UI = {
             exportBtnText.textContent = appState.selectedImage ? 'Export Mockup' : 'Export Design';
         }
 
-        // Update reset buttons
-        this.elements.resetBlurBtn.disabled = appState.backgroundBlurRadius === 0;
+        // Update reset buttons (with optional chaining for removed elements)
+        if (this.elements.resetBlurBtn) this.elements.resetBlurBtn.disabled = appState.backgroundBlurRadius === 0;
         this.elements.resetCornerBtn.disabled = appState.cornerRadius === Config.defaultCornerRadius;
         this.elements.resetPaddingBtn.disabled = appState.padding === Config.defaultPadding;
         this.elements.resetShadowOpacityBtn.disabled = appState.shadowOpacity === Config.defaultShadowOpacity;
@@ -1996,8 +1996,8 @@ window.UI = {
         this.elements.resetShadowColorBtn.disabled = appState.shadowColor === Config.defaultShadowColor;
         this.elements.resetRotationBtn.disabled = appState.rotation === Config.defaultRotation;
 
-        // Update value displays
-        this.elements.blurValue.textContent = `${Math.round(appState.backgroundBlurRadius * 5)}%`;
+        // Update value displays (with optional chaining for removed elements)
+        if (this.elements.blurValue) this.elements.blurValue.textContent = `${Math.round(appState.backgroundBlurRadius * 5)}%`;
         this.elements.cornerRadiusValue.textContent = `${appState.cornerRadius}px`;
         this.elements.paddingValue.textContent = `${appState.padding}px`;
         this.elements.shadowOpacityValue.textContent = `${Math.round(appState.shadowOpacity * 100)}%`;
