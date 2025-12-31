@@ -2209,6 +2209,7 @@ window.App = {
 
     // Set corner radius
     setCornerRadius(value) {
+        console.log('🔧 App.setCornerRadius called with value:', value);
         this.saveStateForUndo();
         this.state.cornerRadius = Number(value);
         document.getElementById('corner-radius-value').textContent = `${value}px`;
@@ -2218,6 +2219,7 @@ window.App = {
 
     // Set padding
     setPadding(value) {
+        console.log('🔧 App.setPadding called with value:', value);
         this.saveStateForUndo();
         this.state.padding = Number(value);
         document.getElementById('padding-value').textContent = `${value}px`;
@@ -2227,6 +2229,7 @@ window.App = {
 
     // Set shadow opacity
     setShadowOpacity(value) {
+        console.log('🔧 App.setShadowOpacity called with value:', value);
         this.saveStateForUndo();
         this.state.shadowOpacity = Number(value);
         document.getElementById('shadow-opacity-value').textContent = `${Math.round(value * 100)}%`;
@@ -2236,6 +2239,7 @@ window.App = {
 
     // Set shadow radius
     setShadowRadius(value) {
+        console.log('🔧 App.setShadowRadius called with value:', value);
         this.saveStateForUndo();
         this.state.shadowRadius = Number(value);
         document.getElementById('shadow-radius-value').textContent = `${value}px`;
@@ -2571,8 +2575,10 @@ window.App = {
 
     // Toggle Smart Fill and Crop
     toggleSmartFill() {
+        console.log('🔧 App.toggleSmartFill called, current state:', this.state.smartFillEnabled);
         this.saveStateForUndo();
         this.state.smartFillEnabled = !this.state.smartFillEnabled;
+        console.log('🔧 Smart fill toggled to:', this.state.smartFillEnabled);
 
         // Reset panning when toggling Smart Fill
         if (!this.state.smartFillEnabled) {

@@ -669,26 +669,68 @@ window.UI = {
         if (this.elements.resetRotationBtn) this.elements.resetRotationBtn.addEventListener('click', () => window.App.resetRotation());
 
         // Slider events
+        console.log('📋 Setting up slider event listeners...');
+        console.log('  Corner radius slider found:', !!this.elements.cornerRadiusSlider);
+        console.log('  Padding slider found:', !!this.elements.paddingSlider);
+        console.log('  Shadow opacity slider found:', !!this.elements.shadowOpacitySlider);
+        console.log('  Shadow radius slider found:', !!this.elements.shadowRadiusSlider);
+
         if (this.elements.bgBlurSlider) this.elements.bgBlurSlider.addEventListener('input', (e) => {
             console.log('🎚️ Blur slider changed:', e.target.value);
             if (window.App && window.App.setBackgroundBlur) window.App.setBackgroundBlur(e.target.value);
         });
-        if (this.elements.cornerRadiusSlider) this.elements.cornerRadiusSlider.addEventListener('input', (e) => {
-            console.log('🎚️ Corner radius slider changed:', e.target.value);
-            if (window.App && window.App.setCornerRadius) window.App.setCornerRadius(e.target.value);
-        });
-        if (this.elements.paddingSlider) this.elements.paddingSlider.addEventListener('input', (e) => {
-            console.log('🎚️ Padding slider changed:', e.target.value);
-            if (window.App && window.App.setPadding) window.App.setPadding(e.target.value);
-        });
-        if (this.elements.shadowOpacitySlider) this.elements.shadowOpacitySlider.addEventListener('input', (e) => {
-            console.log('🎚️ Shadow opacity slider changed:', e.target.value);
-            if (window.App && window.App.setShadowOpacity) window.App.setShadowOpacity(e.target.value);
-        });
-        if (this.elements.shadowRadiusSlider) this.elements.shadowRadiusSlider.addEventListener('input', (e) => {
-            console.log('🎚️ Shadow radius slider changed:', e.target.value);
-            if (window.App && window.App.setShadowRadius) window.App.setShadowRadius(e.target.value);
-        });
+        if (this.elements.cornerRadiusSlider) {
+            console.log('  ✅ Attaching corner radius listener');
+            this.elements.cornerRadiusSlider.addEventListener('input', (e) => {
+                console.log('🎚️ Corner radius slider changed:', e.target.value);
+                console.log('  window.App exists:', !!window.App);
+                console.log('  App.setCornerRadius exists:', !!(window.App && window.App.setCornerRadius));
+                if (window.App && window.App.setCornerRadius) {
+                    window.App.setCornerRadius(e.target.value);
+                } else {
+                    console.error('  ❌ App.setCornerRadius not available!');
+                }
+            });
+        }
+        if (this.elements.paddingSlider) {
+            console.log('  ✅ Attaching padding listener');
+            this.elements.paddingSlider.addEventListener('input', (e) => {
+                console.log('🎚️ Padding slider changed:', e.target.value);
+                console.log('  window.App exists:', !!window.App);
+                console.log('  App.setPadding exists:', !!(window.App && window.App.setPadding));
+                if (window.App && window.App.setPadding) {
+                    window.App.setPadding(e.target.value);
+                } else {
+                    console.error('  ❌ App.setPadding not available!');
+                }
+            });
+        }
+        if (this.elements.shadowOpacitySlider) {
+            console.log('  ✅ Attaching shadow opacity listener');
+            this.elements.shadowOpacitySlider.addEventListener('input', (e) => {
+                console.log('🎚️ Shadow opacity slider changed:', e.target.value);
+                console.log('  window.App exists:', !!window.App);
+                console.log('  App.setShadowOpacity exists:', !!(window.App && window.App.setShadowOpacity));
+                if (window.App && window.App.setShadowOpacity) {
+                    window.App.setShadowOpacity(e.target.value);
+                } else {
+                    console.error('  ❌ App.setShadowOpacity not available!');
+                }
+            });
+        }
+        if (this.elements.shadowRadiusSlider) {
+            console.log('  ✅ Attaching shadow radius listener');
+            this.elements.shadowRadiusSlider.addEventListener('input', (e) => {
+                console.log('🎚️ Shadow radius slider changed:', e.target.value);
+                console.log('  window.App exists:', !!window.App);
+                console.log('  App.setShadowRadius exists:', !!(window.App && window.App.setShadowRadius));
+                if (window.App && window.App.setShadowRadius) {
+                    window.App.setShadowRadius(e.target.value);
+                } else {
+                    console.error('  ❌ App.setShadowRadius not available!');
+                }
+            });
+        }
         if (this.elements.shadowOffsetXSlider) this.elements.shadowOffsetXSlider.addEventListener('input', (e) => {
             console.log('🎚️ Shadow offset X slider changed:', e.target.value);
             if (window.App && window.App.setShadowOffsetX) window.App.setShadowOffsetX(e.target.value);
@@ -710,10 +752,18 @@ window.UI = {
 
         // Smart Fill and panning controls
         const smartFillToggle = document.getElementById('smart-fill-toggle');
+        console.log('📋 Smart fill toggle element:', smartFillToggle ? 'FOUND' : 'NOT FOUND');
         if (smartFillToggle) {
+            console.log('  ✅ Attaching smart fill toggle listener');
             smartFillToggle.addEventListener('change', () => {
                 console.log('🔘 Smart fill toggle changed:', smartFillToggle.checked);
-                if (window.App && window.App.toggleSmartFill) window.App.toggleSmartFill();
+                console.log('  window.App exists:', !!window.App);
+                console.log('  App.toggleSmartFill exists:', !!(window.App && window.App.toggleSmartFill));
+                if (window.App && window.App.toggleSmartFill) {
+                    window.App.toggleSmartFill();
+                } else {
+                    console.error('  ❌ App.toggleSmartFill not available!');
+                }
             });
         } else {
             console.warn('⚠️ Smart fill toggle not found');
