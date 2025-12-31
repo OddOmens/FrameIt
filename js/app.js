@@ -108,10 +108,7 @@ window.App = {
         UI.updateLayoutSelection(layoutId);
         UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
 
-        // Force recalculation of collapsible section heights after DOM updates
-        setTimeout(() => {
-            UI.recalculateCollapsibleSections();
-        }, 50);
+        // Collapsible section recalculation removed as we moved to tabs
 
         UI.showNotification(`Layout changed to ${layout.name}`, 'success', 2000);
     },
@@ -310,8 +307,7 @@ window.App = {
         UI.updateLayoutSelection(this.state.currentLayout);
         UI.updateImageSlots(this.state.images, this.state.selectedImageIndex);
 
-        // Force recalculation of collapsible section height
-        UI.recalculateCollapsibleSections();
+        // Collapsible section recalculation removed as we moved to tabs
 
         console.log('✅ Multi-image system initialized');
     },
@@ -337,6 +333,7 @@ window.App = {
         // Setup templates and resolutions
         UI.renderTemplates();
         UI.setupResolutionOptions();
+        UI.renderLayoutOptions();
 
         // Enable export from start (can create designs without images)
         document.getElementById('export-btn').disabled = false;

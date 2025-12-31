@@ -1,0 +1,53 @@
+/* Actions Dropdown Menu - Standardized */
+.dropdown-menu {
+    position: fixed;
+    background-color: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 6px;
+    display: none;
+    z-index: 100;
+    min-width: 220px;
+    animation: zoomIn 0.1s ease-out;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--popover-foreground);
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:last-child {
+    margin-bottom: 0;
+}
+
+.dropdown-item:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--muted-foreground);
+}
+
+.dropdown-item:hover i {
+    color: var(--foreground);
+}

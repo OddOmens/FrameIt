@@ -17,8 +17,9 @@
     <link rel="canonical" href="https://frameit.social">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/app-enhanced.css?v=11">
+    <link rel="stylesheet" href="css/styles.css?v=20251230">
+    <link rel="stylesheet" href="css/app-enhanced.css?v=20251230">
+    <link rel="stylesheet" href="css/dropdowns.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,34 +73,64 @@
                     <!-- Logout button removed - no authentication needed -->
                 </div>
 
-                <div class="toolbar-right">
-                    <button id="add-image-btn" class="btn">
-                        <i class="fas fa-image"></i>
-                        <span>Add Image</span>
-                    </button>
-                    <button id="upload-btn" class="btn">
-                        <i class="fas fa-plus"></i>
-                        <span>New Canvas</span>
-                    </button>
 
-                    <!-- Actions Dropdown -->
-                    <div class="dropdown-container">
-                        <button id="actions-dropdown-btn" class="btn dropdown-btn">
-                            <i class="fas fa-cog"></i>
-                            <span>Actions</span>
-                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+
+            </div>
+
+            <!-- Top Menubar (New) -->
+            <div class="menubar">
+                <!-- Spacer to push content to right -->
+                <div style="flex: 1;"></div>
+
+                <div class="menu-item" id="menu-resolution">
+                    <i class="fas fa-desktop"></i> Resolution
+                    <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
+                    <div class="menu-dropdown" id="dropdown-resolution"></div>
+                </div>
+                <div class="menu-item" id="menu-templates">
+                    <i class="fas fa-swatchbook"></i> Templates
+                    <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
+                    <div class="menu-dropdown" id="dropdown-templates"></div>
+                </div>
+
+                <div style="width: 1px; height: 20px; background: var(--border); margin: 0 12px;"></div>
+
+                <div class="menu-item" id="add-image-btn">
+                    <i class="fas fa-image"></i> <span>Add Image</span>
+                </div>
+                <div class="menu-item" id="upload-btn">
+                    <i class="fas fa-plus"></i> <span>New Canvas</span>
+                </div>
+
+                <div class="menu-item" id="menu-actions" style="position: relative;">
+                    <i class="fas fa-cog"></i> Actions
+                    <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
+                    <div class="menu-dropdown" id="dropdown-actions">
+                        <button class="dropdown-item" id="reset-all-settings-btn">
+                            <i class="fas fa-undo-alt"></i>
+                            <span>Reset Image Settings</span>
+                        </button>
+                        <button class="dropdown-item" id="reset-bg-effects-btn">
+                            <i class="fas fa-undo-alt"></i>
+                            <span>Reset Background Effects</span>
+                        </button>
+                        <button class="dropdown-item" id="clear-all-canvases-btn">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Clear All Canvases</span>
+                        </button>
+                        <button class="dropdown-item" id="clear-all-watermarks-btn">
+                            <i class="fas fa-stamp"></i>
+                            <span>Clear All Watermarks</span>
                         </button>
                     </div>
+                </div>
 
-                    <button id="export-all-btn" class="btn">
-                        <i class="fas fa-file-export"></i>
-                        <span>Export All</span>
-                    </button>
+                <div class="menu-item" id="export-all-btn">
+                    <i class="fas fa-file-export"></i> <span>Export All</span>
+                </div>
 
-                    <button id="export-btn" class="btn primary-btn" disabled>
-                        <i class="fas fa-download"></i>
-                        <span>Export Mockup</span>
-                    </button>
+                <div class="menu-item" id="export-btn" style="opacity: 0.5; pointer-events: none;">
+                    <i class="fas fa-download"></i> <span>Export Design</span>
                 </div>
             </div>
 
@@ -107,12 +138,7 @@
             <div class="main-content">
                 <!-- Gallery Panel (vertical left side) -->
                 <div class="gallery-bar" id="gallery-container">
-                    <h5 class="panel-title">Gallery
-                        <button id="gallery-upload-btn" class="btn success-btn">
-                            <i class="fas fa-plus"></i>
-                            <span>New Canvas</span>
-                        </button>
-                    </h5>
+                    <h5 class="panel-title">Canvases</h5>
                     <div class="gallery-content-wrapper">
                         <div class="gallery-content" id="gallery-content">
                             <!-- Gallery items will be added here dynamically -->
@@ -155,125 +181,32 @@
 
                 <!-- Control Panels -->
                 <div class="control-panels">
-                    <!-- Combined Settings Panel -->
-                    <div class="control-panel">
-                        <h5 class="panel-title">Customize
-                            <button id="apply-to-all-btn" class="btn success-btn">
-                                <i class="fas fa-sync"></i>
-                                <span>Apply to All</span>
-                            </button>
-                        </h5>
-                        <div class="panel-content">
-                            <!-- App Marketing Section -->
+                    <!-- Icon Tab Bar -->
+                    <div class="sidebar-tabs">
+                        <button class="tab-btn active" data-tab="tab-image" title="Image">
+                            <i class="fas fa-sliders-h"></i>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-shadow" title="Shadows">
+                            <i class="fas fa-cloud"></i>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-background" title="Background">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-noise" title="Noise">
+                            <i class="fas fa-spray-can"></i>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-text" title="Text">
+                            <i class="fas fa-font"></i>
+                        </button>
+                    </div>
+
+                    <!-- Sidebar Content -->
+                    <div class="sidebar-content">
+
+                        <!-- TAB: Image Manipulation -->
+                        <div id="tab-image" class="tab-pane active">
                             <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>App Marketing</h5>
-                                </div>
-                                <div class="section-content">
-                                    <!-- Templates -->
-                                    <div class="form-group">
-                                        <label class="form-label">Quick Templates</label>
-                                        <div class="button-row" style="margin-bottom: 15px;">
-                                            <button id="mkt-template-modern" class="btn small-btn outline-btn" style="flex: 1;">Modern</button>
-                                            <button id="mkt-template-bold" class="btn small-btn outline-btn" style="flex: 1;">Bold</button>
-                                            <button id="mkt-template-clean" class="btn small-btn outline-btn" style="flex: 1;">Clean</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Content -->
-                                    <div class="form-group">
-                                        <label class="form-label">App Icon</label>
-                                        <button id="mkt-icon-upload-btn" class="btn primary-btn full-width" style="margin-top: 5px;">
-                                            <i class="fas fa-cloud-upload-alt"></i>
-                                            <span>Upload Icon</span>
-                                        </button>
-                                        <input type="file" id="mkt-icon-upload" accept="image/*" style="display: none;">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">App Name</label>
-                                        <input type="text" id="mkt-app-name" class="input-control" placeholder="App Name">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">Subtitle</label>
-                                        <input type="text" id="mkt-subtitle" class="input-control" placeholder="Subtitle">
-                                    </div>
-
-                                    <div class="divider"></div>
-
-                                    <!-- CTA Controls -->
-                                    <div class="form-group">
-                                        <label class="form-label">CTA Button</label>
-                                        <input type="text" id="mkt-cta-text" class="input-control" value="Download Now" placeholder="Button Text">
-                                    </div>
-
-                                    <div class="adjustment-row">
-                                        <label>Button Color</label>
-                                    </div>
-                                    <div class="color-input-wrapper">
-                                        <input type="color" id="mkt-cta-color" value="#3B82F6">
-                                    </div>
-                                    
-                                    <div class="adjustment-row">
-                                        <label>Button Text Color</label>
-                                    </div>
-                                    <div class="color-input-wrapper">
-                                        <input type="color" id="mkt-cta-text-color" value="#FFFFFF">
-                                    </div>
-
-                                    <div class="form-group" style="margin-top: 15px;">
-                                        <div class="checkbox-container">
-                                            <input type="checkbox" id="mkt-cta-enabled">
-                                            <label for="mkt-cta-enabled">Show CTA Button</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <!-- Resolution Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Resolution</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="resolution-categories">
-                                        <!-- Resolution categories will be populated dynamically -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <!-- Multi-Image Layout Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Layout</h5>
-                                </div>
-                                <div class="section-content">
-                                    <div class="layout-grid" id="layout-grid">
-                                        <!-- Layout templates will be populated dynamically -->
-                                    </div>
-
-                                    <!-- Image Slots -->
-                                    <div id="image-slots-container" class="image-slots-container">
-                                        <h6 class="slots-title">Image Slots</h6>
-                                        <div id="image-slots" class="image-slots">
-                                            <!-- Image slots will be populated dynamically -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <!-- Image Manipulation Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Image Manipulation</h5>
-                                </div>
+                                <h5 class="tab-header">Image Manipulation</h5>
                                 <div class="section-content">
                                     <!-- Smart Fill and Crop Toggle -->
                                     <div class="form-group">
@@ -358,14 +291,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="divider"></div>
-
-                            <!-- Shadow Settings Section -->
+                        <!-- TAB: Shadow -->
+                        <div id="tab-shadow" class="tab-pane">
                             <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Shadow Settings</h5>
-                                </div>
+                                <h5 class="tab-header">Shadow Settings</h5>
                                 <div class="section-content">
                                     <div class="adjustment-row">
                                         <label>Shadow Opacity</label>
@@ -436,190 +367,46 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="divider"></div>
-
-                            <!-- Templates Section -->
+                        <!-- TAB: Templates (Moved to top menu) -->
+                        <div id="hidden-templates-content" class="hidden-content">
                             <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Templates</h5>
-                                </div>
                                 <div class="section-content">
-                                    <div class="templates-grid" id="templates-grid">
-                                        <!-- Template swatches will be added here via JavaScript -->
+                                    <div class="templates-grid" id="templates-grid"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: Background -->
+                        <div id="tab-background" class="tab-pane">
+                            <div class="settings-section">
+                                <h5 class="tab-header">Background</h5>
+                                <div class="section-content">
+                                    <!-- Color swatches -->
+                                    <h5 class="subsection-title">Colors</h5>
+                                    <div class="color-grid" id="color-swatches">
+                                        <!-- Color swatches will be added here via JavaScript -->
+                                    </div>
+
+                                    <!-- Gradients -->
+                                    <h5 class="subsection-title">Gradients</h5>
+                                    <div class="gradient-grid" id="gradient-swatches">
+                                        <!-- Gradient swatches will be added here via JavaScript -->
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="divider"></div>
-
-                            <!-- Background Options Section -->
+                        <!-- TAB: Noise -->
+                        <div id="tab-noise" class="tab-pane">
                             <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Background</h5>
-                                    <div class="header-buttons">
-                                        <button id="random-bg-btn" class="btn primary-btn small-btn">
-                                            <i class="fas fa-dice"></i>
-                                            <span>Random</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="section-content">
-                                    <!-- Blur & Filters Subsection -->
-                                    <div class="settings-subsection">
-                                        <div class="subsection-header">
-                                            <h6>Blur & Filters</h6>
-                                        </div>
-                                        <div class="subsection-content">
-                                            <div class="adjustment-row">
-                                                <label>Background Blur</label>
-                                                <span class="value-display" id="blur-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-blur-slider" min="0" max="20" value="0"
-                                                    step="1">
-                                                <button id="reset-blur-btn" class="reset-btn" disabled>
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Saturation</label>
-                                                <span class="value-display" id="saturation-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-saturation-slider" min="0" max="200"
-                                                    value="100" step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Hue Rotation</label>
-                                                <span class="value-display" id="hue-value">0°</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-hue-slider" min="0" max="360" value="0"
-                                                    step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Contrast</label>
-                                                <span class="value-display" id="contrast-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-contrast-slider" min="0" max="200"
-                                                    value="100" step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Brightness</label>
-                                                <span class="value-display" id="brightness-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-brightness-slider" min="0" max="200"
-                                                    value="100" step="5">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Distortion Effects Subsection -->
-                                    <div class="settings-subsection">
-                                        <div class="subsection-header">
-                                            <h6>Distortion Effects</h6>
-                                        </div>
-                                        <div class="subsection-content">
-                                            <div class="adjustment-row">
-                                                <label>Twirl Effect</label>
-                                                <span class="value-display" id="twirl-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-twirl-slider" min="0" max="100" value="0"
-                                                    step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Wave Distortion</label>
-                                                <span class="value-display" id="wave-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-wave-slider" min="0" max="100" value="0"
-                                                    step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Ripple Effect</label>
-                                                <span class="value-display" id="ripple-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-ripple-slider" min="0" max="100" value="0"
-                                                    step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Zoom Scale</label>
-                                                <span class="value-display" id="zoom-value">100%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-zoom-slider" min="50" max="200" value="100"
-                                                    step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Shake Effect</label>
-                                                <span class="value-display" id="shake-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-shake-slider" min="0" max="100" value="0"
-                                                    step="5">
-                                            </div>
-
-                                            <div class="adjustment-row">
-                                                <label>Lens Distortion</label>
-                                                <span class="value-display" id="lens-value">0%</span>
-                                            </div>
-                                            <div class="slider-container">
-                                                <input type="range" id="bg-lens-slider" min="0" max="100" value="0"
-                                                    step="5">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Color Options Subsection -->
-                                    <div class="settings-subsection">
-                                        <div class="subsection-header">
-                                            <h6>Color Options</h6>
-                                        </div>
-                                        <div class="subsection-content">
-                                            <!-- Color swatches -->
-                                            <h5 class="subsection-title">Colors</h5>
-                                            <div class="color-grid" id="color-swatches">
-                                                <!-- Color swatches will be added here via JavaScript -->
-                                            </div>
-
-                                            <!-- Gradients -->
-                                            <h5 class="subsection-title">Gradients</h5>
-                                            <div class="gradient-grid" id="gradient-swatches">
-                                                <!-- Gradient swatches will be added here via JavaScript -->
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <!-- Noise Section -->
-                            <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Noise & Texture</h5>
-                                    <div class="header-buttons">
-                                        <button id="random-noise-btn" class="btn primary-btn small-btn">
-                                            <i class="fas fa-dice"></i>
-                                            <span>Random</span>
-                                        </button>
-                                    </div>
-                                </div>
+                                <h5 class="tab-header">Noise & Texture
+                                    <button id="random-noise-btn" class="btn primary-btn small-btn"
+                                        style="float: right;">
+                                        <i class="fas fa-dice"></i>
+                                    </button>
+                                </h5>
                                 <div class="section-content">
                                     <div class="noise-controls">
                                         <div class="form-group">
@@ -697,20 +484,16 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="divider"></div>
-
-                            <!-- Text Layers Section -->
+                        <!-- TAB: Text -->
+                        <div id="tab-text" class="tab-pane">
                             <div class="settings-section">
-                                <div class="section-header">
-                                    <h5>Text Layers</h5>
-                                    <div class="header-buttons">
-                                        <button id="add-text-btn" class="btn primary-btn small-btn">
-                                            <i class="fas fa-plus"></i>
-                                            <span>Add Text</span>
-                                        </button>
-                                    </div>
-                                </div>
+                                <h5 class="tab-header">Text Layers
+                                    <button id="add-text-btn" class="btn primary-btn small-btn" style="float: right;">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </h5>
                                 <div class="section-content">
                                     <div id="text-layers-list" class="text-layers-list">
                                         <!-- Text layers will be added here via JavaScript -->
@@ -1486,43 +1269,24 @@
     <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
 
     <!-- Scripts -->
-    <!-- Actions Dropdown Menu (Moved to root to avoid z-index issues) -->
-    <div class="dropdown-menu" id="actions-dropdown-menu">
-        <button class="dropdown-item" id="reset-all-settings-btn">
-            <i class="fas fa-undo-alt"></i>
-            <span>Reset Image Settings</span>
-        </button>
-        <button class="dropdown-item" id="reset-bg-effects-btn">
-            <i class="fas fa-undo-alt"></i>
-            <span>Reset Background Effects</span>
-        </button>
-        <button class="dropdown-item" id="clear-all-canvases-btn">
-            <i class="fas fa-trash-alt"></i>
-            <span>Clear All Canvases</span>
-        </button>
-        <button class="dropdown-item" id="clear-all-watermarks-btn">
-            <i class="fas fa-stamp"></i>
-            <span>Clear All Watermarks</span>
-        </button>
-    </div>
 
     <script src="js/config.js"></script>
     <!-- frameit-config.js removed - no Supabase needed -->
     <script src="js/noise.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/models.js"></script>
     <script src="js/models/export.js"></script>
     <script src="js/models/image.js"></script>
     <script src="js/models/text.js"></script>
-    <script src="js/models.js"></script>
     <script src="js/auth-bypass.js"></script>
     <script src="js/analytics-simple.js"></script>
     <!-- payments.js removed - no payments needed -->
     <script src="js/stripe-integration.js"></script>
     <script src="js/managers/gallery-manager.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="js/ui.js?v=20251230"></script>
     <script src="js/canvas.js"></script>
     <script src="js/marketing.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=20251230"></script>
     <script>
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', async () => {

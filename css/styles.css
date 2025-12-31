@@ -55,8 +55,9 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    margin: var(--space-m);
-    margin-bottom: var(--space-m);
+    margin: 0;
+    /* Remove margin for flush layout */
+    height: 100vh;
 }
 
 /* Toolbar */
@@ -201,52 +202,55 @@ body {
     display: flex;
     flex: 1;
     height: 100%;
-    /* Ensure it tries to fill */
     min-height: 0;
-    /* Allow shrinking */
     overflow: hidden;
-    padding: var(--space-m);
-    gap: var(--space-m);
+    padding: 0;
+    /* Flush layout */
+    gap: 0;
+    /* No gaps */
     position: relative;
     margin: 0;
-    /* Remove side margins since they're on the wrapper now */
-    border-radius: 0 0 12px 12px;
-    /* Round bottom corners */
-    border: 1px solid #2a2a2a;
-    /* Match toolbar border */
-    border-top: none;
-    /* Remove top border to connect with toolbar */
+    border-radius: 0;
+    /* Flush layout */
+    border: none;
+    border-top: 1px solid #2a2a2a;
+    /* Separation from toolbar */
     background-color: var(--primary-bg);
 }
 
-/* Left Column */
+/* Left Column (Canvas Area) */
 .left-column {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-width: 0;
-    max-width: calc(100% - 680px);
-    /* Account for right panel + gallery */
+    /* Allow shrinking */
     overflow: hidden;
+    background-color: #0d0d0d;
+    /* Slightly darker than sidebars */
 }
 
 /* Gallery Bar (vertical left side) */
+/* Gallery Bar (vertical left side) */
 .gallery-bar {
     display: flex;
-    /* Always show gallery */
     flex-direction: column;
     background-color: #1a1a1a;
-    /* Match control panel background */
-    width: 280px;
+    width: 320px;
+    /* Increased from 280px */
     height: 100%;
-    min-height: calc(100vh - 90px) !important;
-    /* Ensure minimum height like customize panel */
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    min-height: 0;
+    border-radius: 0;
+    /* Cleaner flat look */
+    box-shadow: none;
     overflow: hidden;
-    margin-right: var(--space-m);
-    border: 1px solid #2a2a2a;
-    /* Match control panel border */
+    margin-right: 0;
+    /* Remove margin for flush look */
+    border-right: 1px solid var(--border-color);
+    /* Add separation border */
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
 }
 
 /* Remove .hidden class override since gallery should always show */
@@ -266,7 +270,7 @@ body {
 
 .gallery-content {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: var(--space-s);
     overflow-y: auto;
     overflow-x: hidden;
@@ -350,15 +354,17 @@ body {
 /* Canvas Container */
 .canvas-container {
     flex: 1;
-    padding: 20px;
+    padding: 40px;
+    /* Internal breathing room */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background-color: var(--primary-bg);
+    background-color: #0d0d0d;
     position: relative;
-    border-radius: 12px;
-    margin-bottom: var(--space-m);
+    border-radius: 0;
+    margin-bottom: 0;
+    border: none;
 }
 
 .canvas-wrapper {
@@ -501,6 +507,7 @@ body {
     border-radius: 2px;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .slider-container input[type="range"]::-webkit-slider-thumb {
@@ -1172,16 +1179,16 @@ select {
 }
 
 /* Control Panels - Refactored for Robustness */
+/* Control Panels - Refactored for Robustness */
 .control-panels {
     display: flex;
     flex-direction: column;
-    width: 380px;
+    width: 440px;
+    /* Increased from 380px to 440px for more breathing room */
     height: 100%;
     margin-left: auto;
     overflow: hidden;
-    /* Contain inner scrolling */
     border-left: 1px solid var(--border-color);
-    /* Ensure separation */
 }
 
 .control-panel {

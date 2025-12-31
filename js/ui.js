@@ -8,10 +8,122 @@ window.UI = {
         expandedCategories: new Set(['standard']),
         isHistoryModalVisible: false,
         isDraggingOver: false,
-        isFileInputOpen: false
+        isFileInputOpen: false,
+        activeTab: 'tab-image', // Default active tab
+        activeMenu: null // Default active menu
     },
 
-    // DOM Elements
+    // Initialization
+
+
+    addTabListeners() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        console.log('Adding listeners to tabs:', tabs.length);
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const targetId = tab.dataset.tab;
+                console.log('Tab clicked:', targetId);
+                this.switchTab(targetId);
+            });
+        });
+    },
+
+    switchTab(tabId) {
+        console.log('Switching to tab:', tabId);
+        // Deactivate all tabs
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+        // Activate selected
+        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        const pane = document.getElementById(tabId);
+
+        if (btn && pane) {
+            btn.classList.add('active');
+            pane.classList.add('active');
+            this.state.activeTab = tabId;
+        } else {
+            console.error('Tab target not found:', tabId, !!btn, !!pane);
+        }
+    },
+
+    addMenuListeners() {
+        // Prevent double-initialization
+        if (this._menuListenersAttached) {
+            console.log('⚠️ Menu listeners already attached, skipping');
+            return;
+        }
+        this._menuListenersAttached = true;
+
+        // Only add dropdown behavior to menu items that have a dropdown child
+        const menuItems = document.querySelectorAll('.menu-item');
+        console.log('🔧 Setting up menu listeners for', menuItems.length, 'menu items');
+
+        let listenersAdded = 0;
+
+        menuItems.forEach(item => {
+            const hasDropdown = item.querySelector('.menu-dropdown');
+
+            if (hasDropdown) {
+                console.log('✅ Adding dropdown listener to:', item.id);
+                listenersAdded++;
+
+                // This menu item has a dropdown - add toggle behavior
+                const clickHandler = (e) => {
+                    console.log('🖱️ Dropdown menu clicked:', item.id, e.target);
+
+                    // Let clicks inside dropdown content pass through to their own handlers
+                    if (e.target.closest('.menu-dropdown')) {
+                        console.log('⚠️ Click inside dropdown content, letting it pass through');
+                        return;
+                    }
+
+                    // Stop event propagation only for clicks on the menu item itself
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const isActive = item.classList.contains('active');
+                    console.log('📊 Current active state:', isActive);
+
+                    // Close all menus
+                    this.closeAllMenus();
+
+                    if (!isActive) {
+                        console.log('🔓 Opening dropdown:', item.id);
+                        item.classList.add('active');
+                        this.state.activeMenu = item.id;
+                    } else {
+                        console.log('🔒 Closing dropdown:', item.id);
+                    }
+                };
+
+                // Use capture phase to ensure we get the event first
+                item.addEventListener('click', clickHandler, true);
+
+                // Also add in bubble phase as backup
+                item.addEventListener('click', clickHandler, false);
+            } else {
+                console.log('ℹ️ No dropdown for:', item.id);
+            }
+            // Items without dropdowns will use their own click handlers (add-image-btn, export-btn, etc.)
+        });
+
+        // Close menus when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-item')) {
+                this.closeAllMenus();
+            }
+        });
+
+        console.log(`✅ Menu listeners setup complete. Added listeners to ${listenersAdded} dropdown menus.`);
+    },
+
+    closeAllMenus() {
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.menu-dropdown').forEach(d => d.style.display = '');
+        this.state.activeMenu = null;
+    },
+
     elements: {
         // Canvas and preview
         canvas: document.getElementById('preview-canvas'),
@@ -23,9 +135,7 @@ window.UI = {
         exportAllBtn: document.getElementById('export-all-btn'),
         applyToAllBtn: document.getElementById('apply-to-all-btn'),
 
-        // New dropdown elements
-        actionsDropdownBtn: document.getElementById('actions-dropdown-btn'),
-        actionsDropdownMenu: document.getElementById('actions-dropdown-menu'),
+        // Dropdown action buttons (within menu dropdowns)
         clearAllCanvasesBtn: document.getElementById('clear-all-canvases-btn'),
         clearAllWatermarksBtn: document.getElementById('clear-all-watermarks-btn'),
 
@@ -154,6 +264,16 @@ window.UI = {
 
     // Initialize the UI
     init() {
+        // Tab and Menu Listeners (moved from duplicate init)
+        this.addTabListeners();
+        this.addMenuListeners();
+
+        // Activate default tab
+        this.switchTab(this.state.activeTab);
+
+        // Ensure all menus are closed initially
+        this.closeAllMenus();
+
         // Reset rendering flags
         this._gradientSectionsRendered = false;
 
@@ -162,6 +282,10 @@ window.UI = {
         this.setupWatermarkControls(); // Add watermark control setup
         this.renderTemplates(); // Render templates in their own section
         this.renderLayouts(); // Render layout options
+
+        // Populate menu dropdowns
+        this.renderLayoutOptions(); // Populate Layout dropdown
+        this.setupResolutionOptions(); // Populate Resolution dropdown
 
         // Force enable export buttons after all setup is complete
         this.forceEnableExportButtons();
@@ -321,11 +445,9 @@ window.UI = {
         this.elements.textBgOptions = document.getElementById('text-bg-options');
         this.elements.textBgColor = document.getElementById('text-bg-color');
         this.elements.textPaddingSlider = document.getElementById('text-padding-slider');
-        this.elements.textPaddingValue = document.getElementById('text-padding-value'),
+        this.elements.textPaddingValue = document.getElementById('text-padding-value');
 
-            // New dropdown elements
-            this.elements.actionsDropdownBtn = document.getElementById('actions-dropdown-btn');
-        this.elements.actionsDropdownMenu = document.getElementById('actions-dropdown-menu');
+        // Dropdown action buttons
         this.elements.clearAllCanvasesBtn = document.getElementById('clear-all-canvases-btn');
         this.elements.clearAllWatermarksBtn = document.getElementById('clear-all-watermarks-btn');
 
@@ -346,8 +468,11 @@ window.UI = {
     forceEnableExportButtons() {
         [this.elements.exportBtn, this.elements.exportAllBtn].forEach(btn => {
             if (btn) {
-                btn.disabled = false;
-                btn.removeAttribute('disabled');
+                // Handle both button elements and div.menu-item elements
+                if (btn.tagName === 'BUTTON') {
+                    btn.disabled = false;
+                    btn.removeAttribute('disabled');
+                }
                 btn.style.pointerEvents = 'auto';
                 btn.style.opacity = '1';
                 btn.style.cursor = 'pointer';
@@ -451,59 +576,7 @@ window.UI = {
             console.error('❌ Add Image button not found!');
         }
 
-        // Actions Dropdown
-        if (this.elements.actionsDropdownBtn && !this._actionsDropdownListenerAttached) {
-            this._actionsDropdownListenerAttached = true;
-
-            this.elements.actionsDropdownBtn.addEventListener('click', (e) => {
-                console.log('🔘 Actions dropdown clicked');
-                e.preventDefault();
-                e.stopPropagation();
-
-                const isCurrentlyOpen = this.elements.actionsDropdownMenu.classList.contains('show');
-
-                if (isCurrentlyOpen) {
-                    this.elements.actionsDropdownMenu.classList.remove('show');
-                    this.elements.actionsDropdownBtn.classList.remove('active');
-                } else {
-                    // Calculate button position for fixed positioning
-                    const btnRect = this.elements.actionsDropdownBtn.getBoundingClientRect();
-                    this.elements.actionsDropdownMenu.style.top = `${btnRect.bottom + 8}px`;
-                    this.elements.actionsDropdownMenu.style.right = `${window.innerWidth - btnRect.right}px`;
-
-                    this.elements.actionsDropdownMenu.classList.add('show');
-                    this.elements.actionsDropdownBtn.classList.add('active');
-                }
-
-                console.log('🔘 Dropdown classes:', this.elements.actionsDropdownMenu.className);
-            });
-
-            // Close dropdown when clicking on any dropdown item
-            const dropdownItems = this.elements.actionsDropdownMenu.querySelectorAll('.dropdown-item');
-            dropdownItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    this.elements.actionsDropdownMenu.classList.remove('show');
-                    this.elements.actionsDropdownBtn.classList.remove('active');
-                });
-            });
-
-            // Close dropdown when clicking outside (attach only once)
-            document.addEventListener('click', (e) => {
-                // Don't close if clicking on the button or menu
-                if (this.elements.actionsDropdownBtn && this.elements.actionsDropdownBtn.contains(e.target)) {
-                    return;
-                }
-                if (this.elements.actionsDropdownMenu && this.elements.actionsDropdownMenu.contains(e.target)) {
-                    return;
-                }
-
-                // Close the dropdown
-                if (this.elements.actionsDropdownMenu && this.elements.actionsDropdownMenu.classList.contains('show')) {
-                    this.elements.actionsDropdownMenu.classList.remove('show');
-                    this.elements.actionsDropdownBtn.classList.remove('active');
-                }
-            });
-        }
+        // Actions dropdown is now handled by addMenuListeners()
 
         this.elements.exportBtn.addEventListener('click', () => this.showExportSettingsModal());
         console.log('✅ Export button event listener attached');
@@ -1420,46 +1493,34 @@ window.UI = {
         // Watermark controls
         this.setupWatermarkControls();
 
-        // Actions dropdown
-        this.elements.actionsDropdownBtn?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleActionsDropdown();
-        });
-
+        // Actions dropdown items (dropdown itself is handled by addMenuListeners)
         // Clear all canvases action
         this.elements.clearAllCanvasesBtn?.addEventListener('click', () => {
             this.clearAllCanvases();
-            this.hideActionsDropdown();
+            this.closeAllMenus();
         });
 
         // Clear all watermarks action
         this.elements.clearAllWatermarksBtn?.addEventListener('click', () => {
             this.clearAllWatermarks();
-            this.hideActionsDropdown();
+            this.closeAllMenus();
         });
 
-        // Reset all image settings action (moved from Image Manipulation section)
+        // Reset all image settings action
         document.getElementById('reset-all-settings-btn')?.addEventListener('click', () => {
             window.App.resetAllImageSettings();
-            this.hideActionsDropdown();
+            this.closeAllMenus();
         });
 
-        // Reset background effects action (moved from Background section)
+        // Reset background effects action
         document.getElementById('reset-bg-effects-btn')?.addEventListener('click', () => {
             window.App.resetBackgroundEffects();
-            this.hideActionsDropdown();
+            this.closeAllMenus();
         });
 
         // Apply watermark to all
         this.elements.applyWatermarkToAllBtn?.addEventListener('click', () => {
             this.applyWatermarkToAll();
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.dropdown-container')) {
-                this.hideActionsDropdown();
-            }
         });
     },
 
@@ -1904,7 +1965,16 @@ window.UI = {
         const appState = window.App.state;
 
         // Enable/disable buttons
-        this.elements.exportBtn.disabled = false; // Always allow export - supports text/background-only designs
+        if (this.elements.exportBtn) {
+            // Handle both button elements and div.menu-item elements
+            if (this.elements.exportBtn.tagName === 'BUTTON') {
+                this.elements.exportBtn.disabled = false;
+            } else {
+                this.elements.exportBtn.classList.remove('disabled');
+                this.elements.exportBtn.style.pointerEvents = 'auto';
+                this.elements.exportBtn.style.opacity = '1';
+            }
+        }
 
         // Force enable both export buttons using helper function
         this.forceEnableExportButtons();
@@ -2091,37 +2161,6 @@ window.UI = {
 
     // Background image functions removed per user request
 
-    // Renders templates
-    renderTemplates() {
-        const container = document.getElementById('templates-grid');
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        window.Config.templates.forEach(template => {
-            const templateItem = document.createElement('div');
-            templateItem.className = 'template-item';
-            templateItem.dataset.templateId = template.id;
-
-            // Create image element with thumbnail
-            const img = document.createElement('img');
-            img.src = template.thumbnail;
-            img.alt = template.name;
-            img.loading = 'lazy';
-
-            // Create name overlay
-            const nameOverlay = document.createElement('div');
-            nameOverlay.className = 'template-item-name';
-            nameOverlay.textContent = template.name;
-
-            // Add click handler
-            templateItem.addEventListener('click', () => window.App.applyTemplate(template.id));
-
-            templateItem.appendChild(img);
-            templateItem.appendChild(nameOverlay);
-            container.appendChild(templateItem);
-        });
-    },
 
     // Render layout options
     renderLayouts() {
@@ -2149,8 +2188,6 @@ window.UI = {
             // Add click handler
             layoutItem.addEventListener('click', () => {
                 window.App.setLayout(layout.id);
-                // Force recalculation after layout change
-                setTimeout(() => this.recalculateCollapsibleSections(), 100);
             });
 
             layoutItem.appendChild(img);
@@ -2185,14 +2222,9 @@ window.UI = {
 
         if (currentLayout.maxImages <= 1) {
             slotsContainer.style.display = 'none';
-            // If we just hid the slots, recalculate section height
-            if (wasVisible) {
-                setTimeout(() => this.recalculateCollapsibleSections(), 50);
-            }
             return;
         } else {
             slotsContainer.style.display = 'block';
-            // If we just showed the slots, we'll recalculate after adding content
         }
 
         container.innerHTML = '';
@@ -2299,7 +2331,7 @@ window.UI = {
         }
 
         // Recalculate section height after adding all slots
-        setTimeout(() => this.recalculateCollapsibleSections(), 50);
+
     },
 
     // Handle drag start for image slots
@@ -2466,8 +2498,279 @@ window.UI = {
 
     // Recalculate collapsible section heights - DEPRECATED
     // We now use CSS-only solution for robust handling of dynamic content
-    recalculateCollapsibleSections() {
-        return;
+    renderLayoutOptions() {
+        const categoriesContainer = document.querySelector('#dropdown-layout');
+        if (!categoriesContainer) return;
+
+        categoriesContainer.innerHTML = '';
+
+        const header = document.createElement('h6');
+        header.innerText = 'Select Layout';
+        header.style.cssText = 'color: #fff; margin: 0 0 10px 0; font-size: 14px; padding: 4px;';
+        categoriesContainer.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;';
+
+        Config.multiImageLayouts.forEach(layout => {
+            const el = document.createElement('div');
+            el.className = 'layout-option';
+            if (App.state.currentLayout === layout.id) el.classList.add('selected');
+            el.dataset.layout = layout.id;
+            el.style.cssText = 'padding: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; text-align: center; border: 1px solid transparent; transition: all 0.2s;';
+
+            if (App.state.currentLayout === layout.id) {
+                el.style.borderColor = '#fff';
+                el.style.background = 'rgba(255,255,255,0.1)';
+            }
+
+            el.innerHTML = `
+                <div style="font-size: 20px; margin-bottom: 4px; color: #a1a1aa;"><i class="${layout.icon || 'fas fa-square'}"></i></div>
+                <div style="font-size: 11px; color: #fff;">${layout.name}</div>
+            `;
+
+            el.addEventListener('click', () => {
+                App.setLayout(layout.id);
+                this.closeAllMenus();
+                // Re-render to update selected state
+                this.renderLayoutOptions();
+            });
+
+            el.onmouseenter = () => {
+                if (!el.classList.contains('selected')) el.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            };
+            el.onmouseleave = () => {
+                if (!el.classList.contains('selected')) el.style.backgroundColor = 'rgba(255,255,255,0.05)';
+            };
+
+            grid.appendChild(el);
+        });
+
+        categoriesContainer.appendChild(grid);
+    },
+
+    // Recalculate collapsible section heights - Removed
+
+    setupResolutionOptions() {
+        const categoriesContainer = document.querySelector('#dropdown-resolution'); // Changed target
+        if (!categoriesContainer) {
+            console.error('Resolution Dropdown not found!');
+            return;
+        }
+
+        // Clear existing
+        categoriesContainer.innerHTML = '';
+
+        // Add header/title inside dropdown for consistency
+        const header = document.createElement('h6');
+        header.innerText = 'Select a Resolution';
+        header.style.cssText = 'color: #fff; margin: 0 0 10px 0; font-size: 14px; padding: 4px;';
+        categoriesContainer.appendChild(header);
+
+        // Use resolutionCategories from Config
+        if (!Config.resolutionCategories || Config.resolutionCategories.length === 0) {
+            console.error('No resolution categories found in Config');
+            return;
+        }
+
+        // Iterate through each category
+        Config.resolutionCategories.forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'resolution-category';
+            categoryDiv.style.marginBottom = '12px';
+
+            const title = document.createElement('div');
+            title.className = 'category-title';
+            title.textContent = category.name;
+            title.style.cssText = 'font-size: 12px; color: #a1a1aa; margin-bottom: 6px; padding: 0 4px; font-weight: 600; text-transform: uppercase;';
+            categoryDiv.appendChild(title);
+
+            const optionsGrid = document.createElement('div');
+            optionsGrid.className = 'resolution-options-grid';
+            optionsGrid.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px;';
+
+            category.resolutions.forEach(res => {
+                const option = document.createElement('div');
+                option.className = 'resolution-option';
+                option.dataset.id = res.id;
+                option.style.cssText = 'padding: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;';
+
+                if (App.state.resolution && App.state.resolution.id === res.id) {
+                    option.classList.add('selected');
+                    option.style.borderColor = '#fff';
+                    option.style.background = 'rgba(255,255,255,0.1)';
+                }
+
+                option.innerHTML = `
+                    <div class="res-name" style="font-size: 13px; font-weight: 500; color: #fff;">${res.name}</div>
+                    <div class="res-dims" style="font-size: 11px; color: #a1a1aa;">${res.width} x ${res.height}</div>
+                `;
+
+                option.addEventListener('click', () => {
+                    // Update selection UI
+                    document.querySelectorAll('.resolution-option').forEach(el => {
+                        el.classList.remove('selected');
+                        el.style.borderColor = 'transparent';
+                        el.style.background = 'rgba(255,255,255,0.05)';
+                    });
+                    option.classList.add('selected');
+                    option.style.borderColor = '#fff';
+                    option.style.background = 'rgba(255,255,255,0.1)';
+
+                    // Apply resolution
+                    App.state.resolution = res;
+                    App.updateCanvasSize();
+                    App.renderPreview();
+                    App.saveSettings();
+
+                    // Close menu
+                    this.closeAllMenus();
+                });
+
+                optionsGrid.appendChild(option);
+            });
+
+            categoryDiv.appendChild(optionsGrid);
+            categoriesContainer.appendChild(categoryDiv);
+        });
+    },
+
+    renderTemplates() {
+        console.log('🎨🎨🎨 renderTemplates() CALLED!');
+
+        // Render background style presets to dropdown
+        const grid = document.getElementById('dropdown-templates');
+        console.log('🎨 dropdown-templates element:', grid);
+
+        if (!grid) {
+            console.error('❌ dropdown-templates element not found!');
+            return;
+        }
+
+        console.log('✅ Found dropdown-templates, clearing innerHTML');
+        grid.innerHTML = '';
+
+        // Create wrapper using templates-grid class
+        const templatesGrid = document.createElement('div');
+        templatesGrid.className = 'templates-grid';
+        grid.appendChild(templatesGrid);
+
+        // Define background style presets
+        const backgroundPresets = [
+            { id: 'gradient-sunset', name: 'Sunset', colors: ['#FF6B6B', '#FFE66D'], type: 'gradient', angle: 135 },
+            { id: 'gradient-ocean', name: 'Ocean', colors: ['#667eea', '#764ba2'], type: 'gradient', angle: 135 },
+            { id: 'gradient-forest', name: 'Forest', colors: ['#134E5E', '#71B280'], type: 'gradient', angle: 135 },
+            { id: 'gradient-night', name: 'Night', colors: ['#2C3E50', '#4CA1AF'], type: 'gradient', angle: 135 },
+            { id: 'gradient-fire', name: 'Fire', colors: ['#f12711', '#f5af19'], type: 'gradient', angle: 135 },
+            { id: 'gradient-purple', name: 'Purple', colors: ['#8E2DE2', '#4A00E0'], type: 'gradient', angle: 135 },
+            { id: 'solid-dark', name: 'Dark', colors: ['#1a1a1a'], type: 'solid' },
+            { id: 'solid-light', name: 'Light', colors: ['#f5f5f5'], type: 'solid' },
+            { id: 'gradient-pink', name: 'Pink Dream', colors: ['#ff9a9e', '#fecfef'], type: 'gradient', angle: 135 },
+            { id: 'gradient-blue', name: 'Blue Sky', colors: ['#a1c4fd', '#c2e9fb'], type: 'gradient', angle: 135 },
+        ];
+
+        backgroundPresets.forEach(preset => {
+            const templateItem = document.createElement('div');
+            templateItem.className = 'template-item';
+            templateItem.dataset.templateId = preset.id;
+
+            // Create preview with the background style
+            const preview = document.createElement('div');
+            preview.className = 'template-preview';
+
+            if (preset.type === 'gradient' && preset.colors.length >= 2) {
+                preview.style.background = `linear-gradient(${preset.angle}deg, ${preset.colors[0]}, ${preset.colors[1]})`;
+            } else {
+                preview.style.background = preset.colors[0];
+            }
+
+            // Create name
+            const name = document.createElement('div');
+            name.className = 'template-name';
+            name.textContent = preset.name;
+
+            templateItem.appendChild(preview);
+            templateItem.appendChild(name);
+
+            // Add click handler to apply background style
+            templateItem.addEventListener('click', (e) => {
+                console.log('🎨 TEMPLATE CLICKED!', preset.name);
+                e.stopPropagation();
+                e.preventDefault();
+                console.log('🎨 Event stopped, calling applyBackgroundPreset');
+                console.log('🎨 this context:', this);
+                console.log('🎨 window.App.state:', window.App?.state);
+                this.applyBackgroundPreset(preset);
+                console.log('🎨 Background preset applied, closing menus');
+                this.closeAllMenus();
+                console.log('🎨 Done!');
+            }, { capture: true });
+
+            templatesGrid.appendChild(templateItem);
+        });
+
+        console.log(`✅ Rendered ${backgroundPresets.length} background presets to dropdown`);
+    },
+
+    applyBackgroundPreset(preset) {
+        console.log('🔧 applyBackgroundPreset called with:', preset);
+
+        if (!window.App || !window.App.state) {
+            console.error('❌ App state not available!', { App: window.App, state: window.App?.state });
+            return;
+        }
+
+        console.log('✅ App state is available');
+
+        // Map template preset IDs to actual gradient IDs in Config
+        const gradientIdMap = {
+            'gradient-sunset': 'sunset',
+            'gradient-ocean': 'ocean',
+            'gradient-forest': 'forest',
+            'gradient-night': 'midnight',
+            'gradient-fire': 'ruby-fire',
+            'gradient-purple': 'royal-purple',
+            'gradient-pink': 'purple-haze',
+            'gradient-blue': 'ocean-breeze'
+        };
+
+        // Apply the background style to current canvas using App's state structure
+        if (preset.type === 'gradient') {
+            const gradientId = gradientIdMap[preset.id];
+            if (gradientId) {
+                console.log('🎨 Applying gradient:', gradientId);
+                window.App.state.backgroundColor = null;
+                window.App.state.backgroundImageId = null;
+                window.App.state.backgroundGradientId = gradientId;
+            } else {
+                console.warn('⚠️ No matching gradient ID found for:', preset.id);
+            }
+        } else if (preset.type === 'solid') {
+            console.log('🎨 Applying solid color:', preset.colors[0]);
+            window.App.state.backgroundColor = preset.colors[0];
+            window.App.state.backgroundGradientId = null;
+            window.App.state.backgroundImageId = null;
+        }
+
+        console.log('📊 Updated App.state:', {
+            backgroundColor: window.App.state.backgroundColor,
+            backgroundGradientId: window.App.state.backgroundGradientId,
+            backgroundImageId: window.App.state.backgroundImageId
+        });
+
+        // Trigger App's render which handles everything properly
+        if (window.App && typeof window.App.render === 'function') {
+            console.log('🖼️ Calling App.render()');
+            window.App.render();
+            console.log('✅ Canvas rendered via App.render()');
+        } else {
+            console.error('❌ App.render not available!', {
+                App: window.App,
+                render: window.App?.render
+            });
+        }
+
+        console.log('✅ Applied background preset:', preset.name);
     },
 
     // Show duplicate options modal
@@ -2790,25 +3093,7 @@ window.UI = {
         return `<div class="platform-icons">${icons}</div>`;
     },
 
-    // Setup resolution option clicks
-    setupResolutionOptions() {
-        const resolutionOptions = document.querySelectorAll('.resolution-option');
 
-        resolutionOptions.forEach((option, index) => {
-            option.addEventListener('click', () => {
-                const width = parseInt(option.dataset.width, 10);
-                const height = parseInt(option.dataset.height, 10);
-
-                if (width && height) {
-                    // Update the app state with new dimensions
-                    window.App.setResolution(width, height);
-
-                    // Update UI to show selected resolution - use the standardized method
-                    this.updateResolutionSelection(`${width}x${height}`);
-                }
-            });
-        });
-    },
 
     // Updates selected resolution option
     updateResolutionSelection(resolutionKey) {
@@ -4396,21 +4681,7 @@ window.UI = {
         }
     },
 
-    // Toggle actions dropdown
-    toggleActionsDropdown() {
-        const container = document.querySelector('.dropdown-container');
-        if (container) {
-            container.classList.toggle('active');
-        }
-    },
-
-    // Hide actions dropdown
-    hideActionsDropdown() {
-        const container = document.querySelector('.dropdown-container');
-        if (container) {
-            container.classList.remove('active');
-        }
-    },
+    // Actions dropdown is now handled by addMenuListeners() and closeAllMenus()
 
     // Clear all canvases
     clearAllCanvases() {

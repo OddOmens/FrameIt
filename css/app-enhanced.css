@@ -1,276 +1,654 @@
-/* App Enhanced - Matching Landing Page Theme */
+/* App Enhanced - Shadcn Zinc Dark Theme */
 
 :root {
-    /* Colors - Clean Dark Theme */
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #121212;
-    --bg-tertiary: #1e1e1e;
+    /* Shadcn Zinc Palette (Dark) */
+    --background: #09090b;
+    --foreground: #fafafa;
 
-    --text-primary: #ffffff;
-    --text-secondary: #a1a1aa;
-    --text-muted: #52525b;
+    --card: #09090b;
+    --card-foreground: #fafafa;
 
-    /* Accents - Solid & Clean */
-    --accent: #ffffff;
-    --accent-hover: #e5e5e5;
-    --accent-subtle: rgba(255, 255, 255, 0.1);
+    --popover: #09090b;
+    --popover-foreground: #fafafa;
 
-    --border: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.16);
-    --border-strong: rgba(255, 255, 255, 0.24);
+    --primary: #fafafa;
+    --primary-foreground: #18181b;
 
-    /* Overriding styles.css variables */
-    --primary-bg: #0a0a0a;
-    --secondary-bg: #121212;
-    --panel-bg: #1e1e1e;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --text-color: #ffffff;
-    --accent-color: #ffffff;
+    --secondary: #27272a;
+    --secondary-foreground: #fafafa;
 
-    /* UI Elements */
-    --btn-bg: #1e1e1e;
-    --btn-hover: rgba(255, 255, 255, 0.16);
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
 
-    /* Spacing */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
+
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fafafa;
+
+    --border: #27272a;
+    --input: #27272a;
+    --ring: #d4d4d8;
+
+    --radius: 0.5rem;
+
+    /* Overriding styles.css legacy variables */
+    --primary-bg: var(--background);
+    --secondary-bg: var(--card);
+    --panel-bg: var(--card);
+    --border-color: var(--border);
+    --text-color: var(--foreground);
+    --accent-color: var(--primary);
 }
 
 body {
-    background-color: #0a0a0a;
-    color: #ffffff;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* App Container */
-.app-container {
-    background-color: #0a0a0a;
+/* --- Layout Structure --- */
+
+/* Force flush layout */
+.app-container,
+.toolbar-and-content-wrapper,
+.main-content {
+    background-color: var(--background);
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 /* Toolbar */
 .toolbar {
-    background-color: rgba(10, 10, 10, 0.95);
-    /* Increased opacity */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-bottom: none;
-    border-radius: 1rem 1rem 0 0;
-    margin: 12px;
+    background-color: var(--background);
+    /* Solid bg for consistency */
+    border-bottom: 1px solid var(--border);
+    height: 60px;
+    /* Fixed height */
+    padding: 0 16px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+}
+
+/* Menubar (Below Toolbar) */
+.menubar {
+    display: flex;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+    padding: 0 12px;
+    height: 40px;
+    align-items: center;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 40;
+}
+
+.small-btn {
+    height: 32px;
+    font-size: 13px;
+    padding: 0 12px;
+}
+
+/* Menubar Buttons - Match menu-item styling for consistency */
+.menubar .btn {
+    background-color: transparent !important;
+    border: none;
+    box-shadow: none;
+    color: var(--muted-foreground);
+    opacity: 1;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.menubar .btn:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+    opacity: 1;
+}
+
+.menubar .btn.primary-btn {
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground);
+    opacity: 1;
+}
+
+.menubar .btn.primary-btn:hover {
+    background-color: var(--primary);
+    opacity: 0.9;
+}
+
+.menu-item {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    user-select: none;
+}
+
+.menu-item:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.menu-item.active {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.menu-item.disabled,
+.menu-item[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Dropdowns (Popover Style) */
+.menu-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 280px;
+    background-color: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 12px;
+    display: none;
+    /* Hidden by default */
+    z-index: 1000;
+    animation: zoomIn 0.1s ease-out;
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.menu-item.active > .menu-dropdown {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Layout Dropdown Styles */
+.layout-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 4px;
+}
+
+.layout-item {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--card);
+    text-align: center;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.layout-item:hover {
+    background: var(--accent);
+    border-color: var(--muted-foreground);
+}
+
+.layout-item.selected {
+    background: var(--accent);
+    border-color: var(--primary);
+    color: var(--accent-foreground);
+}
+
+.layout-item .layout-icon {
+    font-size: 24px;
+    opacity: 0.7;
+}
+
+.layout-item .layout-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+/* Resolution Dropdown Styles */
+.resolution-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.resolution-option {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    font-size: 13px;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid transparent;
+}
+
+.resolution-option:hover {
+    background: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.resolution-option.selected {
+    background: var(--accent);
+    border-color: var(--primary);
+    color: var(--accent-foreground);
+}
+
+.resolution-option .resolution-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.resolution-option .resolution-dimensions {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* Templates Dropdown Styles */
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.template-item {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--card);
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.template-item:hover {
+    background: var(--accent);
+    border-color: var(--muted-foreground);
+}
+
+.template-item.selected {
+    background: var(--accent);
+    border-color: var(--primary);
+}
+
+.template-item .template-preview {
+    flex: 1;
+    background: var(--muted);
+    border-radius: 4px;
+    min-height: 60px;
+}
+
+.template-item .template-name {
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    color: var(--foreground);
+}
+
+/* Dropdown Items */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--popover-foreground);
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:last-child {
     margin-bottom: 0;
 }
 
-/* Logo */
-.logo-text {
-    background: none;
-    -webkit-text-fill-color: #ffffff;
-    color: #ffffff;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+.dropdown-item:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
 }
 
-/* Main Content Wrapper */
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--muted-foreground);
+}
+
+.dropdown-item:hover i {
+    color: var(--foreground);
+}
+
+/* Main Content Area */
 .main-content {
-    background-color: #121212;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-top: none;
-    border-radius: 0 0 1rem 1rem;
-    margin: 12px;
-    margin-top: 0;
-    padding-bottom: 20px;
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 100px);
+    /* 100vh - toolbar(60) - menubar(40) */
 }
 
-/* Left Column (Gallery) */
+/* Sidebar & Control Panels */
+.control-panels,
 .gallery-bar {
-    background-color: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.75rem;
+    background-color: var(--card);
+    /* Zinc-950/Black */
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.control-panels {
+    width: 320px;
+    /* Shadcn standard sidebar width usually 250-320 */
+    border-right: none;
+    /* Right panel */
+}
+
+.gallery-bar {
+    width: 320px;
+    border-left: none;
+    /* Left panel */
+    background-color: #000000;
+}
+
+/* Sidebar Tabs */
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--background);
+    padding: 0 4px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 20;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted-foreground);
+    padding: 12px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tab-btn:hover {
+    color: var(--foreground);
+    background-color: var(--accent);
+}
+
+.tab-btn.active {
+    color: var(--foreground);
+    border-bottom-color: var(--primary);
+}
+
+/* Sidebar Content */
+.sidebar-content,
+.gallery-content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background-color: var(--card);
 }
 
 .gallery-content-wrapper {
-    background-color: #1e1e1e;
+    background-color: #000000;
 }
 
-.gallery-item-image {
-    background-color: #121212;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.5rem;
+.gallery-content {
+    gap: 8px !important;
 }
 
-.gallery-item:hover .gallery-item-image {
-    border-color: rgba(255, 255, 255, 0.16);
-    background-color: #121212;
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.15s ease;
 }
 
-.gallery-item.selected .gallery-item-image {
-    border-color: #ffffff;
-    box-shadow: 0 0 0 1px #ffffff;
+.tab-pane.active {
+    display: block;
 }
 
-/* Canvas Container */
-.canvas-container {
-    background-color: #0a0a0a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.75rem;
-    position: relative;
-    z-index: 1;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
-.image-drop-zone {
-    background-color: rgba(10, 10, 10, 0.8);
-    border-color: rgba(255, 255, 255, 0.24);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    /* Ensure it's above everything */
-    pointer-events: auto;
-    /* Ensure it captures clicks */
+/* --- Components (Shadcn Style) --- */
+
+/* Typography */
+h5,
+h6,
+.panel-title {
+    color: var(--foreground);
+    font-weight: 600;
+    font-size: 0.875rem;
+    /* 14px */
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
 }
 
-/* Right Sidebar (Controls) */
-.settings-sidebar {
-    background-color: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.75rem;
+label,
+.form-label {
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="number"],
+select,
+textarea,
+.input-control,
+.select-control {
+    background-color: transparent !important;
+    border: 1px solid var(--input) !important;
+    border-radius: var(--radius) !important;
+    color: var(--foreground) !important;
+    padding: 8px 12px !important;
+    font-size: 0.875rem !important;
+    /* 14px */
+    transition: border-color 0.2s;
+    width: 100%;
+    box-shadow: none !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--ring) !important;
+    box-shadow: 0 0 0 1px var(--ring);
+}
+
+input::placeholder {
+    color: var(--muted-foreground);
 }
 
 /* Buttons */
 .btn {
-    background-color: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.5rem;
-    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
     font-weight: 500;
-    transition: all 0.2s ease;
-    box-shadow: none;
-}
-
-.btn:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.24);
-    transform: translateY(-1px);
-    box-shadow: none;
-}
-
-.primary-btn {
-    background-color: #ffffff;
-    color: #0a0a0a;
-    border-color: #ffffff;
-}
-
-.primary-btn:hover:not(:disabled) {
-    background-color: #e5e5e5;
-    border-color: #e5e5e5;
-    color: #0a0a0a;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
-#export-btn.primary-btn:hover:not(:disabled) {
-    background-color: #e5e5e5 !important;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
-.danger-btn {
-    background-color: rgba(220, 38, 38, 0.1);
-    color: #ef4444;
-    border-color: rgba(220, 38, 38, 0.2);
-}
-
-.danger-btn:hover:not(:disabled) {
-    background-color: rgba(220, 38, 38, 0.2);
-    border-color: rgba(220, 38, 38, 0.3);
-}
-
-/* Inputs & Controls */
-.select-control,
-.number-input,
-.text-editor textarea,
-.text-editor select,
-.text-editor input[type="color"] {
-    background-color: #0a0a0a !important;
-    /* Force dark background */
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #ffffff !important;
-    /* Force white text */
-    border-radius: 0.5rem;
-}
-
-.select-control option {
-    background-color: #0a0a0a;
-    color: #ffffff;
-}
-
-.select-control:focus,
-.number-input:focus,
-.text-editor textarea:focus,
-.text-editor select:focus {
-    border-color: #ffffff;
-    outline: none;
-}
-
-/* Sliders */
-.slider-container input[type="range"] {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb {
-    background: #ffffff;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.slider-container input[type="range"]::-moz-range-thumb {
-    background: #ffffff;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Section Headers */
-.settings-section .section-header {
-    border-bottom: 1px solid transparent;
+    height: 36px;
+    padding: 0 16px;
+    transition: all 0.2s;
     cursor: pointer;
-    /* Ensure pointer cursor */
+    border: 1px solid var(--border);
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    box-shadow: none !important;
 }
 
-
-
-.settings-section .section-header h5 {
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: #ffffff;
+.btn:hover {
+    background-color: var(--secondary);
+    opacity: 0.9;
 }
 
-.settings-section .section-header::after {
-    color: #a1a1aa;
+.btn.primary-btn {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
 }
 
-/* Modals */
-.modal {
-    backdrop-filter: blur(12px);
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
+.btn.primary-btn:hover {
+    opacity: 0.9;
+    background-color: var(--primary);
+    /* Maintain color, opacity handles hover */
 }
 
-.modal-content {
-    background-color: #121212;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.5);
+.btn.outline-btn {
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--foreground);
 }
 
-.modal-header {
-    background-color: #1e1e1e;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+.btn.outline-btn:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
 }
 
-.modal .button-row {
-    background-color: #1e1e1e;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+.btn i {
+    margin-right: 8px;
+}
+
+/* Gallery Items */
+.gallery-item-image {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--muted);
+    transition: all 0.2s;
+}
+
+.gallery-item:hover .gallery-item-image {
+    border-color: var(--muted-foreground);
+}
+
+.gallery-item.selected .gallery-item-image {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* Canvas Area */
+.canvas-container {
+    background-color: var(--background);
+    /* Same as body for seamless look */
+    /* Add dot pattern or grid? Optional. Keep simple for now */
+}
+
+/* Resolution Options in Dropdown */
+.resolution-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.resolution-option {
+    padding: 8px;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.resolution-option:hover {
+    background-color: var(--accent);
+}
+
+.resolution-option.selected {
+    background-color: var(--accent);
+    border-color: var(--primary);
+}
+
+/* Legacy Support (Robust Collapsible) */
+.settings-section .section-content {
+    max-height: 5000px !important;
+    opacity: 1 !important;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+}
+
+.hidden-content {
+    display: none !important;
+}
+
+/* Utilities */
+.divider {
+    height: 1px;
+    background-color: var(--border);
+    margin: 16px 0;
+}
+
+.full-width {
+    width: 100%;
 }
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -278,247 +656,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 4px;
+    background: var(--border);
+    border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.16);
-}
-
-/* Text Editor Specifics */
-.text-align-buttons button,
-.text-style-buttons button,
-.text-position-controls button,
-.quick-pos-btn {
-    background-color: #0a0a0a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #a1a1aa;
-}
-
-.text-align-buttons button:hover,
-.text-style-buttons button:hover,
-.text-position-controls button:hover,
-.quick-pos-btn:hover {
-    background-color: #1e1e1e;
-    border-color: rgba(255, 255, 255, 0.16);
-    color: #ffffff;
-}
-
-.text-align-buttons button.active,
-.text-style-buttons button.active,
-.quick-pos-btn.active {
-    background-color: #ffffff;
-    border-color: #ffffff;
-    color: #0a0a0a;
-}
-
-/* Resolution Options */
-.resolution-option {
-    background-color: transparent;
-    border: 1px solid transparent;
-}
-
-.resolution-option:hover {
-    background-color: #0a0a0a;
-    border-color: rgba(255, 255, 255, 0.08);
-}
-
-.resolution-option.selected {
-    background-color: #0a0a0a;
-    border-color: #ffffff;
-}
-
-/* Fix for white text on white background in primary buttons */
-.primary-btn,
-.primary-btn i,
-.primary-btn span {
-    color: #0a0a0a !important;
-}
-
-.primary-btn:hover:not(:disabled),
-.primary-btn:hover:not(:disabled) i,
-.primary-btn:hover:not(:disabled) span {
-    color: #0a0a0a !important;
-}
-
-/* Ensure sidebar panels are clickable */
-.control-panels {
-    position: relative;
-    z-index: 10;
-}
-
-.settings-section .section-header {
-    border-bottom: 1px solid transparent;
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-    pointer-events: auto;
-    /* Ensure clicks are captured */
-}
-
-.settings-section .section-header .header-buttons {
-    position: relative;
-    z-index: 2;
-    pointer-events: auto;
-}
-
-/* Fix for any potential white-on-white inputs */
-input:not([type="color"]):not([type="range"]),
-select,
-textarea {
-    color: #ffffff !important;
-    background-color: #0a0a0a !important;
-}
-
-/* Ensure dropdown options are visible */
-option {
-    background-color: #0a0a0a !important;
-    color: #ffffff !important;
-}
-
-/* Dropdown Menu */
-.dropdown-container {
-    position: relative;
-    display: inline-block;
-    overflow: visible !important;
-}
-
-/* Ensure toolbar allows overflow */
-.toolbar,
-.toolbar-right {
-    overflow: visible !important;
-}
-
-/* Dropdown Menu - Force visibility with fixed positioning */
-#actions-dropdown-menu {
-    position: fixed !important;
-    z-index: 2147483647 !important;
-    display: none !important;
-    min-width: 220px !important;
-    max-width: 280px !important;
-    padding: 6px !important;
-    margin: 0 !important;
-    background-color: #18181b !important;
-    /* Zinc-900 */
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 12px !important;
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.2),
-        0 10px 25px -5px rgba(0, 0, 0, 0.6),
-        0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
-    pointer-events: auto !important;
-    backdrop-filter: blur(12px);
-}
-
-#actions-dropdown-menu.show {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-.dropdown-item {
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-    padding: 10px 12px !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    color: #e4e4e7 !important;
-    text-align: left !important;
-    white-space: nowrap !important;
-    background-color: transparent !important;
-    border: 0 !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    gap: 10px !important;
-    transition: all 0.15s ease !important;
-    margin-bottom: 2px !important;
-}
-
-.dropdown-item:last-child {
-    margin-bottom: 0 !important;
-}
-
-.dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    color: #ffffff !important;
-    transform: translateX(2px);
-}
-
-.dropdown-item i {
-    width: 16px !important;
-    text-align: center !important;
-    color: #a1a1aa !important;
-    font-size: 14px !important;
-    transition: color 0.15s ease !important;
-}
-
-.dropdown-item:hover i {
-    color: #ffffff !important;
-}
-
-.dropdown-btn.active {
-    background-color: rgba(255, 255, 255, 0.16) !important;
-    color: #a1a1aa !important;
-}
-
-/* Ensure dropdown appears above sidebar */
-.customize-panel,
-.settings-panel,
-body>div:not(#actions-dropdown-menu) {
-    z-index: 1000 !important;
-}
-
-#actions-dropdown-menu {
-    z-index: 2147483647 !important;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* 
-   --------------------------------------------------------------------------
-   Robust Collapsible Sections 
-   --------------------------------------------------------------------------
-   Replaces fragile JS height calculation with CSS-only transition.
-   Uses a large max-height for the open state to accommodate dynamic content.
-*/
-
-.settings-section .section-content {
-    /* Use max-height transition for robust animation */
-    /* Set a max-height large enough for any content */
-    max-height: 5000px !important; 
-    opacity: 1 !important;
-    overflow: hidden !important;
-    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.3s ease, margin 0.3s ease !important;
-    padding-bottom: 20px !important; /* Restore padding if needed */
-    display: block !important;
-    visibility: visible !important;
-}
-
-.settings-section.collapsed .section-content {
-    max-height: 0 !important;
-    opacity: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    pointer-events: none !important;
-    border: none !important;
-    visibility: hidden !important;
-}
-
-/* Ensure consistent spacing between sections */
-.settings-section {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Maintain border */
+    background: var(--muted-foreground);
 }
