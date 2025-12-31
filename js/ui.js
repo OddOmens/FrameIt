@@ -2792,15 +2792,15 @@ window.UI = {
             backgroundImageId: window.App.state.backgroundImageId
         });
 
-        // Trigger App's render which handles everything properly
-        if (window.App && typeof window.App.render === 'function') {
-            console.log('🖼️ Calling App.render()');
-            window.App.render();
-            console.log('✅ Canvas rendered via App.render()');
+        // Trigger App's renderPreview which handles everything properly
+        if (window.App && typeof window.App.renderPreview === 'function') {
+            console.log('🖼️ Calling App.renderPreview()');
+            window.App.renderPreview();
+            console.log('✅ Canvas rendered via App.renderPreview()');
         } else {
-            console.error('❌ App.render not available!', {
+            console.error('❌ App.renderPreview not available!', {
                 App: window.App,
-                render: window.App?.render
+                renderPreview: window.App?.renderPreview
             });
         }
 
