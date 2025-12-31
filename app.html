@@ -82,19 +82,6 @@
                 <!-- Spacer to push content to right -->
                 <div style="flex: 1;"></div>
 
-                <div class="menu-item" id="menu-resolution">
-                    <i class="fas fa-desktop"></i> Resolution
-                    <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
-                    <div class="menu-dropdown" id="dropdown-resolution"></div>
-                </div>
-                <div class="menu-item" id="menu-templates">
-                    <i class="fas fa-swatchbook"></i> Templates
-                    <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
-                    <div class="menu-dropdown" id="dropdown-templates"></div>
-                </div>
-
-                <div style="width: 1px; height: 20px; background: var(--border); margin: 0 12px;"></div>
-
                 <div class="menu-item" id="add-image-btn">
                     <i class="fas fa-image"></i> <span>Add Image</span>
                 </div>
@@ -197,6 +184,9 @@
                         </button>
                         <button class="tab-btn" data-tab="tab-text" title="Text">
                             <i class="fas fa-font"></i>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-resolution" title="Resolution">
+                            <i class="fas fa-desktop"></i>
                         </button>
                     </div>
 
@@ -401,12 +391,7 @@
                         <!-- TAB: Noise -->
                         <div id="tab-noise" class="tab-pane">
                             <div class="settings-section">
-                                <h5 class="tab-header">Noise & Texture
-                                    <button id="random-noise-btn" class="btn primary-btn small-btn"
-                                        style="float: right;">
-                                        <i class="fas fa-dice"></i>
-                                    </button>
-                                </h5>
+                                <h5 class="tab-header">Noise & Texture</h5>
                                 <div class="section-content">
                                     <div class="noise-controls">
                                         <div class="form-group">
@@ -773,6 +758,18 @@
                                             <i class="fas fa-sync"></i>
                                             <span>Apply to All</span>
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: Resolution -->
+                        <div id="tab-resolution" class="tab-pane">
+                            <div class="settings-section">
+                                <h5 class="tab-header">Canvas Resolution</h5>
+                                <div class="section-content">
+                                    <div id="resolution-list" class="resolution-categories">
+                                        <!-- Resolution options will be populated by JavaScript -->
                                     </div>
                                 </div>
                             </div>

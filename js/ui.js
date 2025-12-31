@@ -280,12 +280,12 @@ window.UI = {
         this.cacheElements();
         this.setupEventListeners();
         this.setupWatermarkControls(); // Add watermark control setup
-        this.renderTemplates(); // Render templates in their own section
+        // this.renderTemplates(); // Templates dropdown removed
         this.renderLayouts(); // Render layout options
 
         // Populate menu dropdowns
         this.renderLayoutOptions(); // Populate Layout dropdown
-        this.setupResolutionOptions(); // Populate Resolution dropdown
+        this.setupResolutionOptions(); // Populate Resolution tab panel
 
         // Force enable export buttons after all setup is complete
         this.forceEnableExportButtons();
@@ -2552,20 +2552,14 @@ window.UI = {
     // Recalculate collapsible section heights - Removed
 
     setupResolutionOptions() {
-        const categoriesContainer = document.querySelector('#dropdown-resolution'); // Changed target
+        const categoriesContainer = document.querySelector('#resolution-list'); // Resolution tab panel
         if (!categoriesContainer) {
-            console.error('Resolution Dropdown not found!');
+            console.error('Resolution list container not found!');
             return;
         }
 
         // Clear existing
         categoriesContainer.innerHTML = '';
-
-        // Add header/title inside dropdown for consistency
-        const header = document.createElement('h6');
-        header.innerText = 'Select a Resolution';
-        header.style.cssText = 'color: #fff; margin: 0 0 10px 0; font-size: 14px; padding: 4px;';
-        categoriesContainer.appendChild(header);
 
         // Use resolutionCategories from Config
         if (!Config.resolutionCategories || Config.resolutionCategories.length === 0) {
@@ -2587,13 +2581,13 @@ window.UI = {
 
             const optionsGrid = document.createElement('div');
             optionsGrid.className = 'resolution-options-grid';
-            optionsGrid.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px;';
+            optionsGrid.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
 
             category.resolutions.forEach(res => {
                 const option = document.createElement('div');
                 option.className = 'resolution-option';
                 option.dataset.id = res.id;
-                option.style.cssText = 'padding: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;';
+                option.style.cssText = 'padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 12px;';
 
                 if (App.state.resolution && App.state.resolution.id === res.id) {
                     option.classList.add('selected');
@@ -2601,9 +2595,35 @@ window.UI = {
                     option.style.background = 'rgba(255,255,255,0.1)';
                 }
 
+                // Determine platform icon based on resolution name or dimensions
+                let platformIcon = 'fa-desktop'; // Default
+                const resName = res.name.toLowerCase();
+                if (resName.includes('instagram') || resName.includes('square')) {
+                    platformIcon = 'fa-instagram';
+                } else if (resName.includes('story') || resName.includes('reel') || (res.width === 1080 && res.height === 1920)) {
+                    platformIcon = 'fa-mobile-alt';
+                } else if (resName.includes('twitter') || resName.includes('x ')) {
+                    platformIcon = 'fa-twitter';
+                } else if (resName.includes('facebook')) {
+                    platformIcon = 'fa-facebook';
+                } else if (resName.includes('youtube') || resName.includes('video')) {
+                    platformIcon = 'fa-youtube';
+                } else if (resName.includes('linkedin')) {
+                    platformIcon = 'fa-linkedin';
+                } else if (resName.includes('pinterest')) {
+                    platformIcon = 'fa-pinterest';
+                } else if (resName.includes('4k') || resName.includes('hd')) {
+                    platformIcon = 'fa-tv';
+                } else if (res.width > res.height) {
+                    platformIcon = 'fa-laptop';
+                }
+
                 option.innerHTML = `
-                    <div class="res-name" style="font-size: 13px; font-weight: 500; color: #fff;">${res.name}</div>
-                    <div class="res-dims" style="font-size: 11px; color: #a1a1aa;">${res.width} x ${res.height}</div>
+                    <i class="fab ${platformIcon}" style="font-size: 20px; color: #a1a1aa; width: 24px; text-align: center;"></i>
+                    <div style="flex: 1;">
+                        <div class="res-name" style="font-size: 13px; font-weight: 500; color: #fff;">${res.name}</div>
+                        <div class="res-dims" style="font-size: 11px; color: #a1a1aa;">${res.width} × ${res.height}</div>
+                    </div>
                 `;
 
                 option.addEventListener('click', () => {
@@ -2622,9 +2642,6 @@ window.UI = {
                     App.updateCanvasSize();
                     App.renderPreview();
                     App.saveSettings();
-
-                    // Close menu
-                    this.closeAllMenus();
                 });
 
                 optionsGrid.appendChild(option);

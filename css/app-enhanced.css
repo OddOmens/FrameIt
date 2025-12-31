@@ -440,8 +440,11 @@ body {
 .gallery-content-wrapper {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 16px;
     background-color: var(--card);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .gallery-content-wrapper {

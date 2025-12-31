@@ -1858,10 +1858,12 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
     margin-bottom: 15px;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
     /* Contain hover effects */
 }
 
@@ -1895,9 +1897,11 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* Remove old gradient category styles - now using gradient-grid */
@@ -2705,10 +2709,12 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
     margin-bottom: 15px;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
     /* Contain hover effects */
 }
 
@@ -2742,9 +2748,11 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* Remove old gradient category styles - now using gradient-grid */
@@ -3551,10 +3559,12 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
     margin-bottom: 15px;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
     /* Contain hover effects */
 }
 
@@ -3588,9 +3598,11 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* Remove old gradient category styles - now using gradient-grid */
@@ -4398,10 +4410,12 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
     margin-bottom: 15px;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
     /* Contain hover effects */
 }
 
@@ -4435,9 +4449,11 @@ select {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-s);
-    padding: 0 var(--space-m);
+    padding: 0;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* Remove old gradient category styles - now using gradient-grid */
