@@ -5,12 +5,11 @@
   "main": "index.html",
   "scripts": {
     "dev": "nodemon server.js",
-    "build": "echo 'Static site - copying files'",
+    "build": "mkdir -p dist && cp -r *.html css js img dist/",
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

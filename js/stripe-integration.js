@@ -10,16 +10,16 @@ class StripeIntegration {
             console.error('Stripe.js not loaded. Make sure to include Stripe.js in your HTML.');
             return;
         }
-        
+
         if (!window.STRIPE_CONFIG?.publishableKey) {
             console.error('Stripe publishable key not found. Please configure STRIPE_CONFIG in config.js');
             return;
         }
-        
+
         this.stripe = Stripe(window.STRIPE_CONFIG.publishableKey);
         this.subscriptionStatus = null;
         this.currentUser = null;
-        
+
         // Initialize subscription checking
         this.initializeSubscriptionCheck();
     }
@@ -52,24 +52,24 @@ class StripeIntegration {
             this.setButtonLoading(true, planType);
 
             console.log('Creating Stripe checkout session for:', { priceId, planType, user: this.currentUser.email });
-            
+
             // Since we need a backend to create checkout sessions, let's use Payment Links
             // For now, we'll redirect to a payment link or show that backend is needed
-            
+
             // Option 1: If you have payment links set up in Stripe
             // You can create payment links in Stripe Dashboard and redirect to them
-            
+
             // Option 2: Show message that backend is needed for full implementation
             alert(`🚀 Ready to subscribe to ${planType} plan!\n\n` +
-                  `To complete this integration, you'll need:\n` +
-                  `1. A backend server to create Stripe checkout sessions\n` +
-                  `2. Or use Stripe Payment Links from your Dashboard\n\n` +
-                  `Your Stripe configuration is ready with:\n` +
-                  `- Live publishable key: ✅\n` +
-                  `- Price ID: ${priceId}\n` +
-                  `- User: ${this.currentUser.email}\n\n` +
-                  `See STRIPE_SETUP_GUIDE.md for backend setup instructions.`);
-            
+                `To complete this integration, you'll need:\n` +
+                `1. A backend server to create Stripe checkout sessions\n` +
+                `2. Or use Stripe Payment Links from your Dashboard\n\n` +
+                `Your Stripe configuration is ready with:\n` +
+                `- Live publishable key: ✅\n` +
+                `- Price ID: ${priceId}\n` +
+                `- User: ${this.currentUser.email}\n\n` +
+                `See STRIPE_SETUP_GUIDE.md for backend setup instructions.`);
+
             // For demo: simulate successful subscription
             const shouldSimulateSuccess = confirm('Simulate successful subscription for testing?');
             if (shouldSimulateSuccess) {
@@ -80,14 +80,14 @@ class StripeIntegration {
                     planType: planType,
                     status: 'active'
                 };
-                
+
                 // Store in localStorage for persistence
                 localStorage.setItem(`subscription_${this.currentUser.uid}`, JSON.stringify(this.subscriptionStatus));
-                
+
                 this.updateUIForSubscriptionStatus();
                 alert(`✅ Demo subscription activated!\nPlan: ${planType}\nUser: ${this.currentUser.email}`);
             }
-            
+
         } catch (error) {
             console.error('Checkout session creation failed:', error);
             alert('Subscription checkout failed: ' + error.message);
@@ -101,6 +101,8 @@ class StripeIntegration {
      */
     async createStripeCheckoutSession(priceId) {
         try {
+            console.warn('Backend API calls are disabled. Please use the demo flow.');
+            /*
             const response = await fetch('/api/create-checkout-session', {
                 method: 'POST',
                 headers: {
@@ -130,6 +132,8 @@ class StripeIntegration {
             if (error) {
                 throw error;
             }
+            */
+            throw new Error('Backend payments are disabled. Use the Contact Us button for enterprise plans.');
         } catch (error) {
             console.error('Stripe checkout error:', error);
             throw error;
@@ -157,7 +161,7 @@ class StripeIntegration {
             }
 
             this.updateUIForSubscriptionStatus();
-            
+
         } catch (error) {
             console.error('Subscription status check failed:', error);
             this.subscriptionStatus = { active: false, plan: 'free', status: 'error' };
@@ -172,13 +176,13 @@ class StripeIntegration {
 
         // Update pricing modal buttons
         this.updatePricingButtons();
-        
+
         // Update export limits in UI
         this.updateExportLimits();
-        
+
         // Update any plan badges or indicators
         this.updatePlanIndicators();
-        
+
         // Store subscription status for other parts of the app
         if (window.App) {
             window.App.subscriptionStatus = this.subscriptionStatus;
@@ -191,7 +195,7 @@ class StripeIntegration {
     updatePricingButtons() {
         const monthlyBtn = document.getElementById('subscribe-pro-monthly');
         const yearlyBtn = document.getElementById('subscribe-pro-yearly');
-        
+
         if (this.subscriptionStatus.active && this.subscriptionStatus.plan === 'pro') {
             // User has active pro subscription
             if (monthlyBtn) {
@@ -270,11 +274,11 @@ class StripeIntegration {
     setButtonLoading(loading, planType) {
         const buttonId = planType === 'yearly' ? 'subscribe-pro-yearly' : 'subscribe-pro-monthly';
         const button = document.getElementById(buttonId);
-        
+
         if (button) {
             const textSpan = button.querySelector('.btn-text');
             const spinner = button.querySelector('.btn-spinner');
-            
+
             if (loading) {
                 button.disabled = true;
                 if (textSpan) textSpan.style.display = 'none';
@@ -300,11 +304,11 @@ class StripeIntegration {
      */
     canPerformAction(action, currentUsage = 0) {
         if (!this.subscriptionStatus) return false;
-        
+
         if (this.subscriptionStatus.active && this.subscriptionStatus.plan === 'pro') {
             return true; // Pro users have unlimited access
         }
-        
+
         // Free tier limits
         switch (action) {
             case 'export':
@@ -331,7 +335,7 @@ class StripeIntegration {
             // Implement subscription cancellation
             console.log('Cancelling subscription...');
             // API call to cancel subscription
-            
+
         } catch (error) {
             console.error('Failed to cancel subscription:', error);
             throw error;
