@@ -1,28 +1,16 @@
 {
-  "name": "frameit",
-  "version": "1.0.0",
-  "description": "FrameIt - Beautiful screenshot mockup tool",
-  "main": "index.html",
-  "scripts": {
-    "dev": "nodemon server.js",
-    "build": "mkdir -p dist && cp -r *.html css js img dist/",
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.2"
-  },
-  "engines": {
-    "node": "22.x"
-  },
-  "keywords": [
-    "mockup",
-    "screenshot",
-    "design",
-    "frameit"
-  ],
-  "author": "FrameIt Team",
-  "license": "MIT"
+    "name": "frameit",
+    "version": "2.0.0",
+    "description": "FrameIt - Professional Screenshot Mockups",
+    "main": "index.html",
+    "scripts": {
+        "dev": "nodemon server.js",
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.2"
+    }
 }

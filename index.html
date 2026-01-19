@@ -5,579 +5,747 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FrameIt - Professional Screenshot Mockup Tool</title>
-    <meta name="description"
-        content="Transform your app screenshots into stunning mockups with custom frames, shadows, and backgrounds. The best free alternative to Screenshot Studio. Perfect for app stores, portfolios, and client presentations.">
-    <meta name="keywords"
-        content="screenshot mockup, app presentation, device frames, mockup generator, design tool, app marketing, screenshot studio alternative, free mockup tool">
-    <meta name="author" content="Odd Omens">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://frameit.social">
-    <meta property="og:title" content="FrameIt - Professional Screenshot Mockup Tool">
-    <meta property="og:description"
-        content="Transform your app screenshots into stunning mockups with custom frames, shadows, and backgrounds. The best free alternative to Screenshot Studio.">
-    <meta property="og:image" content="https://frameit.social/img/landing/hero_image.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://frameit.social">
-    <meta property="twitter:title" content="FrameIt - Professional Screenshot Mockup Tool">
-    <meta property="twitter:description"
-        content="Transform your app screenshots into stunning mockups with custom frames, shadows, and backgrounds. The best free alternative to Screenshot Studio.">
-    <meta property="twitter:image" content="https://frameit.social/img/landing/hero_image.png">
-
-    <link rel="canonical" href="https://frameit.social">
-    <link rel="icon" href="img/logo.png" type="image/png">
-
-    <!-- Preload critical resources -->
-    <link rel="preload" href="css/landing-enhanced.css" as="style">
-    <!-- Hero image preload removed since we're not using it -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        as="style">
-
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/landing-enhanced.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Analytics -->
-    <script defer src="https://analytics.oddomens.com/script.js"
-        data-website-id="598c1ef0-e7ed-4cce-a838-8912a90c1a6f"></script>
-    <!-- Scripts -->
-
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "FrameIt",
-        "description": "Create stunning screenshot mockups with professional frames, shadows, and backgrounds. Perfect for app presentations, portfolios, and marketing materials.",
-        "url": "https://frameit.social",
-        "applicationCategory": "DesignApplication",
-        "operatingSystem": "Web Browser",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-        },
-        "creator": {
-            "@type": "Organization",
-            "name": "Odd Omens"
-        },
-        "image": "https://frameit.social/img/landing/hero_image.png"
-    }
-    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&family=Space+Mono&family=Roboto:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Merriweather:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="/" class="nav-brand">
-                <img src="img/logo.png" alt="FrameIt" class="brand-icon-img" height="32">
-                <span class="brand-text">FrameIt</span>
-            </a>
 
-            <div class="nav-actions">
-                <button class="btn btn-primary" id="get-started-btn">Start Creating</button>
-            </div>
-        </div>
-    </nav>
+    <!-- LANDING PAGE -->
+    <div id="landing-page">
+        <!-- Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <a href="#" class="nav-brand">
+                    <span class="logo-icon">🖼️</span>
+                    <span class="brand-text">FrameIt</span>
+                </a>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <i class="fas fa-magic"></i>
-                    <span>Free Screenshot Studio Alternative</span>
-                </div>
-
-                <h1 class="hero-title">
-                    <span class="title-main">Transform Screenshots Into</span>
-                    <span class="title-gradient">Professional Mockups</span>
-                </h1>
-                <p class="hero-description">Turn your screenshots and images into stunning presentations with custom
-                    frames, shadows, and backgrounds. Perfect for portfolios, presentations, and marketing materials.
-                </p>
-
-                <div class="hero-actions">
-                    <button class="btn btn-primary btn-large" id="hero-cta">
-                        <i class="fas fa-rocket"></i>
-                        Start Creating Free
-                    </button>
-                </div>
-
-                <div class="trust-badges">
-                    <div class="trust-badge">
-                        <i class="fas fa-check-circle"></i>
-                        <span>100% Free</span>
-                    </div>
-                    <div class="trust-badge">
-                        <i class="fas fa-check-circle"></i>
-                        <span>No Watermarks</span>
-                    </div>
-                    <div class="trust-badge">
-                        <i class="fas fa-check-circle"></i>
-                        <span>No Sign-Up Required</span>
-                    </div>
-                </div>
-
-                <div class="scroll-indicator">
-                    <div class="scroll-arrow">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
+                <div class="nav-actions">
+                    <button class="btn btn-primary" id="get-started-btn">Start Creating</button>
                 </div>
             </div>
+        </nav>
 
-            <div class="hero-visual">
-                <div class="app-window">
-                    <div class="window-header">
-                        <div class="window-controls">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <div class="window-bar"></div>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-magic"></i>
+                        <span>Free Screenshot Studio Alternative</span>
                     </div>
-                    <div class="window-content">
-                        <div class="sidebar">
-                            <div class="sidebar-item active"></div>
-                            <div class="sidebar-item"></div>
-                            <div class="sidebar-item"></div>
+
+                    <h1 class="hero-title">
+                        <span class="title-main">Transform Screenshots Into</span>
+                        <span class="title-gradient">Professional Mockups</span>
+                    </h1>
+                    <p class="hero-description">Turn your screenshots and images into stunning presentations with custom
+                        frames, shadows, and backgrounds. Perfect for portfolios, presentations, and marketing
+                        materials.
+                    </p>
+
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-large" id="hero-cta">
+                            <i class="fas fa-rocket"></i>
+                            Start Creating Free
+                        </button>
+                    </div>
+
+                    <div class="trust-badges">
+                        <div class="trust-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>100% Free</span>
                         </div>
-                        <div class="main-area">
-                            <div class="canvas-placeholder">
-                                <div class="mockup-placeholder">
-                                    <i class="fas fa-image"></i>
+                        <div class="trust-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>No Watermarks</span>
+                        </div>
+                        <div class="trust-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>No Sign-Up Required</span>
+                        </div>
+                    </div>
+
+                    <div class="scroll-indicator">
+                        <div class="scroll-arrow">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="app-window">
+                        <div class="window-header">
+                            <div class="window-controls">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="window-bar"></div>
+                        </div>
+                        <div class="window-content">
+                            <div class="sidebar">
+                                <div class="sidebar-item active"></div>
+                                <div class="sidebar-item"></div>
+                                <div class="sidebar-item"></div>
+                            </div>
+                            <div class="main-area-landing">
+                                <div class="canvas-placeholder">
+                                    <div class="mockup-placeholder">
+                                        <i class="fas fa-image"></i>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="properties-panel">
+                                <div class="panel-item"></div>
+                                <div class="panel-item"></div>
+                                <div class="panel-item"></div>
+                            </div>
                         </div>
-                        <div class="properties-panel">
-                            <div class="panel-item"></div>
-                            <div class="panel-item"></div>
-                            <div class="panel-item"></div>
+                    </div>
+                    <div class="glow-effect"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Everything You Need for Perfect Mockups</h2>
+                    <p class="section-subtitle">Professional tools designed for developers, designers, and marketers who
+                        want stunning presentations.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h3>Custom Backgrounds</h3>
+                        <p>Choose from colors, gradients, or upload custom images with professional filters and effects
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-adjust"></i>
+                        </div>
+                        <h3>Advanced Shadows</h3>
+                        <p>Fine-tune shadow positioning, blur, opacity, and color for realistic depth and dimension</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3>Textures & Effects</h3>
+                        <p>Add paper, canvas, grain, and fabric textures with customizable blend modes and intensity</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <h3>Text Overlays</h3>
+                        <p>Add custom typography with multiple layers, shadows, and positioning controls</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-stamp"></i>
+                        </div>
+                        <h3>Watermarks</h3>
+                        <p>Brand your mockups with logo watermarks and precise opacity and positioning controls</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Platform Ready</h3>
+                        <p>Export for Instagram, LinkedIn, App Store, or custom dimensions with one click</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">How FrameIt Works</h2>
+                    <p class="section-subtitle">Transform your screenshots into professional mockups in three simple
+                        steps
+                    </p>
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Upload Any Image</h3>
+                            <p>Drag and drop your screenshots, designs, or any image. Supports PNG, JPEG, and WebP
+                                formats.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Style Your Mockup</h3>
+                            <p>Add device frames, customize shadows, choose backgrounds, and apply professional effects
+                                with
+                                our intuitive editor.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Export & Present</h3>
+                            <p>Download your professional mockup in high resolution, perfect for portfolios, app stores,
+                                and
+                                presentations.</p>
                         </div>
                     </div>
                 </div>
-                <div class="glow-effect"></div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Everything You Need for Perfect Mockups</h2>
-                <p class="section-subtitle">Professional tools designed for developers, designers, and marketers who
-                    want stunning presentations.</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <h3>Custom Backgrounds</h3>
-                    <p>Choose from colors, gradients, or upload custom images with professional filters and effects</p>
+        <!-- FAQ Section -->
+        <section class="faq">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Everything you need to know about FrameIt</p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-adjust"></i>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h4>Is FrameIt really free?</h4>
+                        <p>Yes! FrameIt is completely free to use with unlimited exports and no watermarks. No credit
+                            card
+                            required.</p>
                     </div>
-                    <h3>Advanced Shadows</h3>
-                    <p>Fine-tune shadow positioning, blur, opacity, and color for realistic depth and dimension</p>
-                </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-layer-group"></i>
+                    <div class="faq-item">
+                        <h4>What image formats does FrameIt support?</h4>
+                        <p>FrameIt supports PNG, JPEG, WebP, and other major image formats. Upload any screenshot or
+                            design
+                            and export in
+                            high-quality formats.</p>
                     </div>
-                    <h3>Textures & Effects</h3>
-                    <p>Add paper, canvas, grain, and fabric textures with customizable blend modes and intensity</p>
-                </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-font"></i>
+                    <div class="faq-item">
+                        <h4>Can I use FrameIt mockups commercially?</h4>
+                        <p>Absolutely! Use your FrameIt mockups for app stores, client presentations, portfolios, and
+                            marketing materials without restrictions.
+                        </p>
                     </div>
-                    <h3>Text Overlays</h3>
-                    <p>Add custom typography with multiple layers, shadows, and positioning controls</p>
-                </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-stamp"></i>
+                    <div class="faq-item">
+                        <h4>Do I need to download any software?</h4>
+                        <p>No downloads needed! FrameIt runs entirely in your web browser on desktop, tablet, or mobile.
+                        </p>
                     </div>
-                    <h3>Watermarks</h3>
-                    <p>Brand your mockups with logo watermarks and precise opacity and positioning controls</p>
-                </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
+                    <div class="faq-item">
+                        <h4>What's the maximum image size I can upload?</h4>
+                        <p>Upload images up to 10MB in size. FrameIt exports your mockups in high resolution up to 4K
+                            quality.
+                        </p>
                     </div>
-                    <h3>Platform Ready</h3>
-                    <p>Export for Instagram, LinkedIn, App Store, or custom dimensions with one click</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Trusted by section removed - being honest about early stage -->
-
-    <!-- Stats section removed - being honest about early stage -->
-
-    <!-- How It Works Section -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">How FrameIt Works</h2>
-                <p class="section-subtitle">Transform your screenshots into professional mockups in three simple steps
-                </p>
-            </div>
-
-            <div class="steps-grid">
-                <div class="step-item">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Upload Any Image</h3>
-                        <p>Drag and drop your screenshots, designs, or any image. Supports PNG, JPEG, and WebP formats.
+                    <div class="faq-item">
+                        <h4>Are my mockup projects saved?</h4>
+                        <p>Yes! Your mockup projects are automatically saved in your browser, so you can return and edit
+                            them anytime.
                         </p>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="step-item">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Style Your Mockup</h3>
-                        <p>Add device frames, customize shadows, choose backgrounds, and apply professional effects with
-                            our intuitive editor.</p>
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to Create Stunning Mockups?</h2>
+                    <p class="cta-subtitle">Start creating professional mockups in seconds</p>
+                    <button class="btn btn-primary btn-large" id="final-cta">
+                        <i class="fas fa-rocket"></i>
+                        Get Started Free
+                    </button>
+                    <p class="cta-note">No credit card required • Start creating immediately</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <a href="/" class="footer-brand">
+                        <span class="logo-icon">🖼️</span>
+                        <span class="brand-text">FrameIt</span>
+                        <p>Transform screenshots into professional mockups</p>
+                    </a>
+
+                    <div class="footer-links">
+                        <div class="footer-section">
+                            <h4>Product</h4>
+                            <ul>
+                                <li><a href="#features">Features</a></li>
+                                <li><a href="#" id="app-link">Launch App</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-section">
+                            <h4>Support</h4>
+                            <ul>
+                                <li><a href="https://docs.oddomens.com" target="_blank"
+                                        rel="noopener noreferrer">Documentation</a></li>
+                                <li><a href="mailto:support@oddomens.com">Contact</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-section">
+                            <h4>Legal</h4>
+                            <ul>
+                                <li><a href="privacy.html">Privacy Policy</a></li>
+                                <li><a href="terms.html">Terms of Service</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <div class="step-item">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Export & Present</h3>
-                        <p>Download your professional mockup in high resolution, perfect for portfolios, app stores, and
-                            presentations.</p>
+                <div class="footer-bottom">
+                    <p>&copy; 2024 FrameIt by Odd Omens. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- END LANDING PAGE -->
+
+
+    <!-- APP CONTAINER -->
+    <div class="app-container" style="display: none;">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="brand">
+                <span class="logo-icon">🖼️</span>
+                <span class="file-name">Untitled Mockup</span>
+            </div>
+            <div class="header-actions"></div>
+        </header>
+
+        <div class="workspace">
+            <!-- Main Canvas Area -->
+            <main class="main-area">
+                <div class="canvas-viewport" id="canvas-viewport">
+                    <canvas id="main-canvas"></canvas>
+
+                    <div id="upload-overlay" class="upload-overlay">
+                        <div class="upload-content">
+                            <h3>Upload Image</h3>
+                            <p>Drag & drop or Click</p>
+                        </div>
+                        <input type="file" id="file-input" accept="image/*" multiple>
+                    </div>
+                </div>
+            </main>
+
+            <!-- LEFT PANEL: LAYERS + TYPOGRAPHY + ANIMATIONS -->
+            <div class="floating-panel left-panel active" id="layers-panel">
+                <div class="panel-header" id="layers-drag-handle">
+                    <span>Layouts & Images</span>
+                    <div class="panel-actions">
+                        <button class="icon-btn" id="btn-close-app" title="Exit to Home">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+
+                    <!-- Layouts -->
+                    <div class="prop-section">
+                        <div class="section-title">Layout</div>
+                        <div class="layout-grid">
+                            <button class="layout-btn active" data-layout="single" title="Single">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                                </svg>
+                            </button>
+                            <button class="layout-btn" data-layout="row" title="Row (2)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="4" width="9" height="16" rx="2" />
+                                    <rect x="13" y="4" width="9" height="16" rx="2" />
+                                </svg>
+                            </button>
+                            <button class="layout-btn" data-layout="row-3" title="Row (3)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="4" width="6" height="16" rx="1" />
+                                    <rect x="9" y="4" width="6" height="16" rx="1" />
+                                    <rect x="16" y="4" width="6" height="16" rx="1" />
+                                </svg>
+                            </button>
+                            <button class="layout-btn" data-layout="col" title="Stack (2)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="4" y="2" width="16" height="9" rx="2" />
+                                    <rect x="4" y="13" width="16" height="9" rx="2" />
+                                </svg>
+                            </button>
+                            <button class="layout-btn" data-layout="grid" title="Grid (4)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="3" width="8" height="8" rx="1" />
+                                    <rect x="13" y="3" width="8" height="8" rx="1" />
+                                    <rect x="3" y="13" width="8" height="8" rx="1" />
+                                    <rect x="13" y="13" width="8" height="8" rx="1" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="control-row mt-2">
+                            <label class="toggle-label">
+                                <span>Enable Smart Crop</span>
+                                <div style="display:flex; align-items:center;">
+                                    <input type="checkbox" id="check-smart-crop">
+                                    <span class="toggle-switch"></span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Image Layers -->
+                    <div class="prop-section">
+                        <div class="section-title">Images</div>
+                        <div id="layer-list" class="layer-list">
+                            <!-- Items populated by JS -->
+                        </div>
+                        <button id="btn-add-layer" class="btn outline w-100 mt-2">
+                            + Add Image
+                        </button>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: FRAME PROPERTIES -->
+            <div class="floating-panel active" id="prop-panel">
+                <div class="panel-header" id="panel-drag-handle">
+                    <span>Frame</span>
+                    <div class="panel-actions">
+                        <button id="btn-toggle-layers-small" class="icon-btn active" title="Toggle Sidebar">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <line x1="9" y1="3" x2="9" y2="21" />
+                            </svg>
+                        </button>
+                        <button id="btn-toggle-anim" class="icon-btn" title="Animations">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polygon points="10 8 16 12 10 16 10 8" />
+                            </svg>
+                        </button>
+                        <button id="btn-add-text-shortcut" class="icon-btn" title="Add Text">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 7V4h16v3" />
+                                <path d="M9 20h6" />
+                                <path d="M12 4v16" />
+                            </svg>
+                        </button>
+                        <button id="btn-download" class="icon-btn primary-icon" title="Export">
+                            <span style="font-size:10px;">Export</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-content">
+                    <div class="prop-section">
+                        <div class="section-title">Canvas</div>
+                        <div class="segmented-control w-100" id="res-control">
+                            <button class="segment active" data-res="story">Story</button>
+                            <button class="segment" data-res="portrait">Portrait</button>
+                            <button class="segment" data-res="square">Square</button>
+                        </div>
+                    </div>
+
+                    <div class="prop-section">
+                        <div class="control-row">
+                            <div class="label-group"><label>Frame Style</label></div>
+                            <div class="segmented-control w-100" id="frame-style-control">
+                                <button class="segment active" data-frame="none">None</button>
+                                <button class="segment" data-frame="browser">Browser</button>
+                                <button class="segment" data-frame="phone">Phone</button>
+                            </div>
+                        </div>
+                        <div class="control-row mt-2" id="browser-theme-row" style="display: none;">
+                            <div class="label-group"><label>Theme</label></div>
+                            <div class="segmented-control w-100" id="frame-theme-control">
+                                <button class="segment active" data-theme="light">Light</button>
+                                <button class="segment" data-theme="dark">Dark</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prop-section">
+                        <div class="section-title">Image</div>
+                        <div class="control-row">
+                            <div class="label-group"><label>Scale</label><span class="val-display"
+                                    id="val-scale">100%</span></div>
+                            <input type="range" class="pill-slider" id="slider-scale" min="50" max="150" value="100">
+                        </div>
+                        <div class="control-row mt-2">
+                            <div class="label-group"><label>Radius</label><span class="val-display"
+                                    id="val-radius">20px</span></div>
+                            <input type="range" class="pill-slider" id="slider-radius" min="0" max="200" value="20">
+                        </div>
+                    </div>
+
+                    <div class="prop-section">
+                        <div class="section-title">Shadow</div>
+                        <div class="control-row">
+                            <div class="label-group"><label>Blur</label><span class="val-display"
+                                    id="val-blur">40</span></div>
+                            <input type="range" class="pill-slider" id="slider-blur" min="0" max="100" value="40">
+                        </div>
+                        <div class="control-row mt-2">
+                            <div class="label-group"><label>Y-Off</label><span class="val-display"
+                                    id="val-offset">20</span></div>
+                            <input type="range" class="pill-slider" id="slider-offset" min="-50" max="50" value="20">
+                        </div>
+                        <div class="control-row mt-2">
+                            <div class="label-group"><label>Opacity</label><span class="val-display"
+                                    id="val-opacity">40%</span></div>
+                            <input type="range" class="pill-slider" id="slider-opacity" min="0" max="100" value="40">
+                        </div>
+                    </div>
+
+                    <div class="prop-section">
+                        <div class="section-title">Effects</div>
+                        <div class="effect-grid" id="texture-grid">
+                            <button class="effect-btn active" data-texture="none"></button>
+                            <button class="effect-btn" data-texture="noise"></button>
+                            <button class="effect-btn" data-texture="grain"></button>
+                            <button class="effect-btn" data-texture="scanlines"></button>
+                            <button class="effect-btn" data-texture="halftone"></button>
+                            <button class="effect-btn" data-texture="grid"></button>
+                            <button class="effect-btn" data-texture="fabric"></button>
+                            <button class="effect-btn" data-texture="vignette"></button>
+                        </div>
+                        <div class="control-row">
+                            <div class="label-group"><label>Intensity</label><span class="val-display"
+                                    id="val-texture">30%</span></div>
+                            <input type="range" class="pill-slider" id="slider-texture" min="0" max="100" value="30">
+                        </div>
+                    </div>
+
+                    <div class="prop-section icon-grid-section">
+                        <div class="section-title">Background</div>
+                        <div class="bg-input-row">
+                            <div class="color-preview"><input type="color" id="input-bg-color" value="#1a1a1a"></div>
+                            <input type="text" id="hex-input" value="1A1A1A" class="hex-text">
+                        </div>
+                        <div class="gradient-grid" id="gradient-grid"></div>
                     </div>
                 </div>
             </div>
+
+            <!-- TYPOGRAPHY PANEL (Separate) -->
+            <div class="floating-panel active" id="text-panel" style="top: 360px; left: 20px;">
+                <div class="panel-header" id="text-drag-handle">
+                    <span>Typography</span>
+                    <div class="panel-actions">
+                        <button id="btn-close-text" class="icon-btn" title="Close">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="prop-section">
+                        <div id="text-layer-list" class="layer-list"></div>
+                        <button id="btn-add-text-panel" class="btn outline w-100 mt-2">+ Add Text</button>
+                    </div>
+
+                    <div class="prop-section mt-2" id="text-edit-controls">
+                        <!-- Removed display:none so it's visible or managed by selection state -->
+                        <div class="section-title">Edit Text</div>
+                        <textarea id="text-content" rows="3" placeholder="Select text to edit..."
+                            class="text-area-input"></textarea>
+
+                        <div class="control-row mt-2">
+                            <select id="font-family" class="select-input">
+                                <option value="Inter">Inter</option>
+                                <option value="Roboto">Roboto</option>
+                                <option value="Lato">Lato</option>
+                                <option value="Montserrat">Montserrat</option>
+                                <option value="Open Sans">Open Sans</option>
+                                <option value="Oswald">Oswald</option>
+                                <option value="Merriweather">Merriweather</option>
+                                <option value="Playfair Display">Playfair</option>
+                                <option value="Space Mono">Space Mono</option>
+                                <option value="Arial">Arial</option>
+                            </select>
+                        </div>
+                        <div class="control-row mt-2">
+                            <div class="label-group"><label>Size</label><span class="val-display"
+                                    id="val-font-size">60</span></div>
+                            <input type="range" class="pill-slider" id="slider-font-size" min="20" max="300" value="60">
+                        </div>
+                        <div class="control-row mt-2">
+                            <div class="label-group"><label>Color</label></div>
+                            <div class="bg-input-row">
+                                <div class="color-preview"><input type="color" id="input-text-color" value="#ffffff">
+                                </div>
+                                <input type="text" id="text-hex-input" value="FFFFFF" class="hex-text">
+                            </div>
+                        </div>
+                        <button class="btn secondary w-100 mt-2" id="btn-delete-text">Delete Layer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANIMATION PANEL (Separate) -->
+            <div class="floating-panel active" id="animation-panel" style="top: 20px; left: 320px;">
+                <div class="panel-header" id="anim-drag-handle">
+                    <span>Animation</span>
+                    <div class="panel-actions">
+                        <button id="btn-close-anim" class="icon-btn" title="Close">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div id="anim-controls">
+                        <div class="prop-section">
+                            <div class="section-title" style="font-weight:400; font-size:9px;">Style</div>
+                            <div class="anim-grid" id="anim-style-control">
+                                <button class="anim-btn active" data-anim="static">
+                                    <div class="anim-preview"></div>
+                                    <span>Static</span>
+                                </button>
+                                <button class="anim-btn" data-anim="gentle" title="Gentle">
+                                    <div class="anim-preview scale"></div>
+                                    <span>Gentle</span>
+                                </button>
+                                <button class="anim-btn" data-anim="pop" title="Pop">
+                                    <div class="anim-preview scale-fast"></div>
+                                    <span>Pop</span>
+                                </button>
+                                <button class="anim-btn" data-anim="slide" title="Slide">
+                                    <div class="anim-preview slide-up"></div>
+                                    <span>Slide</span>
+                                </button>
+                                <button class="anim-btn" data-anim="pulse" title="Pulse">
+                                    <div class="anim-preview pulse"></div>
+                                    <span>Pulse</span>
+                                </button>
+                                <button class="anim-btn" data-anim="float" title="Float">
+                                    <div class="anim-preview float"></div>
+                                    <span>Float</span>
+                                </button>
+                                <button class="anim-btn" data-anim="spin" title="Spin">
+                                    <div class="anim-preview spin"></div>
+                                    <span>Spin</span>
+                                </button>
+                                <button class="anim-btn" data-anim="glitch" title="Glitch">
+                                    <div class="anim-preview glitch"></div>
+                                    <span>Glitch</span>
+                                </button>
+                                <button class="anim-btn" data-anim="zoom" title="Zoom">
+                                    <div class="anim-preview zoom"></div>
+                                    <span>Zoom</span>
+                                </button>
+                                <button class="anim-btn" data-anim="bounce" title="Bounce">
+                                    <div class="anim-preview bounce"></div>
+                                    <span>Bounce</span>
+                                </button>
+                                <button class="anim-btn" data-anim="fade" title="Fade">
+                                    <div class="anim-preview fade"></div>
+                                    <span>Fade</span>
+                                </button>
+                                <button class="anim-btn" data-anim="swing" title="Swing">
+                                    <div class="anim-preview swing"></div>
+                                    <span>Swing</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Timing Controls -->
+                        <div class="prop-section mt-2">
+                            <div class="section-title" style="font-weight:400; font-size:9px;">Video Duration</div>
+                            <div class="segmented-control w-100" id="anim-duration-control">
+                                <button class="segment active" data-duration="5">5s</button>
+                                <button class="segment" data-duration="10">10s</button>
+                                <button class="segment" data-duration="15">15s</button>
+                            </div>
+                        </div>
+
+                        <div class="prop-section">
+                            <div class="control-row">
+                                <div class="label-group"><label>Speed</label><span class="val-display"
+                                        id="val-anim-speed">1x</span></div>
+                                <input type="range" class="pill-slider" id="slider-anim-speed" min="0.5" max="2"
+                                    step="0.1" value="1">
+                            </div>
+                        </div>
+
+                        <div class="prop-section">
+                            <div class="control-row">
+                                <div class="label-group"><label>Offset</label><span class="val-display"
+                                        id="val-anim-offset">0ms</span></div>
+                                <input type="range" class="pill-slider" id="slider-anim-offset" min="0" max="500"
+                                    step="50" value="0">
+                            </div>
+                        </div>
+
+                        <div class="prop-section">
+                            <div class="control-row">
+                                <div class="label-group"><label>Intensity</label><span class="val-display"
+                                        id="val-anim-intensity">1x</span></div>
+                                <input type="range" class="pill-slider" id="slider-anim-intensity" min="0.5" max="2"
+                                    step="0.1" value="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </section>
-
-    <!-- Showcase section removed - keeping it simple and honest -->
-
-    <!-- Testimonials section removed - being honest about early stage -->
-
-    <!-- FAQ Section -->
-    <section class="faq">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Frequently Asked Questions</h2>
-                <p class="section-subtitle">Everything you need to know about FrameIt</p>
-            </div>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h4>Is FrameIt really free?</h4>
-                    <p>Yes! FrameIt is completely free to use with unlimited exports and no watermarks. No credit card
-                        required.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4>What image formats does FrameIt support?</h4>
-                    <p>FrameIt supports PNG, JPEG, WebP, and other major image formats. Upload any screenshot or design
-                        and export in
-                        high-quality formats.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4>Can I use FrameIt mockups commercially?</h4>
-                    <p>Absolutely! Use your FrameIt mockups for app stores, client presentations, portfolios, and
-                        marketing materials without restrictions.
-                    </p>
-                </div>
-
-                <div class="faq-item">
-                    <h4>Do I need to download any software?</h4>
-                    <p>No downloads needed! FrameIt runs entirely in your web browser on desktop, tablet, or mobile.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4>What's the maximum image size I can upload?</h4>
-                    <p>Upload images up to 10MB in size. FrameIt exports your mockups in high resolution up to 4K
-                        quality.
-                    </p>
-                </div>
-
-                <div class="faq-item">
-                    <h4>Are my mockup projects saved?</h4>
-                    <p>Yes! Your mockup projects are automatically saved in your browser, so you can return and edit
-                        them anytime.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta">
-        <div class="container">
-            <div class="cta-content">
-                <h2 class="cta-title">Ready to Create Stunning Mockups?</h2>
-                <p class="cta-subtitle">Start creating professional mockups in seconds</p>
-                <button class="btn btn-primary btn-large" id="final-cta">
-                    <i class="fas fa-rocket"></i>
-                    Get Started Free
-                </button>
-                <p class="cta-note">No credit card required • Start creating immediately</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <a href="/" class="footer-brand">
-                    <img src="img/logo.png" alt="FrameIt" class="brand-icon-img" height="32">
-                    <span class="brand-text">FrameIt</span>
-                    <p>Transform screenshots into professional mockups</p>
-                </a>
-
-                <div class="footer-links">
-                    <div class="footer-section">
-                        <h4>Product</h4>
-                        <ul>
-                            <li><a href="#features">Features</a></li>
-                            <li><a href="#" id="app-link">Launch App</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-section">
-                        <h4>Support</h4>
-                        <ul>
-                            <li><a href="https://docs.oddomens.com" target="_blank"
-                                    rel="noopener noreferrer">Documentation</a></li>
-                            <li><a href="mailto:support@oddomens.com">Contact</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-section">
-                        <h4>Legal</h4>
-                        <ul>
-                            <li><a href="privacy.html">Privacy Policy</a></li>
-                            <li><a href="terms.html">Terms of Service</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2024 FrameIt by Odd Omens. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Auth modal removed - no authentication needed -->
-
-    <!-- Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/analytics-simple.js"></script>
-    <script>
-        // Modern landing page functionality
-        class LandingPage {
-            constructor() {
-                this.init();
-            }
-
-            init() {
-                this.setupNavbar();
-                this.setupModals();
-                this.setupAuth();
-                this.loadStats();
-                this.setupSmoothScroll();
-                // Stats animation removed - no stats to animate
-                this.setupParallax();
-            }
-
-            setupParallax() {
-                // Parallax disabled for now - pseudo-elements can't be selected with JS
-                // The CSS animations provide enough visual interest
-                console.log('✨ Parallax effects handled by CSS animations');
-            }
-
-            setupNavbar() {
-                const navbar = document.getElementById('navbar');
-
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 50) {
-                        navbar.classList.add('scrolled');
-                    } else {
-                        navbar.classList.remove('scrolled');
-                    }
-                });
-            }
-
-            setupModals() {
-                // Set up CTA buttons to go to app when clicked
-                ['get-started-btn', 'hero-cta', 'final-cta'].forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.addEventListener('click', () => {
-                            // Go directly to app - no authentication needed
-                            window.location.href = 'app.html';
-                        });
-                    }
-                });
-
-                // Set up app link in footer
-                const appLink = document.getElementById('app-link');
-                if (appLink) {
-                    appLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        window.location.href = 'app.html';
-                    });
-                }
-            }
-
-            setupAuth() {
-                // No authentication needed - removed
-                console.log('✅ Authentication bypassed - direct access enabled');
-            }
-
-            // Stats animation functions removed - no fake stats
-
-            async loadStats() {
-                try {
-                    // Try to get cached stats first
-                    const cachedStats = this.getCachedStats();
-                    if (cachedStats) {
-                        this.updateStats(cachedStats);
-                        return;
-                    }
-
-                    // Fallback to API
-                    const response = await fetch('/api/global-stats');
-                    if (response.ok) {
-                        const stats = await response.json();
-                        this.updateStats(stats);
-                    }
-                } catch (error) {
-                    console.log('Using default stats');
-                    // Keep default 0 values
-                }
-            }
-
-            getCachedStats() {
-                try {
-                    const cached = localStorage.getItem('frameit_global_stats_cache');
-                    const hasRealData = localStorage.getItem('frameit_real_data_available');
-
-                    if (!cached || !hasRealData) return null;
-
-                    const stats = JSON.parse(cached);
-                    const lastUpdated = new Date(stats.lastUpdated);
-                    const now = new Date();
-
-                    // Cache expires after 1 hour
-                    if ((now - lastUpdated) / (1000 * 60 * 60) > 1) return null;
-
-                    return {
-                        users: stats.users || 0,
-                        exports: stats.exports || 0
-                    };
-                } catch {
-                    return null;
-                }
-            }
-
-            updateStats(stats) {
-                this.animateNumber('stat-users', stats.users || 0);
-                this.animateNumber('stat-exports', stats.exports || 0);
-            }
-
-            animateNumber(elementId, targetValue, duration = 2000) {
-                const element = document.getElementById(elementId);
-                if (!element || targetValue === 0) return;
-
-                const startValue = 0;
-                const increment = targetValue / (duration / 16);
-                let currentValue = startValue;
-
-                const updateNumber = () => {
-                    currentValue += increment;
-                    if (currentValue >= targetValue) {
-                        element.textContent = this.formatNumber(targetValue);
-                        return;
-                    }
-                    element.textContent = this.formatNumber(Math.floor(currentValue));
-                    requestAnimationFrame(updateNumber);
-                };
-
-                updateNumber();
-            }
-
-            formatNumber(num) {
-                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-                return num.toLocaleString();
-            }
-
-            setupSmoothScroll() {
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                    anchor.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const target = document.querySelector(this.getAttribute('href'));
-                        if (target) {
-                            target.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-                    });
-                });
-
-                // Add click handler for scroll indicator
-                const scrollIndicator = document.querySelector('.scroll-indicator');
-                if (scrollIndicator) {
-                    scrollIndicator.addEventListener('click', () => {
-                        const featuresSection = document.querySelector('.features');
-                        if (featuresSection) {
-                            featuresSection.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-                    });
-                }
-            }
-        }
-
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add loading class to body
-            document.body.classList.add('loading');
-
-            // Initialize landing page
-            const landingPage = new LandingPage();
-
-            // Remove loading class after a short delay
-            setTimeout(() => {
-                document.body.classList.remove('loading');
-                document.body.classList.add('loaded');
-            }, 500);
-        });
-    </script>
+    </div>
+    <script src="app.js"></script>
 </body>
 
 </html>
