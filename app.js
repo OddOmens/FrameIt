@@ -160,7 +160,7 @@ const ELEMENTS = {
     landingPage: document.getElementById('landing-page'),
     appContainer: document.querySelector('.app-container'),
     startBtns: document.querySelectorAll('#get-started-btn, #hero-cta, #final-cta'),
-    btnCloseApp: document.getElementById('btn-close-app'),
+    btnCloseLayers: document.getElementById('btn-close-layers'),
 
     // Handles
     dragHandle: document.getElementById('panel-drag-handle'),
@@ -503,11 +503,10 @@ function setupEventListeners() {
     //     ELEMENTS.btnToggleLayersSmall.classList.remove('active');
     // });
 
-    if (ELEMENTS.btnCloseApp) {
-        ELEMENTS.btnCloseApp.addEventListener('click', () => {
-            ELEMENTS.appContainer.style.display = 'none';
-            ELEMENTS.landingPage.style.display = 'block';
-            window.scrollTo(0, 0);
+    if (ELEMENTS.btnCloseLayers) {
+        ELEMENTS.btnCloseLayers.addEventListener('click', () => {
+            ELEMENTS.layersPanel.classList.remove('active');
+            ELEMENTS.btnToggleLayersSmall.classList.remove('active');
         });
     }
 
