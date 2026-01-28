@@ -1390,19 +1390,15 @@ function roundRect(ctx, x, y, width, height, radius) {
 
 
 
-function downloadCanvas() {
-    if (state.animation.enabled) {
-        exportVideo();
-    } else {
-        const prevSel = state.selectedTextId; state.selectedTextId = null;
-        state.snappedX = false; state.snappedY = false;
-        draw();
-        setTimeout(() => {
-            const link = document.createElement('a'); link.download = `frameit-${state.resolution.id}.png`;
-            link.href = ELEMENTS.canvas.toDataURL('image/png', 1.0); link.click();
-            state.selectedTextId = prevSel; draw();
-        }, 50);
-    }
+function exportImage() {
+    const prevSel = state.selectedTextId; state.selectedTextId = null;
+    state.snappedX = false; state.snappedY = false;
+    draw();
+    setTimeout(() => {
+        const link = document.createElement('a'); link.download = `frameit-${state.resolution.id}.png`;
+        link.href = ELEMENTS.canvas.toDataURL('image/png', 1.0); link.click();
+        state.selectedTextId = prevSel; draw();
+    }, 50);
 }
 
 function exportVideo() {
