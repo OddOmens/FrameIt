@@ -1299,7 +1299,7 @@ canvas {
 /* Buttons */
 .btn.outline {
     background: transparent;
-    border: 1px dashed #444;
+    border: 1px solid #444;
     color: #888;
 }
 

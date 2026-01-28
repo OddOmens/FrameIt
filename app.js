@@ -26,7 +26,7 @@ const state = {
     // Animation State
     animation: {
         enabled: true, // Always enabled
-        style: 'gentle',
+        style: 'static',
         duration: 5,
         speed: 1,
         offset: 0,
@@ -46,6 +46,18 @@ const state = {
 
 // Utils
 const generateId = () => Math.random().toString(36).substr(2, 9);
+
+function exportImage() {
+    const prevSel = state.selectedTextId; state.selectedTextId = null;
+    state.snappedX = false; state.snappedY = false;
+    draw();
+    setTimeout(() => {
+        const link = document.createElement('a'); link.download = `frameit-${state.resolution.id}.png`;
+        link.href = ELEMENTS.canvas.toDataURL('image/png', 1.0); link.click();
+        state.selectedTextId = prevSel; draw();
+    }, 50);
+}
+
 const GRADIENTS = [
     // Pastels & Soft
     'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
@@ -1386,19 +1398,6 @@ function roundRect(ctx, x, y, width, height, radius) {
     if (width < 2 * radius) radius = width / 2; if (height < 2 * radius) radius = height / 2;
     ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.arcTo(x + width, y, x + width, y + height, radius); ctx.arcTo(x + width, y + height, x, y + height, radius);
     ctx.arcTo(x, y + height, x, y, radius); ctx.arcTo(x, y, x + width, y, radius); ctx.closePath();
-}
-
-
-
-function exportImage() {
-    const prevSel = state.selectedTextId; state.selectedTextId = null;
-    state.snappedX = false; state.snappedY = false;
-    draw();
-    setTimeout(() => {
-        const link = document.createElement('a'); link.download = `frameit-${state.resolution.id}.png`;
-        link.href = ELEMENTS.canvas.toDataURL('image/png', 1.0); link.click();
-        state.selectedTextId = prevSel; draw();
-    }, 50);
 }
 
 function exportVideo() {
