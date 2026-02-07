@@ -64,7 +64,7 @@
     --bg-input: #383838;
     --bg-input-hover: #444444;
     --border-app: #444444;
-    --accent-app: #0C8CE9;
+    --accent-app: #EA2E83;
     --text-main: #FFFFFF;
     --text-muted-app: #A0A0A0;
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -163,15 +163,21 @@ body {
 }
 
 .btn-primary {
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    border-color: var(--text-primary);
+    background: #EA2E83;
+    color: var(--text-primary);
+    border-color: #EA2E83;
 }
 
 .btn-primary:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
+    background: #d42070;
+    border-color: #d42070;
     transform: translateY(-1px);
+}
+
+.logo-icon-img {
+    height: 1.5em;
+    width: auto;
+    vertical-align: middle;
 }
 
 .btn-large {
@@ -885,9 +891,7 @@ label,
     width: 100px;
 }
 
-.logo-icon {
-    font-size: 16px;
-}
+
 
 .header-actions {
     width: 100px;
